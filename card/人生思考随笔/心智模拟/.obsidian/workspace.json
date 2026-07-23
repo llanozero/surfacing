@@ -1,0 +1,226 @@
+{
+  "main": {
+    "id": "9474b599ebeb2f7a",
+    "type": "split",
+    "children": [
+      {
+        "id": "08cd0b214094048a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1c8df18476d2090c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "实践指导手册-自然涌现与能量管理.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "实践指导手册-自然涌现与能量管理"
+            }
+          },
+          {
+            "id": "d3b8b0a61d608004",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "未命名.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "未命名"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "46e366d0613cdc9e",
+    "type": "split",
+    "children": [
+      {
+        "id": "40f5178c10c5eb5d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6f6081b9601098d1",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "433b2719eda76354",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "9d34fa2853507bb5",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "bb791c44686d8bde",
+    "type": "split",
+    "children": [
+      {
+        "id": "c0cf135b49b837cc",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3f576d118347c902",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "01-信念库/15-信念库-权威成长资源三角定理.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "15-信念库-权威成长资源三角定理 的反向链接列表"
+            }
+          },
+          {
+            "id": "2eb8161540acd770",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "01-信念库/15-信念库-权威成长资源三角定理.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "15-信念库-权威成长资源三角定理 的出链列表"
+            }
+          },
+          {
+            "id": "82c9afbfffec9886",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "1d520001265e4e82",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "01-信念库/15-信念库-权威成长资源三角定理.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "15-信念库-权威成长资源三角定理 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "bases:新建数据库": false,
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "d3b8b0a61d608004",
+  "lastOpenFiles": [
+    "未命名 1.md",
+    "实践指导手册-自然涌现与能量管理.md",
+    "DL.pdf",
+    "ER.pdf",
+    "WP1.pdf",
+    "WP.pdf",
+    "博客文章-从聪明反被聪明误到战略去魅.md",
+    "设计者视角/14-定理体系调用指南.md",
+    "执行者视角/背诵卡片-五阶段执行口诀.md",
+    "设计者视角/01-信念库/22-信念库-战略去魅与战术归真体系.md",
+    "执行者视角/逻辑链执行纲领-从直觉启动到黑盒交付.md",
+    "执行者视角/快速诊断-问题识别与实例匹配.md",
+    "设计者视角/14-定理体系调用指南.md.baiduyun.uploading.cfg",
+    "设计者视角/02-欲望库/11-欲望库-工作与成长.md.baiduyun.uploading.cfg",
+    "设计者视角/02-欲望库/10-欲望库-治疗目标.md.baiduyun.uploading.cfg",
+    "设计者视角/01-信念库/21-信念库-身份真实性与黑盒价值体系.md.baiduyun.uploading.cfg",
+    "设计者视角/01-信念库/20-信念库-手感与拆解时机的智慧.md.baiduyun.uploading.cfg",
+    "设计者视角/01-信念库/19-信念库-低迷状态与能量循环管理.md.baiduyun.uploading.cfg",
+    "执行者视角/执行者视角-信念库调用指南.md",
+    "01-信念库/15-信念库-权威成长资源三角定理.md",
+    "01-信念库/11-信念库-内向特质与工作模式.md",
+    "02-BDI模型设计.md",
+    "未命名.md",
+    "01-信念库/14-定理体系调用指南.md",
+    "01-信念库/13-信念库-社会生存定理体系.md",
+    "01-信念库/12-信念库-个体成长定理体系.md",
+    "02-欲望库/11-欲望库-工作与成长.md",
+    "02-欲望库/10-欲望库-治疗目标.md",
+    "01-信念库/09-信念库-创伤疗愈.md",
+    "README.md",
+    "10-欲望库-治疗目标.md",
+    "09-信念库-创伤疗愈.md",
+    "08-多人格系统治疗框架.md",
+    "06-用户界面设计.md",
+    "05-LLM集成方案.md",
+    "04-后台运作机制.md"
+  ]
+}

@@ -1,0 +1,663 @@
+network_id: life-essay-state-network-v2
+title: 人生思考随笔状态网 V2
+description: 基于《人生思考随笔》目录重构的四阶段主线、专题支线与螺旋 checkpoint 网络。
+start_node_ids:
+  - entry_book_root
+metadata:
+  topic_key: life-essay
+  topic_label: 人生思考随笔
+  source_dir: C:/Users/llano/.astrbot/data/人生思考随笔
+  blueprint_doc: C:/Users/llano/.astrbot/data/人生思考随笔/状态网V2转换规范与映射蓝图.md
+  recommended_initial_state:
+    stage: 0
+    spiral_round: 1
+    theory_depth: 0
+    defense_awareness: 0
+    breakthrough_ready: 0
+    modeling_depth: 0
+    social_leverage: 0
+    topic_relationship: 0
+    topic_expression: 0
+    topic_neurotype: 0
+    topic_narrative: 0
+    topic_social_erosion: 0
+nodes:
+  entry_book_root:
+    node_id: entry_book_root
+    title: 全书入口
+    description: 从 README 进入整套材料，先理解这是一个从理论框架到社会跃迁的主线系统，而不是松散文章集合。
+    category: scene
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - entry_nav_hub
+      - stage_overview
+    candidate_conditions:
+      entry_nav_hub: []
+      stage_overview: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 入口
+      - README
+      - 主线
+    canvas_position:
+      x: 480
+      y: 60
+
+  entry_nav_hub:
+    node_id: entry_nav_hub
+    title: 导航中枢
+    description: 按当前阅读目的和所处状态，把读者分流到新读者路径、破局路径、建模路径、跃迁路径或专题路径。
+    category: gateway
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - path_new_reader
+      - path_breakthrough
+      - path_modeling
+      - path_transition
+      - path_topics
+    candidate_conditions:
+      path_new_reader: []
+      path_breakthrough: []
+      path_modeling: []
+      path_transition: []
+      path_topics: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - NAV
+      - 分流
+      - gateway
+    canvas_position:
+      x: 480
+      y: 180
+
+  path_new_reader:
+    node_id: path_new_reader
+    title: 新读者路径
+    description: 适合第一次进入这套材料的人，从整体框架建立全景，再进入四阶段主线。
+    category: gateway
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_overview
+      - stage_1_theory_framework
+    candidate_conditions:
+      stage_overview: []
+      stage_1_theory_framework: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 新读者
+      - 总览
+      - 路径
+    canvas_position:
+      x: 160
+      y: 320
+
+  path_breakthrough:
+    node_id: path_breakthrough
+    title: 破局路径
+    description: 适合已经感到低容错压力、失望重构和惯性失效的人，直接进入防御分析与破局部分。
+    category: gateway
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_2_defense_analysis
+      - stage_2_breakthrough
+    candidate_conditions:
+      stage_2_defense_analysis: []
+      stage_2_breakthrough:
+        - source: state
+          key: defense_awareness
+          operator: '>='
+          value: 1
+          target_key: null
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 破局
+      - 防御
+      - 路径
+    canvas_position:
+      x: 320
+      y: 320
+
+  path_modeling:
+    node_id: path_modeling
+    title: 建模路径
+    description: 适合已有真实经验、希望提炼规则模型的人，从 Stage 3 建模入口开始推进。
+    category: gateway
+    entry_conditions:
+      - source: state
+        key: breakthrough_ready
+        operator: '>='
+        value: 1
+        target_key: null
+    unlock_rules: []
+    candidate_targets:
+      - stage_3_modeling
+    candidate_conditions:
+      stage_3_modeling: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 建模
+      - 经验抽象
+      - 路径
+    canvas_position:
+      x: 480
+      y: 320
+
+  path_transition:
+    node_id: path_transition
+    title: 跃迁路径
+    description: 适合已经形成模型、准备讨论社会部署、身份演戏与杠杆置换的人。
+    category: gateway
+    entry_conditions:
+      - source: state
+        key: modeling_depth
+        operator: '>='
+        value: 1
+        target_key: null
+    unlock_rules: []
+    candidate_targets:
+      - stage_4_transition
+    candidate_conditions:
+      stage_4_transition: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 跃迁
+      - 杠杆
+      - 路径
+    canvas_position:
+      x: 640
+      y: 320
+
+  path_topics:
+    node_id: path_topics
+    title: 专题路径
+    description: 适合从关系、表达、神经类型、叙事包装或原子化社会切入，再回流主线。
+    category: gateway
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - topic_hub
+    candidate_conditions:
+      topic_hub: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 专题
+      - 支线
+      - 路径
+    canvas_position:
+      x: 800
+      y: 320
+
+  stage_overview:
+    node_id: stage_overview
+    title: 四阶段总纲
+    description: 用压缩方式说明四大核心阶段的递进关系，帮助读者理解整体骨架、主线问题意识和螺旋推进方式。
+    category: scene
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_1_theory_framework
+    candidate_conditions:
+      stage_1_theory_framework: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 总纲
+      - 四阶段
+      - 概览
+    canvas_position:
+      x: 480
+      y: 460
+
+  stage_1_theory_framework:
+    node_id: stage_1_theory_framework
+    title: Stage 1 系统论基础
+    description: 对应 Part0_TheoryFramework，从稳态、损失函数、分布式部署与预测加工闭环出发，建立人类行为的底层操作系统。
+    category: scene
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - checkpoint_stage_1
+      - topic_social_erosion
+    candidate_conditions:
+      checkpoint_stage_1: []
+      topic_social_erosion: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - Stage1
+      - 理论框架
+      - 系统论
+    canvas_position:
+      x: 480
+      y: 620
+
+  checkpoint_stage_1:
+    node_id: checkpoint_stage_1
+    title: Stage 1 检测点
+    description: 判断读者是否已经完成系统论层面的经验、反思、抽象与实践循环，准备进入防御分析阶段。
+    category: gateway
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_2_defense_analysis
+      - stage_1_theory_framework
+    candidate_conditions:
+      stage_2_defense_analysis:
+        - source: state
+          key: theory_depth
+          operator: '>='
+          value: 1
+          target_key: null
+      stage_1_theory_framework: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - checkpoint
+      - Stage1
+      - 螺旋
+    canvas_position:
+      x: 480
+      y: 760
+
+  stage_2_defense_analysis:
+    node_id: stage_2_defense_analysis
+    title: Stage 2 防御分析
+    description: 对应资源、传承与失望部分，把失望、低容错率和防御性生存策略重新翻译成系统问题。
+    category: scene
+    entry_conditions:
+      - source: state
+        key: theory_depth
+        operator: '>='
+        value: 1
+        target_key: null
+    unlock_rules: []
+    candidate_targets:
+      - stage_2_breakthrough
+      - topic_neurotype_translation
+    candidate_conditions:
+      stage_2_breakthrough: []
+      topic_neurotype_translation: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - Stage2
+      - 失望
+      - 防御
+    canvas_position:
+      x: 300
+      y: 920
+
+  stage_2_breakthrough:
+    node_id: stage_2_breakthrough
+    title: Stage 2 破局与锚定
+    description: 对应 Part1_Breakthrough，从惯性脚本失效、觉醒触发和核心框架锚定出发，找到最小可行破局点。
+    category: scene
+    entry_conditions:
+      - source: state
+        key: theory_depth
+        operator: '>='
+        value: 1
+        target_key: null
+    unlock_rules: []
+    candidate_targets:
+      - checkpoint_stage_2
+      - topic_relationship_matching
+      - topic_expression_rhythm
+    candidate_conditions:
+      checkpoint_stage_2: []
+      topic_relationship_matching: []
+      topic_expression_rhythm: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - Stage2
+      - 破局
+      - 锚定
+    canvas_position:
+      x: 660
+      y: 920
+
+  checkpoint_stage_2:
+    node_id: checkpoint_stage_2
+    title: Stage 2 检测点
+    description: 判断读者是否已能识别防御机制并准备进入经验建模，或需要从专题和主线重新补采样。
+    category: gateway
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_3_modeling
+      - topic_hub
+      - stage_1_theory_framework
+    candidate_conditions:
+      stage_3_modeling:
+        - source: state
+          key: defense_awareness
+          operator: '>='
+          value: 1
+          target_key: null
+        - source: state
+          key: breakthrough_ready
+          operator: '>='
+          value: 1
+          target_key: null
+      topic_hub: []
+      stage_1_theory_framework: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - checkpoint
+      - Stage2
+      - 分流
+    canvas_position:
+      x: 480
+      y: 1080
+
+  stage_3_modeling:
+    node_id: stage_3_modeling
+    title: Stage 3 经验建模
+    description: 对应 Part2_Modeling，把战场采样、特征值提取、痛点货币化和虚拟化复现组织成可复用规则模型。
+    category: scene
+    entry_conditions:
+      - source: state
+        key: defense_awareness
+        operator: '>='
+        value: 1
+        target_key: null
+      - source: state
+        key: breakthrough_ready
+        operator: '>='
+        value: 1
+        target_key: null
+    unlock_rules: []
+    candidate_targets:
+      - checkpoint_stage_3
+      - topic_hub
+    candidate_conditions:
+      checkpoint_stage_3: []
+      topic_hub: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - Stage3
+      - 建模
+      - 特征值
+    canvas_position:
+      x: 480
+      y: 1240
+
+  checkpoint_stage_3:
+    node_id: checkpoint_stage_3
+    title: Stage 3 检测点
+    description: 判断读者是否已经把个人经验抽象为可验证、可传播的模型，还是需要回到 Stage 2 继续采样和校正。
+    category: gateway
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_4_transition
+      - stage_2_breakthrough
+    candidate_conditions:
+      stage_4_transition:
+        - source: state
+          key: modeling_depth
+          operator: '>='
+          value: 1
+          target_key: null
+      stage_2_breakthrough: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - checkpoint
+      - Stage3
+      - 回退
+    canvas_position:
+      x: 480
+      y: 1380
+
+  stage_4_transition:
+    node_id: stage_4_transition
+    title: Stage 4 跃迁与部署
+    description: 对应 Part3_Transition，把已经成型的模型部署进社会系统，通过身份演戏、风口伏击和杠杆置换争取规则参与权。
+    category: scene
+    entry_conditions:
+      - source: state
+        key: modeling_depth
+        operator: '>='
+        value: 1
+        target_key: null
+    unlock_rules: []
+    candidate_targets:
+      - checkpoint_stage_4
+      - topic_narrative_packaging
+    candidate_conditions:
+      checkpoint_stage_4: []
+      topic_narrative_packaging: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - Stage4
+      - 跃迁
+      - 杠杆
+    canvas_position:
+      x: 480
+      y: 1540
+
+  checkpoint_stage_4:
+    node_id: checkpoint_stage_4
+    title: Stage 4 检测点
+    description: 判断本轮是否完成从个人模型到社会部署的转换；如果完成，则回到入口开启新一轮螺旋，否则回到建模阶段修正模型。
+    category: gateway
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - entry_nav_hub
+      - stage_3_modeling
+    candidate_conditions:
+      entry_nav_hub:
+        - source: state
+          key: social_leverage
+          operator: '>='
+          value: 1
+          target_key: null
+      stage_3_modeling: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - checkpoint
+      - Stage4
+      - 新螺旋
+    canvas_position:
+      x: 480
+      y: 1680
+
+  topic_hub:
+    node_id: topic_hub
+    title: 专题支线入口
+    description: 从主线切入五个高频专题：关系匹配、表达节奏、神经类型与社交翻译、叙事包装、原子化社会互动侵蚀。
+    category: gateway
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - topic_relationship_matching
+      - topic_expression_rhythm
+      - topic_neurotype_translation
+      - topic_narrative_packaging
+      - topic_social_erosion
+    candidate_conditions:
+      topic_relationship_matching: []
+      topic_expression_rhythm: []
+      topic_neurotype_translation: []
+      topic_narrative_packaging: []
+      topic_social_erosion: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 专题
+      - 支线
+      - hub
+    canvas_position:
+      x: 980
+      y: 1080
+
+  topic_relationship_matching:
+    node_id: topic_relationship_matching
+    title: 专题一 关系匹配与双向补缺
+    description: 对应关系匹配、阶段兼容与双向选择问题，适合作为 Stage 2 破局期的关系建模补充。
+    category: scene
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_2_breakthrough
+    candidate_conditions:
+      stage_2_breakthrough: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 专题一
+      - 关系
+      - 匹配
+    canvas_position:
+      x: 860
+      y: 1220
+
+  topic_expression_rhythm:
+    node_id: topic_expression_rhythm
+    title: 专题二 表达风险与对话节奏
+    description: 对应表达风险、节奏控制和练习场建设，帮助读者把破局阶段的输出方式变得更可执行。
+    category: scene
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_2_breakthrough
+    candidate_conditions:
+      stage_2_breakthrough: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 专题二
+      - 表达
+      - 节奏
+    canvas_position:
+      x: 980
+      y: 1220
+
+  topic_neurotype_translation:
+    node_id: topic_neurotype_translation
+    title: 专题三 神经类型与社交翻译
+    description: 对应神经类型差异、低容错表达与社交翻译，最适合回流到 Stage 2 的防御分析与节点兼容问题。
+    category: scene
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_2_defense_analysis
+    candidate_conditions:
+      stage_2_defense_analysis: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 专题三
+      - 神经类型
+      - 社交翻译
+    canvas_position:
+      x: 1100
+      y: 1220
+
+  topic_narrative_packaging:
+    node_id: topic_narrative_packaging
+    title: 专题四 叙事包装与舞台杠杆
+    description: 对应叙事包装、愿景建构与舞台 leverage，是 Stage 4 跃迁与部署的天然支线延展。
+    category: scene
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_4_transition
+    candidate_conditions:
+      stage_4_transition: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 专题四
+      - 叙事
+      - 杠杆
+    canvas_position:
+      x: 1220
+      y: 1220
+
+  topic_social_erosion:
+    node_id: topic_social_erosion
+    title: 专题五 原子化社会与互动侵蚀
+    description: 对应互动生态断裂与社会侵蚀问题，既可从理论框架进入，也可回流到防御分析阶段继续理解环境约束。
+    category: scene
+    entry_conditions: []
+    unlock_rules: []
+    candidate_targets:
+      - stage_1_theory_framework
+      - stage_2_defense_analysis
+    candidate_conditions:
+      stage_1_theory_framework: []
+      stage_2_defense_analysis: []
+    linked_assessment_ids: []
+    linked_requirements_ids: []
+    linked_sequence_ids: []
+    workflow_code: ''
+    tags:
+      - 专题五
+      - 原子化
+      - 互动侵蚀
+    canvas_position:
+      x: 1340
+      y: 1220

@@ -1,0 +1,30 @@
+{
+	"nodes":[
+		{"id":"b6e12eeffc93a17e","type":"file","file":"分支_挣扎诊断.md","x":160,"y":-200,"width":400,"height":400},
+		{"id":"ef93eac9d41a0166","type":"file","file":"分支_挣扎逻辑.md","x":160,"y":340,"width":400,"height":400},
+		{"id":"5eb32226ed1c2908","type":"file","file":"分支_松动与逃避.md","x":780,"y":60,"width":400,"height":400},
+		{"id":"26c9a1440cdf2f3e","type":"file","file":"心流导航模拟.md","x":-480,"y":60,"width":400,"height":400},
+		{"id":"9eddc073c5f823cd","type":"file","file":"分支_心流与继承.md","x":1320,"y":-200,"width":400,"height":400},
+		{"id":"6919bcffe9c85981","type":"file","file":"分支_日常实战.md","x":1320,"y":340,"width":400,"height":400},
+		{"id":"dd19b317af58eab3","type":"file","file":"分支_恢复与懈怠.md","x":1880,"y":-200,"width":400,"height":400},
+		{"id":"52e9c60a0bb895fb","type":"file","file":"分支_涌现与随机.md","x":1880,"y":340,"width":400,"height":400},
+		{"id":"8c94e3b0726deadd","type":"file","file":"分支_循环死锁.md","x":2400,"y":60,"width":400,"height":400},
+		{"id":"6247724a37fec02f","type":"file","file":"分支_彻底淡化.md","x":2920,"y":340,"width":400,"height":400},
+		{"id":"c2dc922d890dd81b","type":"file","file":"开放空间_禅.md","x":2920,"y":-400,"width":400,"height":400}
+	],
+	"edges":[
+		{"id":"078140b121eb8476","fromNode":"5eb32226ed1c2908","fromSide":"right","toNode":"9eddc073c5f823cd","toSide":"left"},
+		{"id":"a1242b6ad70955b4","fromNode":"5eb32226ed1c2908","fromSide":"right","toNode":"6919bcffe9c85981","toSide":"left"},
+		{"id":"1c831eedf5ed9372","fromNode":"6919bcffe9c85981","fromSide":"right","toNode":"52e9c60a0bb895fb","toSide":"left"},
+		{"id":"1e6f78c1be56c945","fromNode":"9eddc073c5f823cd","fromSide":"right","toNode":"dd19b317af58eab3","toSide":"left"},
+		{"id":"e2dfcae2714e7439","fromNode":"dd19b317af58eab3","fromSide":"right","toNode":"c2dc922d890dd81b","toSide":"left"},
+		{"id":"bd00525efd141c02","fromNode":"8c94e3b0726deadd","fromSide":"right","toNode":"c2dc922d890dd81b","toSide":"left"},
+		{"id":"c24ad2d149885da5","fromNode":"8c94e3b0726deadd","fromSide":"right","toNode":"6247724a37fec02f","toSide":"left"},
+		{"id":"0ca9d8d98c70b530","fromNode":"52e9c60a0bb895fb","fromSide":"right","toNode":"8c94e3b0726deadd","toSide":"left"},
+		{"id":"2a296c8f3020b83c","fromNode":"26c9a1440cdf2f3e","fromSide":"right","toNode":"b6e12eeffc93a17e","toSide":"left"},
+		{"id":"32ea000e44d4a971","fromNode":"26c9a1440cdf2f3e","fromSide":"right","toNode":"ef93eac9d41a0166","toSide":"left"},
+		{"id":"74d08fa772606582","fromNode":"b6e12eeffc93a17e","fromSide":"right","toNode":"5eb32226ed1c2908","toSide":"left"},
+		{"id":"5e4c2b98d0a0d01e","fromNode":"ef93eac9d41a0166","fromSide":"right","toNode":"5eb32226ed1c2908","toSide":"left"},
+		{"id":"abac89653a1b5289","fromNode":"dd19b317af58eab3","fromSide":"right","toNode":"8c94e3b0726deadd","toSide":"left"}
+	]
+}

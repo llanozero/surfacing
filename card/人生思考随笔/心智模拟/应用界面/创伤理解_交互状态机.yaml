@@ -1,0 +1,522 @@
+flow_id: trauma-understanding-interaction-v1
+title: 创伤理解交互状态机
+description: >
+  将“冻结的灵魂与变贵的理解”议题拆成单卡顺序脚本与读后分类器，
+  用于交互式阅读、态度识别、偏好采集与接口匹配。
+version: "1.0"
+start_node_id: entry
+metadata:
+  topic_key: trauma-understanding
+  topic_label: 创伤理解
+  source_docs:
+    - C:/Users/llano/.astrbot/data/人生思考随笔/冻结的灵魂与变贵的理解：为什么成年后的修复如此艰难？.md
+    - C:/Users/llano/.astrbot/data/人生思考随笔/心智模拟/应用界面/创伤理解_单卡顺序脚本.md
+    - C:/Users/llano/.astrbot/data/人生思考随笔/心智模拟/应用界面/创伤理解_态度与偏好分类器.md
+  initial_state:
+    current_card_index: 0
+    comprehension_depth: 0
+    emotional_openness: 0
+    structural_curiosity: 0
+    defensiveness: 0
+    pacing_tolerance: 0
+    attitude: unknown
+    entry_mode: unknown
+    support_role: unknown
+    pace: unknown
+    continue_permission: true
+nodes:
+  entry:
+    node_id: entry
+    title: 交互入口
+    category: gateway
+    description: 建立低压阅读预期，说明这是一套逐卡理解流程，而不是要求对方立刻表态。
+    prompt: >
+      这是一组一张一张读的卡片。每次只看一个核心意思，不急着下结论。
+      你只需要告诉我：继续、停一下，或者这张你是否有感觉。
+    candidate_targets:
+      - card_1_survival_mode
+    candidate_conditions:
+      card_1_survival_mode: []
+
+  card_1_survival_mode:
+    node_id: card_1_survival_mode
+    title: 卡片1 生存模式
+    category: card
+    description: 将问题从性格缺陷转到长期防御后遗症。
+    core_text: >
+      当别人在练习社交、亲密和朝气时，复杂创伤的幸存者往往把大量生命能量用于防御。
+      成年后留下的，不只是疲惫，而是一整套被生存模式重塑过的反应方式。
+    allowed_responses:
+      - continue
+      - resonate
+      - confused
+      - pause
+    state_effects:
+      continue:
+        comprehension_depth: 1
+      resonate:
+        emotional_openness: 1
+      confused:
+        structural_curiosity: 1
+      pause:
+        continue_permission: false
+    candidate_targets:
+      - card_2_missed_season
+      - pause_soft
+    candidate_conditions:
+      card_2_missed_season:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: true
+          target_key: null
+      pause_soft:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: false
+          target_key: null
+
+  card_2_missed_season:
+    node_id: card_2_missed_season
+    title: 卡片2 错过花期感
+    category: card
+    description: 解释迟到感与窗口期焦虑。
+    core_text: >
+      很多成年创伤者真正痛的，不只是现在难受，而是会觉得别人早就练过的东西，
+      自己现在才准备补课，于是误以为自己以后都不会再被世界温柔对待。
+    allowed_responses:
+      - continue
+      - resonate
+      - unsure
+      - pause
+    state_effects:
+      resonate:
+        emotional_openness: 1
+      unsure:
+        structural_curiosity: 1
+      pause:
+        continue_permission: false
+    candidate_targets:
+      - card_3_support_shift
+      - pause_soft
+    candidate_conditions:
+      card_3_support_shift:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: true
+          target_key: null
+      pause_soft:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: false
+          target_key: null
+
+  card_3_support_shift:
+    node_id: card_3_support_shift
+    title: 卡片3 支持结构位移
+    category: card
+    description: 解释成年修复更难，是因为社会托底减少。
+    core_text: >
+      年轻时，很多脆弱会被社会视作“还在长”；成年后，同样的退缩和迟疑，
+      往往不再被看成成长的一部分，而被当成应当自理的问题。
+    allowed_responses:
+      - continue
+      - understand
+      - think_more
+      - pause
+    state_effects:
+      understand:
+        comprehension_depth: 1
+      think_more:
+        structural_curiosity: 1
+      pause:
+        continue_permission: false
+    candidate_targets:
+      - card_4_social_burden
+      - pause_soft
+    candidate_conditions:
+      card_4_social_burden:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: true
+          target_key: null
+      pause_soft:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: false
+          target_key: null
+
+  card_4_social_burden:
+    node_id: card_4_social_burden
+    title: 卡片4 沉重感如何被接收
+    category: card
+    description: 解释他人退缩未必出于冷酷，也可能出于承载不足。
+    core_text: >
+      对普通人来说，社交像能量交换；对创伤者来说，社交常像防御演习。
+      长期警觉留下的焦虑与紧迫，会让旁人感觉“这件事我可能承接不起”。
+    allowed_responses:
+      - continue
+      - understand_retreat
+      - pressure
+      - pause
+    state_effects:
+      understand_retreat:
+        comprehension_depth: 1
+      pressure:
+        defensiveness: 1
+      pause:
+        continue_permission: false
+    candidate_targets:
+      - card_5_costly_understanding
+      - pause_soft
+    candidate_conditions:
+      card_5_costly_understanding:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: true
+          target_key: null
+      pause_soft:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: false
+          target_key: null
+
+  card_5_costly_understanding:
+    node_id: card_5_costly_understanding
+    title: 卡片5 理解为何变贵
+    category: card
+    description: 解释求助本身为何成了高消耗动作。
+    core_text: >
+      成年后的难点之一，是你不能再只靠“表现脆弱”来获得帮助，
+      还要先判断对方是否具备理解这份复杂度的能力。
+    allowed_responses:
+      - continue
+      - get_it
+      - new_to_me
+      - pause
+    state_effects:
+      get_it:
+        comprehension_depth: 1
+      new_to_me:
+        structural_curiosity: 1
+      pause:
+        continue_permission: false
+    candidate_targets:
+      - card_6_catastrophe_prediction
+      - pause_soft
+    candidate_conditions:
+      card_6_catastrophe_prediction:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: true
+          target_key: null
+      pause_soft:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: false
+          target_key: null
+
+  card_6_catastrophe_prediction:
+    node_id: card_6_catastrophe_prediction
+    title: 卡片6 绝望推演
+    category: card
+    description: 把“再也不会得到帮助”从事实改写为防御机制。
+    core_text: >
+      “我以后不会再被帮助了”的感觉，往往也是创伤逻辑的一部分，
+      它通过先预演最坏结果，来减少再次落空时的伤害。
+    allowed_responses:
+      - continue
+      - remember
+      - reserve
+      - pause
+    state_effects:
+      remember:
+        emotional_openness: 1
+      reserve:
+        structural_curiosity: 1
+      pause:
+        continue_permission: false
+    candidate_targets:
+      - card_7_help_has_changed
+      - pause_soft
+    candidate_conditions:
+      card_7_help_has_changed:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: true
+          target_key: null
+      pause_soft:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: false
+          target_key: null
+
+  card_7_help_has_changed:
+    node_id: card_7_help_has_changed
+    title: 卡片7 帮助换了形态
+    category: card
+    description: 从“扶起我”转向“带接口的共振”。
+    core_text: >
+      成年人的帮助，往往不再是别人一眼看穿你、主动把你抱起来，
+      而是当你能描述自己的状态、节奏和边界时，有能力的人更容易知道该怎么靠近。
+    allowed_responses:
+      - continue
+      - hopeful
+      - not_sure
+      - pause
+    state_effects:
+      hopeful:
+        emotional_openness: 1
+      not_sure:
+        structural_curiosity: 1
+      pause:
+        continue_permission: false
+    candidate_targets:
+      - card_8_interface
+      - pause_soft
+    candidate_conditions:
+      card_8_interface:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: true
+          target_key: null
+      pause_soft:
+        - source: state
+          key: continue_permission
+          operator: '='
+          value: false
+          target_key: null
+
+  card_8_interface:
+    node_id: card_8_interface
+    title: 卡片8 建立接口
+    category: card
+    description: 把目标从泛泛安慰切换到接口匹配。
+    core_text: >
+      真正需要的不是泛泛安慰，而是一个更合适的接口：
+      对方愿不愿意理解、理解到多深、适合承接情绪还是结构、
+      愿意陪伴还是更适合给边界与信息。
+    allowed_responses:
+      - enter_classifier
+      - stop_here
+      - lighter_version
+    state_effects:
+      enter_classifier:
+        comprehension_depth: 1
+      stop_here:
+        continue_permission: false
+      lighter_version:
+        pacing_tolerance: -1
+    candidate_targets:
+      - classifier_attitude
+      - pause_soft
+    candidate_conditions:
+      classifier_attitude:
+        - source: response
+          key: action
+          operator: '='
+          value: enter_classifier
+          target_key: null
+      pause_soft:
+        - source: response
+          key: action
+          operator: '!='
+          value: enter_classifier
+          target_key: null
+
+  classifier_attitude:
+    node_id: classifier_attitude
+    title: 分类器 态度层
+    category: classifier
+    description: 判断对方更开放、好奇、观望还是防御。
+    prompt: >
+      你现在更接近哪种感觉：能理解、想知道、需要消化，还是有点想退？
+    outputs:
+      can_understand: open
+      want_to_know: curious
+      need_digest: cautious
+      want_to_retreat: defensive
+    candidate_targets:
+      - classifier_entry_mode
+    candidate_conditions:
+      classifier_entry_mode: []
+
+  classifier_entry_mode:
+    node_id: classifier_entry_mode
+    title: 分类器 入口偏好
+    category: classifier
+    description: 判断更适合情绪、结构还是边界入口。
+    prompt: >
+      如果继续聊，你更适合先听感受、先听逻辑，还是先讲清楚互动边界？
+    outputs:
+      feelings_first: emotion
+      logic_first: structure
+      boundaries_first: boundary
+    candidate_targets:
+      - classifier_role
+    candidate_conditions:
+      classifier_role: []
+
+  classifier_role:
+    node_id: classifier_role
+    title: 分类器 承接角色
+    category: classifier
+    description: 判断对方适合扮演陪伴者、整理者、建议者还是外围读者。
+    prompt: >
+      如果继续，你更适合陪我理一理、帮我整理结构、帮我看现实选项，还是先只读到这里？
+    outputs:
+      stay_with_you: companion
+      organize_it: organizer
+      suggest_options: advisor
+      keep_it_light: peripheral
+    candidate_targets:
+      - classifier_pace
+    candidate_conditions:
+      classifier_pace: []
+
+  classifier_pace:
+    node_id: classifier_pace
+    title: 分类器 节奏偏好
+    category: classifier
+    description: 判断适合慢速、短句、明边界还是暂停。
+    prompt: >
+      我们更适合慢一点聊、继续用短卡、先把边界讲清楚，还是今天先到这里？
+    outputs:
+      slow_talk: slow
+      short_cards: short
+      clear_boundary: bounded
+      stop_today: pause
+    candidate_targets:
+      - interface_matcher
+    candidate_conditions:
+      interface_matcher: []
+
+  interface_matcher:
+    node_id: interface_matcher
+    title: 接口匹配
+    category: gateway
+    description: 根据态度、入口、角色和节奏，给出合适的话术接口。
+    candidate_targets:
+      - interface_open_emotion_companion
+      - interface_curious_structure_organizer
+      - interface_cautious_boundary_peripheral
+      - interface_defensive_pause
+      - interface_generic
+    candidate_conditions:
+      interface_open_emotion_companion:
+        - source: state
+          key: attitude
+          operator: '='
+          value: open
+          target_key: null
+        - source: state
+          key: entry_mode
+          operator: '='
+          value: emotion
+          target_key: null
+        - source: state
+          key: support_role
+          operator: '='
+          value: companion
+          target_key: null
+      interface_curious_structure_organizer:
+        - source: state
+          key: attitude
+          operator: '='
+          value: curious
+          target_key: null
+        - source: state
+          key: entry_mode
+          operator: '='
+          value: structure
+          target_key: null
+        - source: state
+          key: support_role
+          operator: '='
+          value: organizer
+          target_key: null
+      interface_cautious_boundary_peripheral:
+        - source: state
+          key: attitude
+          operator: '='
+          value: cautious
+          target_key: null
+        - source: state
+          key: entry_mode
+          operator: '='
+          value: boundary
+          target_key: null
+      interface_defensive_pause:
+        - source: state
+          key: attitude
+          operator: '='
+          value: defensive
+          target_key: null
+      interface_generic: []
+
+  interface_open_emotion_companion:
+    node_id: interface_open_emotion_companion
+    title: 开放共振接口
+    category: outcome
+    recommended_interface: >
+      如果你愿意，我想慢一点讲，不是让你解决我，而是想让你知道这种状态里的人到底在经历什么。
+    avoid: >
+      不要立刻给结论，不要急着修理问题。
+
+  interface_curious_structure_organizer:
+    node_id: interface_curious_structure_organizer
+    title: 理性好奇接口
+    category: outcome
+    recommended_interface: >
+      你可以先不用代入情绪，只要帮我把这里面的结构和因果理一理，就已经很接近了。
+    avoid: >
+      不要要求对方立刻共情，不要把他推到安慰者位置。
+
+  interface_cautious_boundary_peripheral:
+    node_id: interface_cautious_boundary_peripheral
+    title: 谨慎观望接口
+    category: outcome
+    recommended_interface: >
+      你不需要马上理解全部，我们先停在“这不是单纯性格问题”这一层就够了。
+    avoid: >
+      不追问立场，不要求深聊，不一次性堆太多内容。
+
+  interface_defensive_pause:
+    node_id: interface_defensive_pause
+    title: 防御暂停接口
+    category: outcome
+    recommended_interface: >
+      没关系，这个话题到这里就可以。你不必现在进入，我也不打算勉强解释。
+    avoid: >
+      不继续证明自己，不试图追着让对方理解。
+
+  interface_generic:
+    node_id: interface_generic
+    title: 通用接口
+    category: outcome
+    recommended_interface: >
+      我们不需要一下子聊很深，只要找到一个双方都不太吃力的接口就够了。
+    avoid: >
+      不做过度承诺，不跳过分类直接深聊。
+
+  pause_soft:
+    node_id: pause_soft
+    title: 柔性暂停
+    category: outcome
+    recommended_interface: >
+      我们可以先停在这里，不急着把后面的内容走完。
+    avoid: >
+      不把暂停当作拒绝，不立刻补充更多解释。
+

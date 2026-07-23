@@ -1,0 +1,13 @@
+# 子项目（单独管理）
+coze-studio/
+
+# 参考仓库（只读，不参与项目提交）
+the-algorithm/
+x-algorithm/
+
+# 杂项
+*.msi
+log
+__pycache__/
+*.pyc
+.env

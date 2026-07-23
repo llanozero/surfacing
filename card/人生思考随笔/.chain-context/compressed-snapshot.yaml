@@ -1,0 +1,151 @@
+# 人生思考随笔 - 上下文压缩快照
+# 由 md-chain-integrity 生成
+
+session_id: "caodi-life-notes-v1"
+version: "1.0"
+compressed_at: "2024-04-19"
+valid_until: "2024-05-19"
+
+# === 核心元数据 ===
+project_name: "草台置换：从边缘博弈到规则定义的底层逻辑"
+theme: "人生思考与认知跃迁"
+target_audience: "高防御生存者、边缘博弈者、认知觉醒者"
+
+# === 四阶段核心框架 ===
+core_framework:
+  stage1:
+    name: "系统论基础"
+    key_concepts:
+      - "稳态导向的目标函数"
+      - "硬编码损失函数体系"
+      - "预测加工驱动闭环"
+      - "认知遮蔽与动力悖论"
+    files:
+      - "Part0_TheoryFramework.md"
+    duration_estimate: "30-45分钟"
+    
+  stage2:
+    name: "防御性生存策略"
+    key_concepts:
+      - "失望的系统论重构"
+      - "低容错率塑造防御结构"
+      - "节点兼容性调试"
+      - "惯性失效时的觉醒"
+    files:
+      - "Part0_ResourceInheritanceAndDisappointment.md"
+      - "Part1_Breakthrough.md"
+    duration_estimate: "45-60分钟"
+    
+  stage3:
+    name: "战场经验建模"
+    key_concepts:
+      - "最小可行破局点"
+      - "真实采样优先"
+      - "特征值提取"
+      - "痛点货币化"
+      - "虚拟化复现"
+    files:
+      - "Part1_Breakthrough.md"
+      - "Part2_Modeling.md"
+    duration_estimate: "40-50分钟"
+    
+  stage4:
+    name: "杠杆置换跃迁"
+    key_concepts:
+      - "身份演戏策略"
+      - "正式表演与职业化"
+      - "杠杆置换效应"
+      - "影响力变现"
+    files:
+      - "Part3_Transition.md"
+    duration_estimate: "30-40分钟"
+
+# === 专题展开索引 ===
+topics:
+  topic1:
+    title: "关系匹配、阶段兼容与双向补缺"
+    file: "Topic1_RelationshipMatchingAndMutualSelection.md"
+    relevance: ["stage2", "stage3"]
+  topic2:
+    title: "表达风险、对话节奏与练习场建设"
+    file: "Topic2_ExpressionRiskAndConversationRhythm.md"
+    relevance: ["stage2"]
+  topic3:
+    title: "神经类型差异、社交翻译与低容错表达"
+    file: "Topic3_NeurotypeAndSocialTranslation.md"
+    relevance: ["stage2"]
+  topic4:
+    title: "叙事包装、愿景建构与舞台杠杆"
+    file: "Topic4_NarrativePackagingAndStageLeverage.md"
+    relevance: ["stage3", "stage4"]
+  topic5:
+    title: "原子化社会与断裂中的互动生态"
+    file: "Topic5_AtomizedSocietyAndInteractionErosion.md"
+    relevance: ["stage1", "stage2"]
+
+# === 用户画像推断 ===
+user_profiles:
+  profile_a:
+    description: "刚接触概念，需要建立整体框架"
+    entry_point: "framework_overview"
+    recommended_path: ["overview", "stage1", "stage2"]
+    
+  profile_b:
+    description: "已在低容错环境生存，寻求破局方法"
+    entry_point: "breakthrough_selector"
+    recommended_path: ["stage2_summary", "stage3"]
+    
+  profile_c:
+    description: "已有个人经验，想提炼成模型"
+    entry_point: "modeling_guide"
+    recommended_path: ["stage3", "stage4"]
+    
+  profile_d:
+    description: "准备进入社会博弈，寻求跃迁策略"
+    entry_point: "transition_selector"
+    recommended_path: ["stage4", "topic4"]
+
+# === 导航树结构（预计算） ===
+navigation_tree:
+  entry: "NAV.md"
+  branches:
+    - id: "new_reader"
+      name: "新读者：建立框架"
+      target: "nav/00_new_reader/README.md"
+    - id: "seeking_breakthrough"
+      name: "寻求破局"
+      target: "nav/01_breakthrough/README.md"
+    - id: "modeling_experience"
+      name: "经验建模"
+      target: "nav/02_modeling/README.md"
+    - id: "social_transition"
+      name: "社会跃迁"
+      target: "nav/03_transition/README.md"
+    - id: "deep_dive"
+      name: "专题深入"
+      target: "nav/04_topics/README.md"
+
+# === 腐化检测结果 ===
+integrity_check:
+  status: "needs_restructure"
+  issues:
+    - "Part1_Breakthrough.md 同时属于 stage2 和 stage3，边界模糊"
+    - "专题展开与主文档的关系不明确"
+    - "缺少统一入口 NAV.md"
+    - "README.md 过于冗长，用户难以快速定位"
+  recommendations:
+    - "创建链式导航结构，明确阶段边界"
+    - "将专题展开与主线关联"
+    - "分离'了解框架'和'实际使用'两条路径"
+
+# === 压缩摘要 ===
+compressed_summary: |
+  这是一套关于"从边缘生存者到规则参与者"的认知跃迁指南。
+  核心逻辑：先理解人作为预测加工系统的运行机制(stage1)，
+  再理解低容错环境如何塑造防御性生存策略(stage2)，
+  然后把血泪经验提取为可复用的规则模型(stage3)，
+  最后通过身份演戏和杠杆置换完成社会跃迁(stage4)。
+  专题展开提供5个高密度场景：关系匹配、表达风险、神经类型差异、
+  叙事包装、原子化社会。需要为不同用户画像设计差异化的进入路径。
+
+next_session_hint: "基于用户当前状态，重建链式导航结构"

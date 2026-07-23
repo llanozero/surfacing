@@ -1,0 +1,6 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\llano\\Desktop\\ÁúÏº\\cognitive-cards']
+INFO:     Uvicorn running on http://0.0.0.0:8170 (Press CTRL+C to quit)
+INFO:     Started reloader process [3260] using WatchFiles
+INFO:     Started server process [4508]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

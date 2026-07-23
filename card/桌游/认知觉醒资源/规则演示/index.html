@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>认知觉醒：能量六环 — 规则演示</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    min-height: 100vh;
+  }
+
+  /* ===== Scrollbar ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+  /* ===== Layout ===== */
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+
+  /* ===== Navigation ===== */
+  .nav-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    background: #1e293b/80; backdrop-filter: blur(8px);
+    border-radius: 16px; padding: 10px 16px;
+    position: sticky; top: 12px; z-index: 100;
+    background: rgba(30, 41, 59, 0.85);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  .nav-pills { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+  .nav-pill {
+    padding: 6px 16px; border-radius: 20px; cursor: pointer;
+    font-size: 14px; font-weight: 500; transition: all 0.2s;
+    border: 1px solid transparent; background: transparent;
+    color: #94a3b8; user-select: none;
+  }
+  .nav-pill:hover { color: #e2e8f0; background: rgba(255,255,255,0.06); }
+  .nav-pill.active { color: #fff; }
+  .nav-meta {
+    display: flex; gap: 4px; flex-wrap: wrap;
+    border-left: 1px solid #334155; padding-left: 12px; margin-left: auto;
+  }
+  .nav-meta-btn {
+    padding: 5px 12px; border-radius: 12px; cursor: pointer;
+    font-size: 13px; font-weight: 500; transition: all 0.2s;
+    border: 1px solid #334155; background: transparent;
+    color: #94a3b8; user-select: none; white-space: nowrap;
+  }
+  .nav-meta-btn:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
+  .nav-meta-btn.active { color: #fff; border-color: #60a5fa; background: rgba(96,165,250,0.12); }
+
+  /* ===== Hero ===== */
+  .hero {
+    padding: 32px 0 20px; text-align: center;
+    transition: opacity 0.25s;
+  }
+  .hero .phase-en { font-size: 14px; color: #64748b; letter-spacing: 2px; text-transform: uppercase; }
+  .hero .phase-cn { font-size: 32px; font-weight: 700; margin: 4px 0; }
+  .hero .phase-time { font-size: 14px; color: #94a3b8; }
+  .hero .phase-tagline { font-size: 15px; color: #cbd5e1; margin-top: 8px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+  .hero .phase-comm { margin-top: 8px; font-size: 14px; }
+  .hero .phase-comm span { display: inline-block; padding: 2px 12px; border-radius: 10px; background: rgba(255,255,255,0.06); }
+
+  /* ===== Resources ===== */
+  .resources-panel {
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    padding: 16px 0; margin-bottom: 20px;
+  }
+  .resource-card {
+    flex: 0 0 130px; padding: 12px 10px; border-radius: 12px;
+    background: rgba(30,41,59,0.6); border: 1px solid #334155;
+    text-align: center; transition: all 0.2s;
+  }
+  .resource-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .resource-dot {
+    display: inline-block; width: 12px; height: 12px;
+    border-radius: 50%; margin-bottom: 6px;
+  }
+  .resource-card .r-name { font-size: 14px; font-weight: 600; }
+  .resource-card .r-desc { font-size: 12px; color: #94a3b8; margin-top: 4px; line-height: 1.4; }
+
+  /* ===== Main Content ===== */
+  .main-content { transition: opacity 0.2s; }
+
+  /* ===== Rule Cards ===== */
+  .rule-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 800px) { .rule-grid { grid-template-columns: 1fr; } }
+  .rule-card {
+    background: rgba(30,41,59,0.65); border-radius: 14px;
+    padding: 18px; border: 1px solid rgba(51,65,85,0.6);
+    backdrop-filter: blur(4px);
+  }
+  .rule-card h3 {
+    font-size: 15px; font-weight: 600; margin-bottom: 12px;
+    padding-bottom: 6px; border-bottom: 2px solid #334155;
+  }
+  .rule-card ul { list-style: none; padding: 0; }
+  .rule-card li {
+    font-size: 13px; line-height: 1.6; padding: 6px 0;
+    border-bottom: 1px solid rgba(51,65,85,0.3);
+    font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", "Consolas", monospace;
+    color: #cbd5e1;
+  }
+  .rule-card li:last-child { border-bottom: none; }
+  .rule-card li strong { color: #e2e8f0; }
+  .rule-card p { font-size: 13px; line-height: 1.6; color: #cbd5e1; font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", "Consolas", monospace; }
+
+  /* ===== Supervision + Flow ===== */
+  .info-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 700px) { .info-row { grid-template-columns: 1fr; } }
+  .info-card {
+    background: rgba(30,41,59,0.5); border-radius: 12px;
+    padding: 16px; border: 1px solid rgba(51,65,85,0.4);
+  }
+  .info-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .info-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .info-table th, .info-table td {
+    padding: 6px 10px; text-align: left;
+    border-bottom: 1px solid rgba(51,65,85,0.3);
+  }
+  .info-table th { color: #94a3b8; font-weight: 500; width: 120px; }
+  .flow-chain {
+    display: flex; align-items: center; gap: 4px;
+    flex-wrap: wrap; justify-content: center;
+    font-size: 13px; margin-top: 6px;
+  }
+  .flow-chain .node {
+    padding: 4px 10px; border-radius: 8px;
+    background: rgba(255,255,255,0.06); font-weight: 500;
+  }
+  .flow-chain .arrow { color: #64748b; font-size: 16px; }
+  .flow-chain .current { border: 1px solid; }
+
+  /* ===== Special Mechanics ===== */
+  .spec-grid { display: grid; gap: 20px; }
+  .spec-block {
+    background: rgba(30,41,59,0.65); border-radius: 14px;
+    padding: 20px; border: 1px solid rgba(51,65,85,0.6);
+  }
+  .spec-block h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .spec-block h4 { font-size: 14px; font-weight: 500; color: #94a3b8; margin: 12px 0 6px; }
+  .spec-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; }
+  .spec-table th, .spec-table td {
+    padding: 8px 10px; text-align: left;
+    border-bottom: 1px solid rgba(51,65,85,0.3);
+  }
+  .spec-table th { color: #94a3b8; font-weight: 500; }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .spec-block ul { list-style: none; padding: 0; }
+  .spec-block ul li {
+    font-size: 13px; line-height: 1.6; padding: 5px 0;
+    padding-left: 16px; position: relative;
+  }
+  .spec-block ul li::before { content: "•"; position: absolute; left: 0; color: #64748b; }
+
+  /* ===== Card Types ===== */
+  .card-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .card-type-card {
+    background: rgba(30,41,59,0.65); border-radius: 12px;
+    padding: 16px; border: 1px solid rgba(51,65,85,0.6);
+    transition: all 0.2s;
+  }
+  .card-type-card:hover { transform: translateY(-2px); }
+  .card-type-card .ct-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .card-type-card .ct-name small { font-weight: 400; color: #64748b; font-size: 12px; margin-left: 4px; }
+  .card-type-card .ct-detail { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+  .card-type-card .ct-detail strong { color: #cbd5e1; }
+
+  /* ===== Flow Chart ===== */
+  .flow-chart-section { margin-top: 32px; padding-top: 20px; border-top: 1px solid #1e293b; }
+  .flow-chart-section h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; text-align: center; color: #94a3b8; }
+  .flow-chart {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    position: relative; padding: 16px 0;
+  }
+  .flow-row {
+    display: flex; align-items: center; gap: 24px; justify-content: center;
+    flex-wrap: wrap;
+  }
+  .flow-block {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 18px; border-radius: 12px;
+    background: rgba(30,41,59,0.6); border: 1px solid #334155;
+    min-width: 100px; text-align: center;
+    transition: all 0.2s; cursor: default;
+  }
+  .flow-block:hover { transform: scale(1.04); }
+  .flow-block .fb-name { font-size: 14px; font-weight: 600; }
+  .flow-block .fb-comm { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .flow-v-arrow { color: #334155; font-size: 18px; line-height: 1; }
+  .flow-h-arrow { color: #334155; font-size: 20px; }
+
+  /* ===== Accent colors ===== */
+  .accent-sleep { --accent: #6366f1; }
+  .accent-plan  { --accent: #f59e0b; }
+  .accent-focus { --accent: #ef4444; }
+  .accent-recovery { --accent: #14b8a6; }
+  .accent-collab { --accent: #a855f7; }
+  .accent-invest { --accent: #fbbf24; }
+
+  .accent-sleep .nav-pill.active { background: rgba(99,102,241,0.2); border-color: #6366f1; color: #a5b4fc; }
+  .accent-plan .nav-pill.active  { background: rgba(245,158,11,0.2); border-color: #f59e0b; color: #fcd34d; }
+  .accent-focus .nav-pill.active { background: rgba(239,68,68,0.2); border-color: #ef4444; color: #fca5a5; }
+  .accent-recovery .nav-pill.active { background: rgba(20,184,166,0.2); border-color: #14b8a6; color: #5eead4; }
+  .accent-collab .nav-pill.active { background: rgba(168,85,247,0.2); border-color: #a855f7; color: #d8b4fe; }
+  .accent-invest .nav-pill.active { background: rgba(251,191,36,0.2); border-color: #fbbf24; color: #fde68a; }
+
+  .hero .phase-cn { color: var(--accent, #e2e8f0); }
+  .rule-card h3 { color: var(--accent, #e2e8f0); }
+  .flow-chain .current { border-color: var(--accent, #e2e8f0); color: var(--accent, #e2e8f0); }
+  .flow-block:hover { border-color: var(--accent, #e2e8f0); }
+
+  /* ===== Utility ===== */
+  .hidden { display: none !important; }
+  .fade-in { animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="container" id="app">
+
+  <!-- Navigation -->
+  <nav class="nav-bar" id="navBar">
+    <div class="nav-pills" id="navPills"></div>
+    <div class="nav-meta">
+      <button class="nav-meta-btn" data-view="resources">资源指示物</button>
+      <button class="nav-meta-btn" data-view="cardtypes">卡牌类型</button>
+      <button class="nav-meta-btn" data-view="specials">特殊机制</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero fade-in" id="hero"></div>
+
+  <!-- Resources -->
+  <div class="resources-panel" id="resourcesPanel"></div>
+
+  <!-- Main Content Area -->
+  <div class="main-content" id="mainContent">
+    <!-- Phase Content: rules, supervision, flow chain -->
+    <div id="phaseContent"></div>
+
+    <!-- Card Types (hidden by default) -->
+    <div id="cardTypesContent" class="hidden fade-in"></div>
+
+    <!-- Special Mechanics (hidden by default) -->
+    <div id="specialsContent" class="hidden fade-in"></div>
+  </div>
+
+  <!-- Flow Chart (always visible) -->
+  <div class="flow-chart-section" id="flowChartSection">
+    <h2>♻ 六阶段循环流程图</h2>
+    <div class="flow-chart" id="flowChart"></div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const PHASES = [
+  {
+    id: 'sleep', cn: '睡眠阶段', en: 'Sleep Phase',
+    tagline: '离线整合，后台自动编译',
+    time: '黑夜阶段',
+    comm: '🔇 全员禁言',
+    accent: '#6366f1',
+    rules: {
+      allows: [
+        '【自动编译】指定 P槽 或 R槽 中最多 2 张信息卡，秘密塞入 A槽·领域池 下方进行"潜意识孵化"',
+        '【能量重置】根据 A槽·领域池 中的健康/体能被动卡等级恢复专注能量（红）和社交能量（黄）',
+        '  Lv.0 → 红+2 / 黄+1 | Lv.1 → 红+3 / 黄+2 | Lv.2 → 红+4 / 黄+3 | Lv.3 → 红+5 / 黄+4'
+      ],
+      forbids: [
+        '禁止打出任何手牌',
+        '禁止与其他玩家交流',
+        '若上一轮结束时收集箱中留有精神噪音（黑），恢复的能量减半（向下取整）'
+      ],
+      exit: '从潜意识孵化堆中盲抽 1 张"灵感卡"，直接面朝下放入收集箱。'
+    },
+    supervision: { comm: '🔇 全体禁言', penalty: '说话拿 1 噪音卡' },
+    flow: { prev: '投资阶段', next: '规划阶段' }
+  },
+  {
+    id: 'plan', cn: '规划阶段', en: 'Planning Phase',
+    tagline: '建立地图，意图显化，清点可下注的方向',
+    time: '清晨阶段',
+    comm: '🔊 可交流策略',
+    accent: '#f59e0b',
+    rules: {
+      allows: [
+        '【清空收集箱】强制翻开收集箱中所有卡牌，分类摆放：信息卡→手牌区，噪音卡→留在收集箱，事件卡→立即结算',
+        '【动作转化】消耗 1 点专注能量（红），将手牌中的信息卡转化为"行动卡"，放入执行清单',
+        '【能量锚定】（核心操作）将本轮拥有的能量标记（红/黄），预先放置在执行清单的卡牌上'
+      ],
+      forbids: [
+        '禁止在此时执行卡牌效果（不能进行生产或攻击/防御）',
+        '禁止调取未经规划的 R槽 资源',
+        '执行清单容量 = 当前可用工人数（默认 3 人）'
+      ],
+      exit: '形成一份带有能量标记的 执行清单，公开放置于版图旁。'
+    },
+    supervision: { comm: '🔊 可交流策略计划', penalty: '—' },
+    flow: { prev: '睡眠阶段', next: '专注阶段' }
+  },
+  {
+    id: 'focus', cn: '专注阶段', en: 'Focus Phase',
+    tagline: '深度产出，单向度输出，外部痕迹与自我雕刻',
+    time: '上午阶段',
+    comm: '🔇 全员禁言 + 沙漏计时',
+    accent: '#ef4444',
+    rules: {
+      allows: [
+        '【硬核产出】只能执行执行清单中锚定了 专注能量（红） 的卡牌，消耗红色能量推进项目或加工成果卡',
+        '【深度心流】连续执行 2 张以上红色卡牌，额外获得 1 个信息碎片'
+      ],
+      forbids: [
+        '禁止执行任何带有"社交""沟通""协作"标签的卡牌',
+        '【防壁机制】外部事件卡不得阅读，直接丢入收集箱，否则扣 1 点专注能量',
+        '防壁被突破 2 次以上 → 获得 1 个 Burnout 计数',
+        '本阶段全员禁言，说话者拿 1 张噪音卡 + 扣 1 红能量'
+      ],
+      exit: '产生的"半成品/成果卡"进入「P槽待整理区」。'
+    },
+    supervision: { comm: '🔇 全体禁言 + 沙漏计时', penalty: '说话拿 1 噪音卡 + 扣 1 红能量；防壁突破 2 次→Burnout+1' },
+    flow: { prev: '规划阶段', next: '修复阶段' }
+  },
+  {
+    id: 'recovery', cn: '修复阶段', en: 'Recovery Phase',
+    tagline: '系统清空，垃圾回收与内存释放',
+    time: '中午阶段',
+    comm: '🔈 可轻声交流，不可谈判交易',
+    accent: '#14b8a6',
+    rules: {
+      allows: [
+        '【内存释放】消耗 修复资源（蓝），丢弃收集箱或手牌中的噪音卡（黑），每 1 点蓝资源可丢弃 1 张噪音',
+        '【轻量处理】允许执行执行清单中注明"耗时 < 2分钟"或"0 能量消耗"的机械性杂务卡',
+        '【成果落锁】将专注阶段产出的卡牌，正式整齐地排入 P槽（项目仓）'
+      ],
+      forbids: [
+        '禁止执行任何需要消耗红色或黄色能量的卡牌',
+        '禁止进行玩家间的交易或谈判',
+        '禁止阅读新事件卡'
+      ],
+      exit: '面板整洁。收集箱中噪音卡数量决定下轮能量恢复倍率：0 张→正常 | 1-2 张→×0.75 | 3+ 张→×0.5'
+    },
+    supervision: { comm: '🔈 可轻声交流', penalty: '谈判交易拿 1 噪音卡' },
+    flow: { prev: '专注阶段', next: '协作阶段' }
+  },
+  {
+    id: 'collab', cn: '协作阶段', en: 'Collaboration Phase',
+    tagline: '验证表达，打破防壁，玩家与世界交互的公共阶段',
+    time: '下午阶段',
+    comm: '🔊 开放谈判、交易、嘴炮',
+    accent: '#a855f7',
+    rules: {
+      allows: [
+        '【成果外抛】打出锚定了 社交能量（黄） 的卡牌，向中央市场或特定玩家展示、贩卖成果卡',
+        '【信息吸纳】与其他玩家进行资源交易、结盟，或从公共牌堆抽取"外部反馈卡"',
+        '【狼人杀式交互】自由谈判、说服、结成临时联盟，允许口头承诺（无强制执行）'
+      ],
+      forbids: [
+        '禁止独自闭门造车——所有卡牌结算必须包含"交互"或"对外交付"属性',
+        '禁止强制执行口头承诺（联盟是否兑现全凭自觉）'
+      ],
+      exit: '赚取的资源进入临时缓存；换回的"外部反馈卡"推入反馈收集箱（投资阶段处理）。'
+    },
+    supervision: { comm: '🔊 开放谈判交易', penalty: '—' },
+    flow: { prev: '修复阶段', next: '投资阶段' }
+  },
+  {
+    id: 'invest', cn: '投资阶段', en: 'Investment Phase',
+    tagline: '解构升维，复盘与系统大升级，决定长期强弱的胜负手',
+    time: '傍晚阶段',
+    comm: '🔈 可轻声交流',
+    accent: '#fbbf24',
+    rules: {
+      allows: [
+        '【解构反馈】将协作阶段收到的外部反馈卡分类拆解，每拆解 1 张获得 1 个「认知精粹」',
+        '【提纯增殖】（核心引擎）消耗认知精粹永久升级 A槽·领域池：Lv.1→Lv.2 需 2 精粹/Buff 翻倍 | Lv.2→Lv.3 需 4 精粹/解锁终极效果',
+        '【归档沉淀】将 P槽 中已完成的项目卡移入 A槽·归档区转化为 VP；不再需要的资源移入弃牌堆'
+      ],
+      forbids: [
+        '禁止再向外部世界交付任何成果',
+        '禁止保留未结算的临时反馈卡——未处理的反馈自动转化为噪音卡进入收集箱'
+      ],
+      exit: '升级后的 PARA 系统与清理完毕的 GTD 清单，直接对接下一轮的 睡眠阶段。'
+    },
+    supervision: { comm: '🔈 可轻声交流', penalty: '—' },
+    flow: { prev: '协作阶段', next: '睡眠阶段' }
+  }
+];
+
+const PHASE_IDS = ['sleep','plan','focus','recovery','collab','invest'];
+
+const RESOURCES = [
+  { name: '专注能量', color: '红', dot: '#ef4444', desc: '高算力核心资源，用于专注阶段执行卡牌' },
+  { name: '社交能量', color: '黄', dot: '#fbbf24', desc: '交互核心资源，用于协作阶段展示/交易' },
+  { name: '修复资源', color: '蓝', dot: '#3b82f6', desc: '清空异常状态（噪音、疲劳标记）' },
+  { name: '信息碎片', color: '白', dot: '#e2e8f0', desc: '基础卡牌原料，可转化为行动卡' },
+  { name: '精神噪音', color: '黑', dot: '#1e293b', desc: '负面卡牌，堆积会扣分或导致系统卡顿' }
+];
+
+const CARD_TYPES = [
+  { name: '信息卡', color: '白', source: '信息牌堆', loc: '收集箱→手牌→执行清单', func: '可转化为行动卡' },
+  { name: '行动卡', color: '—', source: '由信息卡转化', loc: '执行清单', func: '执行产出 VP 或资源' },
+  { name: '被动卡', color: '—', source: '被动牌堆', loc: 'A槽·领域池', func: '持续 Buff' },
+  { name: '事件卡', color: '—', source: '事件牌堆', loc: '触发展开', func: '全局影响' },
+  { name: '噪音卡', color: '黑', source: '违规/未处理反馈', loc: '收集箱', func: '负面，扣分' },
+  { name: '反馈卡', color: '—', source: '协作阶段获得', loc: '临时缓存', func: '可解构为认知精粹' },
+  { name: '灵感卡', color: '—', source: '睡眠孵化产出', loc: '收集箱', func: '高价值信息卡' }
+];
+
+const SPECIALS = {
+  burnout: {
+    title: 'Burnout 破产机制',
+    subtitle: '连续高压运转而无修复，必然导致系统崩溃',
+    triggers: [
+      { cond: '连续 2 轮在专注阶段「防壁被突破」', effect: '获得 Burnout 标记' },
+      { cond: '红色专注能量归零超过 1 轮', effect: '获得 Burnout 标记' },
+      { cond: '收集箱中噪音卡超过 5 张', effect: '获得 Burnout 标记' }
+    ],
+    effects: [
+      '跳过下一轮的专注阶段和协作阶段（只能在修复阶段恢复）',
+      '在跳过的轮次中，修复阶段可额外清除 2 张噪音',
+      '跳过轮次结束后，Burnout 标记移除',
+      '终局结算时每个 Burnout 标记扣 3 分'
+    ]
+  },
+  expose: {
+    title: '暴露与隐藏双状态',
+    subtitle: '玩家在每个阶段前可选择当前状态',
+    table: [
+      { state: '暴露状态', effect: '行动收益 +1，但其他玩家可对你打出攻击类卡牌', switching: '修复环自由切换；其他环切换消耗 1 额外行动' },
+      { state: '隐藏状态', effect: '不可被攻击，但行动收益 -1', switching: '修复环自由切换；其他环切换消耗 1 额外行动' }
+    ]
+  },
+  noise: {
+    title: '噪音与破窗惩罚',
+    subtitle: '破窗标记连锁惩罚',
+    table: [
+      { mark: '第 1 个破窗标记', penalty: '相邻环位效率 -1' },
+      { mark: '第 2 个破窗标记', penalty: '所有环位效率 -1' },
+      { mark: '第 3 个破窗标记', penalty: '每轮永久失去 1 个工人' }
+    ],
+    note: '清除条件：修复环中消耗 2 个行动可清除 1 个破窗标记。'
+  }
+};
+
+// ===== STATE =====
+let currentPhase = 'plan';
+let currentView = 'phase'; // 'phase' | 'cardtypes' | 'specials'
+
+// ===== RENDER =====
+function render() {
+  renderNav();
+  renderHero();
+  renderResources();
+  renderFlowChart();
+
+  const phaseContent = document.getElementById('phaseContent');
+  const cardTypesContent = document.getElementById('cardTypesContent');
+  const specialsContent = document.getElementById('specialsContent');
+
+  if (currentView === 'cardtypes') {
+    phaseContent.classList.add('hidden');
+    specialsContent.classList.add('hidden');
+    cardTypesContent.classList.remove('hidden');
+    renderCardTypes();
+  } else if (currentView === 'specials') {
+    phaseContent.classList.add('hidden');
+    cardTypesContent.classList.add('hidden');
+    specialsContent.classList.remove('hidden');
+    renderSpecials();
+  } else {
+    cardTypesContent.classList.add('hidden');
+    specialsContent.classList.add('hidden');
+    phaseContent.classList.remove('hidden');
+    renderPhaseContent();
+  }
+
+  // Update active meta buttons
+  document.querySelectorAll('.nav-meta-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === currentView);
+  });
+}
+
+function renderNav() {
+  const nav = document.getElementById('navPills');
+  const accentClass = getAccentClass(currentPhase);
+  nav.innerHTML = PHASES.map(p => `
+    <button class="nav-pill ${p.id === currentPhase ? 'active' : ''}"
+            data-phase="${p.id}"
+            style="${p.id === currentPhase ? `background:${p.accent}22;border-color:${p.accent};color:${p.accent}` : ''}"
+            onclick="switchPhase('${p.id}')">${p.cn}</button>
+  `).join('');
+}
+
+function getAccentClass(id) {
+  const map = { sleep:'accent-sleep', plan:'accent-plan', focus:'accent-focus', recovery:'accent-recovery', collab:'accent-collab', invest:'accent-invest' };
+  return map[id] || '';
+}
+
+function renderHero() {
+  const p = PHASES.find(x => x.id === currentPhase);
+  document.getElementById('hero').innerHTML = `
+    <div class="phase-en">${p.en}</div>
+    <div class="phase-cn" style="color:${p.accent}">${p.cn}</div>
+    <div class="phase-time">${p.time}</div>
+    <div class="phase-tagline">${p.tagline}</div>
+    <div class="phase-comm"><span>${p.comm}</span></div>
+  `;
+}
+
+function renderResources() {
+  document.getElementById('resourcesPanel').innerHTML = RESOURCES.map(r => `
+    <div class="resource-card">
+      <div class="resource-dot" style="background:${r.dot};${r.color==='白'?'border:1px solid #475569;':''}"></div>
+      <div class="r-name">${r.name}（${r.color}）</div>
+      <div class="r-desc">${r.desc}</div>
+    </div>
+  `).join('');
+}
+
+function renderPhaseContent() {
+  const p = PHASES.find(x => x.id === currentPhase);
+  const ph = document.getElementById('phaseContent');
+  ph.innerHTML = `
+    <div class="rule-grid fade-in">
+      <div class="rule-card" style="--accent:${p.accent}">
+        <h3>✅ 允许的操作</h3>
+        <ul>${p.rules.allows.map(a => `<li>${a}</li>`).join('')}</ul>
+      </div>
+      <div class="rule-card" style="--accent:${p.accent}">
+        <h3>❌ 禁止的行为</h3>
+        <ul>${p.rules.forbids.map(f => `<li>${f}</li>`).join('')}</ul>
+      </div>
+      <div class="rule-card" style="--accent:${p.accent}">
+        <h3>🚀 流通出口</h3>
+        <p>${p.rules.exit}</p>
+      </div>
+    </div>
+    <div class="info-row fade-in">
+      <div class="info-card">
+        <h3>📋 阶段监督</h3>
+        <table class="info-table">
+          <tr><th>沟通状态</th><td>${p.supervision.comm}</td></tr>
+          <tr><th>违规惩罚</th><td>${p.supervision.penalty}</td></tr>
+        </table>
+      </div>
+      <div class="info-card">
+        <h3>🔗 上下游衔接</h3>
+        <div class="flow-chain">
+          <span class="node">${p.flow.prev}</span>
+          <span class="arrow">→</span>
+          <span class="node current" style="border-color:${p.accent};color:${p.accent}">${p.cn}</span>
+          <span class="arrow">→</span>
+          <span class="node">${p.flow.next}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCardTypes() {
+  document.getElementById('cardTypesContent').innerHTML = `
+    <div class="card-grid fade-in">
+      ${CARD_TYPES.map(c => `
+        <div class="card-type-card">
+          <div class="ct-name">${c.name}${c.color !== '—' ? ` <small>（${c.color}）</small>` : ''}</div>
+          <div class="ct-detail"><strong>来源：</strong>${c.source}</div>
+          <div class="ct-detail"><strong>存放：</strong>${c.loc}</div>
+          <div class="ct-detail"><strong>功能：</strong>${c.func}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderSpecials() {
+  document.getElementById('specialsContent').innerHTML = `
+    <div class="spec-grid fade-in">
+
+      <!-- Burnout -->
+      <div class="spec-block">
+        <h3>🔥 ${SPECIALS.burnout.title}</h3>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:10px;">${SPECIALS.burnout.subtitle}</p>
+        <h4>触发条件（满足其一即触发）</h4>
+        <table class="spec-table">
+          <thead><tr><th>条件</th><th>效果</th></tr></thead>
+          <tbody>
+            ${SPECIALS.burnout.triggers.map(t => `<tr><td>${t.cond}</td><td>${t.effect}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <h4>Burnout 效果</h4>
+        <ul>${SPECIALS.burnout.effects.map(e => `<li>${e}</li>`).join('')}</ul>
+      </div>
+
+      <!-- Expose/Hide -->
+      <div class="spec-block">
+        <h3>👁 ${SPECIALS.expose.title}</h3>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:10px;">${SPECIALS.expose.subtitle}</p>
+        <table class="spec-table">
+          <thead><tr><th>状态</th><th>效果</th><th>切换条件</th></tr></thead>
+          <tbody>
+            ${SPECIALS.expose.table.map(r => `<tr><td><strong>${r.state}</strong></td><td>${r.effect}</td><td>${r.switching}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Noise -->
+      <div class="spec-block">
+        <h3>📢 ${SPECIALS.noise.title}</h3>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:10px;">${SPECIALS.noise.subtitle}</p>
+        <table class="spec-table">
+          <thead><tr><th>标记数量</th><th>惩罚效果</th></tr></thead>
+          <tbody>
+            ${SPECIALS.noise.table.map(r => `<tr><td>${r.mark}</td><td>${r.penalty}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <p style="font-size:13px;color:#94a3b8;margin-top:8px;">${SPECIALS.noise.note}</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderFlowChart() {
+  const flowData = [
+    { id: 'sleep', name: '睡眠', comm: '🔇 禁言' },
+    { id: 'plan', name: '规划', comm: '🔊 交流' },
+    { id: 'focus', name: '专注', comm: '🔇 禁言' },
+    { id: 'recovery', name: '修复', comm: '🔈 轻声' },
+    { id: 'collab', name: '协作', comm: '🔊 开放' },
+    { id: 'invest', name: '投资', comm: '🔈 轻声' }
+  ];
+  const colors = { sleep:'#6366f1', plan:'#f59e0b', focus:'#ef4444', recovery:'#14b8a6', collab:'#a855f7', invest:'#fbbf24' };
+
+  // Create a circular/loop layout: top row sleep→plan→focus, bottom row recovery→collab→invest, with return arrow
+  const topRow = flowData.slice(0, 3);
+  const bottomRow = flowData.slice(3, 6);
+
+  const block = (d) => `
+    <div class="flow-block" style="${d.id === currentPhase ? `border-color:${colors[d.id]};` : ''}"
+         onmouseover="this.style.borderColor='${colors[d.id]}'" onmouseout="this.style.borderColor='${d.id === currentPhase ? colors[d.id] : '#334155'}'">
+      <div class="fb-name" style="color:${colors[d.id]}">${d.name}</div>
+      <div class="fb-comm">${d.comm}</div>
+    </div>
+  `;
+
+  const arrow = (id1, id2) => `<span class="flow-h-arrow" style="color:${colors[id1]}">→</span>`;
+
+  document.getElementById('flowChart').innerHTML = `
+    <div class="flow-row">${topRow.map(d => block(d)).join(arrow('sleep','plan'))}</div>
+    <div class="flow-row" style="justify-content:center;gap:8px;">
+      <span class="flow-v-arrow" style="color:${colors['focus']}">↓</span>
+      <span style="margin:0 80px;"></span>
+      <span class="flow-v-arrow" style="color:${colors['invest']}">↓</span>
+      <span style="margin:0 80px;"></span>
+    </div>
+    <div class="flow-row">${bottomRow.map(d => block(d)).join(arrow('recovery','collab'))}</div>
+    <div class="flow-row" style="margin-top:6px;">
+      <span class="flow-h-arrow" style="color:${colors['invest']}">← 回到睡眠（下一轮）</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px;font-size:11px;color:#475569;justify-content:center;flex-wrap:wrap;">
+      <span>投资 → 睡眠 → 规划 → 专注 → 修复 → 协作 → 投资（闭环循环）</span>
+    </div>
+  `;
+}
+
+// ===== INTERACTIONS =====
+function switchPhase(id) {
+  currentPhase = id;
+  currentView = 'phase';
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Meta nav buttons
+document.querySelectorAll('.nav-meta-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const view = this.dataset.view;
+    if (view === 'resources') {
+      document.getElementById('resourcesPanel').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    currentView = view;
+    render();
+  });
+});
+
+// ===== INIT =====
+window.switchPhase = switchPhase;
+render();
+</script>
+</body>
+</html>

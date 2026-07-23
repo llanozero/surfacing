@@ -1,0 +1,12 @@
+- [x] Phase Gate 规则表已定义，4 个 phase 的允许/禁制操作明确
+- [x] Phase Gate 违规检测函数生效，跨阶段操作被拦截并输出日志
+- [x] 卡牌拥有 phaseTag 标签，按阶段区分使用权限
+- [x] `processPhaseGates()` 在 phaseIndex 切换时自动执行批处理
+- [x] Phase 3→0 回绕时自动调用 `endTurnActions()` 并 `round++`
+- [x] 代打 AI 在 Phase 0 跳过（不执行任何操作）
+- [x] 代打 AI 在 Phase 1 执行意识激活 + 非战斗技能 + 摸牌
+- [x] 代打 AI 在 Phase 2 执行战斗技能 + 攻击/防御手牌
+- [x] 代打 AI 在 Phase 3 执行弃牌（手牌上限检查）
+- [x] 代打 AI 每步完成后保留动画延迟
+- [x] "全部代打" 按钮完成一次完整的 Phase 1→2→3→回合结算→新回合 流程
+- [x] 手动模式下跨阶段操作也能被 Phase Gate 拦截

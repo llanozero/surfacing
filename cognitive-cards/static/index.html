@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>认知卡片 · Cognitive Cards</title>
+<style>
+:root {
+  --bg: #0f0f12; --bg2: #1a1a1f; --bg3: #222228;
+  --ink: #e6e2d8; --muted: #8a8578; --rule: #2a2824;
+  --accent: #c8a352; --accent2: #6b8e8a;
+  --accent-glow: rgba(200,163,82,0.12);
+  --crash: #c88a7a; --defend: #a090b8; --danger: #c84a3a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  font-size:15px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Header / Nav ── */
+.nav{
+  position:sticky;top:0;z-index:100;
+  background:var(--bg);border-bottom:1px solid var(--rule);
+  backdrop-filter:blur(12px);
+}
+.nav-inner{
+  max-width:1200px;margin:0 auto;padding:0 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:56px;
+}
+.nav-brand{
+  font-family:'Noto Serif SC','STSong','SimSun',serif;
+  font-size:1.15rem;font-weight:700;color:var(--accent);
+  letter-spacing:0.04em;
+}
+.nav-tabs{display:flex;gap:0;list-style:none}
+.nav-tabs li button{
+  background:none;border:none;color:var(--muted);
+  font-size:0.85rem;padding:0.5rem 1.25rem;cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:color 0.2s,border-color 0.2s;
+  font-family:inherit;letter-spacing:0.04em;
+}
+.nav-tabs li button:hover{color:var(--ink)}
+.nav-tabs li button.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── Main Container ── */
+.main{max-width:1200px;margin:0 auto;padding:2rem;min-height:calc(100vh - 56px - 80px)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── Cards Grid ── */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1.5rem;
+}
+.card-item{
+  background:var(--bg2);border:1px solid var(--rule);
+  border-radius:10px;padding:0;overflow:hidden;
+  transition:border-color 0.3s,box-shadow 0.3s;
+  cursor:pointer;
+}
+.card-item:hover{box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.card-item.selected{border-color:var(--accent)}
+.card-item-header{
+  padding:1.5rem 1.75rem;
+  border-left:3px solid transparent;
+  transition:border-color 0.3s;
+}
+.card-item.selected .card-item-header{border-left-color:var(--accent)}
+.card-item:nth-child(2n) .card-item-header{border-left-color:transparent}
+.card-item:nth-child(2n).selected .card-item-header{border-left-color:var(--accent2)}
+
+.card-number{
+  font-family:'JetBrains Mono','Consolas',monospace;
+  font-size:0.72rem;color:var(--muted);letter-spacing:0.1em;
+  display:block;margin-bottom:0.5rem;
+}
+.card-title{
+  font-family:'Noto Serif SC','STSong','SimSun',serif;
+  font-size:1.3rem;font-weight:700;color:var(--ink);
+  margin-bottom:0.5rem;line-height:1.3;
+}
+.card-title-rule{width:32px;height:2px;background:var(--accent);margin-bottom:1rem;opacity:0.6}
+.card-tags{display:flex;flex-wrap:wrap;gap:0.4rem}
+.card-tag{
+  font-size:0.7rem;padding:0.2rem 0.6rem;
+  border-radius:3px;background:rgba(200,163,82,0.08);
+  color:var(--accent);border:1px solid rgba(200,163,82,0.2);
+}
+.card-detail{display:none;padding:0 1.75rem 1.75rem;border-top:1px solid var(--rule)}
+.card-item.selected .card-detail{display:block}
+.card-section{margin-bottom:1.25rem}
+.card-section:last-child{margin-bottom:0}
+.card-section-label{
+  font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--accent2);font-weight:600;display:block;margin-bottom:0.3rem;
+}
+.card-section-p{font-size:0.9rem;color:var(--ink);line-height:1.8}
+.card-section-p mark{background:none;color:var(--accent);font-weight:600}
+
+/* ── Kits Grid ── */
+.kits-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+.kit-card{
+  background:var(--bg2);border:1px solid var(--rule);
+  border-radius:10px;padding:1.75rem;
+  border-top:3px solid var(--rule);
+  transition:box-shadow 0.3s;
+}
+.kit-card:hover{box-shadow:0 6px 28px rgba(0,0,0,0.28)}
+.kit-card.kit-a{border-top-color:var(--accent)}
+.kit-card.kit-b{border-top-color:var(--accent2)}
+.kit-card.kit-c{border-top-color:var(--crash)}
+.kit-card.kit-d{border-top-color:var(--defend)}
+.kit-card.kit-e{border-top-color:var(--accent2)}
+.kit-card.kit-f{border-top-color:var(--accent)}
+.kit-card.kit-g{border-top-color:var(--accent)}
+.kit-card.kit-h{border-top-color:var(--danger)}
+
+.kit-card-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem}
+.kit-badge{
+  font-family:'JetBrains Mono','Consolas',monospace;
+  font-size:0.7rem;letter-spacing:0.1em;
+  padding:0.2rem 0.6rem;border-radius:4px;
+  border:1px solid;font-weight:600;white-space:nowrap;
+}
+.kit-card.kit-a .kit-badge{color:var(--accent);border-color:rgba(200,163,82,0.3);background:rgba(200,163,82,0.08)}
+.kit-card.kit-b .kit-badge{color:var(--accent2);border-color:rgba(107,142,138,0.3);background:rgba(107,142,138,0.08)}
+.kit-card.kit-c .kit-badge{color:var(--crash);border-color:rgba(200,138,122,0.3);background:rgba(200,138,122,0.08)}
+.kit-card.kit-d .kit-badge{color:var(--defend);border-color:rgba(160,144,184,0.3);background:rgba(160,144,184,0.08)}
+.kit-card.kit-e .kit-badge{color:var(--accent2);border-color:rgba(107,142,138,0.3);background:rgba(107,142,138,0.08)}
+.kit-card.kit-f .kit-badge{color:var(--accent);border-color:rgba(200,163,82,0.3);background:rgba(200,163,82,0.08)}
+.kit-card.kit-g .kit-badge{color:var(--accent);border-color:rgba(200,163,82,0.3);background:rgba(200,163,82,0.08)}
+.kit-card.kit-h .kit-badge{color:var(--danger);border-color:rgba(200,74,58,0.3);background:rgba(200,74,58,0.08)}
+
+.kit-title{font-family:'Noto Serif SC','STSong','SimSun',serif;font-size:1.1rem;font-weight:700;color:var(--ink)}
+.kit-trigger{font-size:0.78rem;color:var(--muted);margin-bottom:1.25rem;padding-left:0.5rem;border-left:2px solid var(--rule);line-height:1.6}
+.kit-body{font-size:0.9rem;color:var(--ink);line-height:1.85;margin-bottom:1rem;padding:1rem 1.25rem;background:var(--bg3);border-radius:6px;border:1px solid var(--rule)}
+.kit-body p{margin-bottom:0.6rem}
+.kit-body p:last-child{margin-bottom:0}
+.kit-mechanism{font-size:0.76rem;color:var(--muted);line-height:1.65;padding-top:0.75rem;border-top:1px solid var(--rule)}
+.kit-mechanism span{color:var(--accent2);font-weight:600;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase}
+
+/* ── Emergence Panel ── */
+.emergence-layout{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:1100px;margin:0 auto}
+.emerge-input-area{display:flex;flex-direction:column;gap:1rem}
+.emerge-input-area h2{
+  font-family:'Noto Serif SC','STSong','SimSun',serif;
+  font-size:1.5rem;color:var(--ink);margin-bottom:0;
+}
+.emerge-input-area .emerge-hint{font-size:0.85rem;color:var(--muted);line-height:1.7}
+.emerge-input-area textarea{
+  width:100%;min-height:140px;padding:1rem 1.25rem;
+  background:var(--bg2);border:1px solid var(--rule);
+  border-radius:8px;color:var(--ink);font-size:0.95rem;
+  line-height:1.8;resize:vertical;
+  font-family:inherit;
+  transition:border-color 0.3s;
+}
+.emerge-input-area textarea:focus{outline:none;border-color:var(--accent)}
+.emerge-input-area textarea::placeholder{color:var(--muted)}
+.emerge-submit{
+  padding:0.75rem 2rem;background:var(--accent);
+  color:var(--bg);border:none;border-radius:6px;
+  font-size:0.95rem;font-weight:600;cursor:pointer;
+  letter-spacing:0.04em;transition:opacity 0.2s;
+  font-family:inherit;
+}
+.emerge-submit:hover{opacity:0.85}
+.emerge-submit:disabled{opacity:0.4;cursor:not-allowed}
+
+.emerge-result{display:flex;flex-direction:column;gap:1.25rem}
+.emerge-result .result-block{
+  background:var(--bg2);border:1px solid var(--rule);
+  border-radius:10px;padding:1.5rem;
+}
+.result-block h3{
+  font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--accent2);margin-bottom:1rem;font-weight:600;
+}
+.result-block .matched-cards-list{display:flex;flex-direction:column;gap:0.75rem}
+.matched-card-entry{
+  padding:0.75rem 1rem;background:var(--bg3);
+  border-radius:6px;border-left:3px solid var(--accent);
+}
+.matched-card-entry .mc-title{font-weight:700;color:var(--ink);font-size:0.95rem}
+.matched-card-entry .mc-reason{font-size:0.8rem;color:var(--muted);margin-top:0.25rem}
+.matched-card-entry .mc-confidence{font-size:0.75rem;color:var(--accent);margin-top:0.15rem}
+
+.guidance-text{
+  font-size:0.95rem;line-height:2;color:var(--ink);
+  white-space:pre-wrap;padding:1rem;background:var(--bg3);
+  border-radius:6px;border:1px solid var(--rule);
+}
+
+.path-steps{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-top:0.5rem}
+.path-step{
+  padding:0.4rem 0.8rem;border-radius:4px;
+  font-size:0.8rem;font-weight:600;
+  background:rgba(107,142,138,0.08);
+  color:var(--accent2);
+  border:1px solid rgba(107,142,138,0.25);
+}
+.path-arrow{color:var(--muted);font-size:0.9rem;user-select:none}
+.warnings-list{list-style:none;display:flex;flex-direction:column;gap:0.5rem}
+.warnings-list li{
+  font-size:0.85rem;color:var(--crash);
+  padding:0.5rem 0.75rem;border-radius:4px;
+  background:rgba(200,138,122,0.06);
+  border:1px solid rgba(200,138,122,0.15);
+}
+
+.emerge-loading{
+  text-align:center;padding:2rem;color:var(--muted);
+  font-size:0.9rem;letter-spacing:0.06em;
+}
+
+/* ── Architecture Tab ── */
+.arch-intro{margin-bottom:2rem;max-width:800px}
+.arch-intro p{font-size:0.9rem;color:var(--muted);line-height:1.9;margin-bottom:0.75rem}
+.arch-intro p mark{background:none;color:var(--accent);font-weight:600}
+
+.layers-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-bottom:2.5rem}
+.arch-layer{
+  background:var(--bg2);border:1px solid var(--rule);
+  border-radius:8px;padding:1.5rem;border-left:3px solid var(--accent);
+}
+.arch-layer:nth-child(2){border-left-color:var(--accent2)}
+.arch-layer:nth-child(3){border-left-color:#a08060}
+.arch-layer:nth-child(4){border-left-color:#608080}
+.arch-layer-name{font-size:0.7rem;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:0.5rem}
+.arch-layer h3{font-family:'Noto Serif SC','STSong','SimSun',serif;font-size:1.05rem;font-weight:700;color:var(--ink);margin-bottom:0.35rem}
+.arch-layer p{font-size:0.83rem;color:var(--muted);line-height:1.7}
+
+.cycle-overview{
+  background:var(--bg2);border:1px solid var(--rule);
+  border-radius:10px;padding:2rem;margin-bottom:2rem;
+  border-top:3px solid var(--accent);
+}
+.cycle-overview h3{
+  font-family:'Noto Serif SC','STSong','SimSun',serif;
+  font-size:1.2rem;color:var(--ink);text-align:center;margin-bottom:1.5rem;
+}
+.cycle-flow{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0.5rem;margin-bottom:1rem}
+.cycle-node{
+  padding:0.5rem 1rem;border-radius:6px;font-size:0.82rem;
+  font-weight:600;white-space:nowrap;border:1px solid;
+}
+.node-designer{background:rgba(200,163,82,0.08);color:var(--accent);border-color:rgba(200,163,82,0.25)}
+.node-executor{background:rgba(107,142,138,0.08);color:var(--accent2);border-color:rgba(107,142,138,0.25)}
+.node-crash{background:rgba(200,138,122,0.08);color:var(--crash);border-color:rgba(200,138,122,0.25)}
+.node-defend{background:rgba(160,144,184,0.08);color:var(--defend);border-color:rgba(160,144,184,0.25)}
+.cycle-arrow{color:var(--muted);font-size:1.1rem;font-weight:300;user-select:none}
+.cycle-note{font-size:0.82rem;color:var(--muted);text-align:center;line-height:1.8;margin-top:0.5rem}
+.cycle-note mark{background:none;color:var(--accent);font-weight:600}
+
+/* ── Footer ── */
+footer{
+  text-align:center;padding:2rem;color:var(--muted);
+  font-size:0.78rem;border-top:1px solid var(--rule);
+}
+
+/* ── Loading / Error ── */
+.loading{text-align:center;padding:3rem;color:var(--muted);font-size:0.9rem}
+.error{text-align:center;padding:2rem;color:var(--crash);font-size:0.9rem}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .nav-inner{padding:0 1rem}
+  .nav-tabs li button{padding:0.5rem 0.75rem;font-size:0.78rem}
+  .cards-grid{grid-template-columns:1fr;gap:1rem}
+  .kits-grid{grid-template-columns:1fr;gap:1rem}
+  .emergence-layout{grid-template-columns:1fr}
+  .layers-grid{grid-template-columns:1fr}
+  .main{padding:1.25rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Navigation ── -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">认知卡片 · CC</div>
+    <ul class="nav-tabs">
+      <li><button data-tab="cards" class="active">卡片</button></li>
+      <li><button data-tab="kits">锦囊</button></li>
+      <li><button data-tab="emerge">涌现引擎</button></li>
+      <li><button data-tab="arch">系统架构</button></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── Main Content ── -->
+<main class="main">
+
+  <!-- Tab: Cards -->
+  <div class="tab-panel active" id="tab-cards">
+    <div class="cards-grid" id="cards-grid"><div class="loading">加载中...</div></div>
+  </div>
+
+  <!-- Tab: Kits -->
+  <div class="tab-panel" id="tab-kits">
+    <div class="kits-grid" id="kits-grid"><div class="loading">加载中...</div></div>
+  </div>
+
+  <!-- Tab: Emergence Engine -->
+  <div class="tab-panel" id="tab-emerge">
+    <div class="emergence-layout">
+      <div class="emerge-input-area">
+        <h2>涌现引擎</h2>
+        <p class="emerge-hint">
+          输入你此刻的感受、状态或困扰。系统会自动匹配认知卡片、筛选语料，并为你生成一段<mark>具身引导词</mark>和锦囊路径。
+        </p>
+        <textarea id="emerge-input" placeholder="例如：最近总是设定目标又拖延，每次开始前都觉得自己准备不够，越准备越焦虑。"></textarea>
+        <button class="emerge-submit" id="emerge-submit" onclick="runEmergence()">生成引导词</button>
+      </div>
+      <div class="emerge-result" id="emerge-result">
+        <div style="color:var(--muted);text-align:center;padding:3rem 0;font-size:0.9rem">
+          在左侧输入你的感受，<br>系统会为你生成个性化的认知引导。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Architecture -->
+  <div class="tab-panel" id="tab-arch">
+    <div id="arch-content"><div class="loading">加载中...</div></div>
+  </div>
+
+</main>
+
+<footer>
+  <p>认知卡片 · Cognitive Cards<br>既是设计说明书，也是产品本身 · 阅读即使用，理解即构建</p>
+</footer>
+
+<script>
+// ── Tab Switching ──
+document.querySelectorAll('.nav-tabs li button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tabs li button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'cards') loadCards();
+    if (btn.dataset.tab === 'kits') loadKits();
+    if (btn.dataset.tab === 'arch') loadArchive();
+  });
+});
+
+// ── API Helper ──
+const API = '/api';
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// ── Load Cards ──
+async function loadCards() {
+  const grid = document.getElementById('cards-grid');
+  if (grid.querySelector('.card-item')) return;
+  try {
+    const cards = await fetchJSON(API + '/cards');
+    grid.innerHTML = cards.map((c, i) => `
+      <article class="card-item" id="card-${c.id}" onclick="toggleCard('${c.id}')">
+        <div class="card-item-header">
+          <span class="card-number">CARD / ${c.number}</span>
+          <h2 class="card-title">${esc(c.title)}</h2>
+          <div class="card-title-rule"></div>
+          <div class="card-tags">${c.tags.map(t => `<span class="card-tag">${esc(t)}</span>`).join('')}</div>
+        </div>
+        <div class="card-detail" id="detail-${c.id}">
+          <div class="card-section">
+            <span class="card-section-label">核心洞察</span>
+            <p class="card-section-p">${esc(c.sections?.insight || '')}</p>
+          </div>
+          <div class="card-section">
+            <span class="card-section-label">设计指令</span>
+            <p class="card-section-p">${esc(c.sections?.design_directive || '')}</p>
+          </div>
+          <div class="card-section">
+            <span class="card-section-label">产品形态</span>
+            <p class="card-section-p">${esc(c.sections?.product_form || '')}</p>
+          </div>
+          <div class="card-section" style="margin-top:0.5rem">
+            <span class="card-section-label">关键词</span>
+            <div class="card-tags">${c.keywords?.map(k => `<span class="card-tag">${esc(k)}</span>`).join('') || ''}</div>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  } catch (e) {
+    grid.innerHTML = '<div class="error">加载卡片失败：' + esc(e.message) + '</div>';
+  }
+}
+
+function toggleCard(cardId) {
+  const item = document.getElementById('card-' + cardId);
+  const isSelected = item.classList.contains('selected');
+  document.querySelectorAll('.card-item.selected').forEach(c => c.classList.remove('selected'));
+  if (!isSelected) { item.classList.add('selected'); }
+}
+
+// ── Load Kits ──
+async function loadKits() {
+  const grid = document.getElementById('kits-grid');
+  if (grid.querySelector('.kit-card')) return;
+  try {
+    const kits = await fetchJSON(API + '/kits');
+    grid.innerHTML = kits.map(k => `
+      <article class="kit-card kit-${k.letter?.toLowerCase()}">
+        <div class="kit-card-header">
+          <span class="kit-badge">锦囊 ${k.letter}</span>
+          <h3 class="kit-title">${esc(k.name)}</h3>
+        </div>
+        <div class="kit-trigger">触发：${esc(k.trigger)}</div>
+        <div class="kit-body">${k.body.map(p => `<p>${esc(p)}</p>`).join('')}</div>
+        <div class="kit-mechanism"><span>机制</span>：${esc(k.mechanism)}</div>
+      </article>
+    `).join('');
+  } catch (e) {
+    grid.innerHTML = '<div class="error">加载锦囊失败：' + esc(e.message) + '</div>';
+  }
+}
+
+// ── Emergence Engine ──
+async function runEmergence() {
+  const input = document.getElementById('emerge-input').value.trim();
+  if (input.length < 3) { alert('请输入更详细的感受（至少3个字）'); return; }
+
+  const resultArea = document.getElementById('emerge-result');
+  const submitBtn = document.getElementById('emerge-submit');
+  submitBtn.disabled = true;
+  resultArea.innerHTML = '<div class="emerge-loading">正在分析你的状态，生成引导词...</div>';
+
+  try {
+    const res = await fetch(API + '/emergence', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({text: input, source: 'chat'})
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e.detail || '请求失败'); }
+    const data = await res.json();
+
+    resultArea.innerHTML = `
+      ${data.matched_cards?.length ? `
+      <div class="result-block">
+        <h3>匹配认知卡片</h3>
+        <div class="matched-cards-list">
+          ${data.matched_cards.map(mc => `
+            <div class="matched-card-entry">
+              <div class="mc-title">Card ${mc.number} · ${esc(mc.title)}</div>
+              <div class="mc-reason">${esc(mc.reason)}</div>
+              <div class="mc-confidence">置信度：${(mc.confidence * 100).toFixed(0)}%</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>` : ''}
+
+      <div class="result-block">
+        <h3>锦囊引导 · ${data.emergent_kit?.letter ? '锦囊 ' + data.emergent_kit.letter : ''} ${esc(data.emergent_kit?.name || '')}</h3>
+        <div class="guidance-text">${esc(data.emergent_kit?.guidance || '')}</div>
+        ${data.emergent_kit?.body_action ? `<p style="margin-top:0.75rem;font-size:0.85rem;color:var(--accent2);font-style:italic">${esc(data.emergent_kit.body_action)}</p>` : ''}
+      </div>
+
+      ${data.predicted_path?.length ? `
+      <div class="result-block">
+        <h3>预测路径</h3>
+        <div class="path-steps">
+          ${data.predicted_path.map((p, i) => {
+            const arrow = i > 0 ? '<span class="path-arrow">→</span>' : '';
+            return arrow + '<span class="path-step" title="' + esc(p.action) + '">' + esc(p.kit_name) + '</span>';
+          }).join('')}
+        </div>
+      </div>` : ''}
+
+      ${data.warnings?.length ? `
+      <div class="result-block">
+        <h3>风险警告</h3>
+        <ul class="warnings-list">
+          ${data.warnings.map(w => '<li>' + (w.startsWith('⚠') ? '' : '⚠ ') + esc(w) + '</li>').join('')}
+        </ul>
+      </div>` : ''}
+    `;
+  } catch (e) {
+    resultArea.innerHTML = '<div class="error">涌现引擎出错：' + esc(e.message) + '</div>';
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+// Allow Enter to submit (Ctrl+Enter)
+document.getElementById('emerge-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.ctrlKey) runEmergence();
+});
+
+// ── Load Archive ──
+async function loadArchive() {
+  const content = document.getElementById('arch-content');
+  if (content.querySelector('.arch-layer')) return;
+  try {
+    const data = await fetchJSON(API + '/archive');
+    content.innerHTML = `
+      <div class="arch-intro">
+        <p>十张卡片构成一个<mark>四层协同系统</mark>。每一层解决不同维度的问题，层与层之间形成递进依赖关系。理解这个架构，你就理解了如何将它们组装成一个真正可运行的工具。</p>
+      </div>
+      <div class="layers-grid">
+        ${data.layers.map(l => `
+          <div class="arch-layer">
+            <span class="arch-layer-name">Layer ${l.layer} · ${esc(l.name)}</span>
+            <h3>卡片 ${esc(l.cards.join(' × '))}</h3>
+            <p>${esc(l.description)}</p>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="cycle-overview">
+        <h3>核心循环</h3>
+        <div class="cycle-flow">
+          <span class="cycle-node node-designer">设计者锚点</span>
+          <span class="cycle-arrow">→</span>
+          <span class="cycle-node node-executor">执行者具身</span>
+          <span class="cycle-arrow">→</span>
+          <span class="cycle-node node-designer">设计者复盘</span>
+          <span class="cycle-arrow">→</span>
+          <span class="cycle-node node-executor">外沿扩大</span>
+        </div>
+        <div class="cycle-flow" style="margin-top:0.75rem">
+          <span class="cycle-node node-executor">执行者轨道</span>
+          <span class="cycle-arrow">⇢</span>
+          <span class="cycle-node node-crash">负向沉沦</span>
+          <span class="cycle-arrow">⇢</span>
+          <span class="cycle-node node-defend">自防御抽离</span>
+          <span class="cycle-arrow">⇢</span>
+          <span class="cycle-node node-executor">内生回归</span>
+          <span class="cycle-arrow">→</span>
+          <span class="cycle-node node-executor">重新进入</span>
+        </div>
+        <p class="cycle-note">
+          主线：<mark>${esc(data.core_cycle?.main || '')}</mark><br>
+          支线：<mark>${esc(data.core_cycle?.side || '')}</mark>
+        </p>
+      </div>
+
+      <div style="background:var(--bg2);border:1px solid var(--rule);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem">
+        <h3 style="font-family:'Noto Serif SC','STSong','SimSun',serif;color:var(--ink);margin-bottom:1rem">使用原则</h3>
+        <ol style="display:flex;flex-direction:column;gap:0.85rem;list-style:none">
+          <li style="padding:0.75rem 1rem;background:var(--bg);border-radius:6px;font-size:0.88rem;color:var(--ink);line-height:1.7"><mark style="background:none;color:var(--accent);font-weight:600">01 阅读即构建</mark>：这些卡片不是"先读后用"的说明书。每一次阅读，你都在构建这个工具在你心智中的版本。读完即拥有。</li>
+          <li style="padding:0.75rem 1rem;background:var(--bg);border-radius:6px;font-size:0.88rem;color:var(--ink);line-height:1.7"><mark style="background:none;color:var(--accent);font-weight:600">02 不追求完整理解</mark>：不需要一次性理解全部。卡片的排列顺序本身就是渐进式激活——从最有共鸣的一张开始，其余会自然跟进。</li>
+          <li style="padding:0.75rem 1rem;background:var(--bg);border-radius:6px;font-size:0.88rem;color:var(--ink);line-height:1.7"><mark style="background:none;color:var(--accent);font-weight:600">03 卡片即界面</mark>：回顾设计原则时不是"回忆内容"，而是"回到卡片"。卡片的视觉形态本身就是认知锚点。</li>
+          <li style="padding:0.75rem 1rem;background:var(--bg);border-radius:6px;font-size:0.88rem;color:var(--ink);line-height:1.7"><mark style="background:none;color:var(--accent);font-weight:600">04 环境优先于内容</mark>：使用环境比卡片内容更重要。安静、独处、不受打扰的环境本身就是工具的一部分。</li>
+          <li style="padding:0.75rem 1rem;background:var(--bg);border-radius:6px;font-size:0.88rem;color:var(--ink);line-height:1.7"><mark style="background:none;color:var(--accent);font-weight:600">05 允许遗忘</mark>：不需要记住任何卡片的内容。一旦理解了系统架构，卡片的具体内容会"到了处境自会知道"。遗忘不是失败，而是信任具身认知的开始。</li>
+        </ol>
+      </div>
+    `;
+  } catch (e) {
+    content.innerHTML = '<div class="error">加载架构数据失败：' + esc(e.message) + '</div>';
+  }
+}
+
+// ── Utility ──
+function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+
+// ── Init ──
+loadCards();
+</script>
+</body>
+</html>

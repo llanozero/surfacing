@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>坍缩 — 认知的两种路径</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700;900&family=Noto+Sans+SC:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --void: #0a0a0f;
+    --deep: #12121a;
+    --surface: #1a1a28;
+    --border: #2a2a3a;
+    --text-primary: #e8e4e0;
+    --text-secondary: #9a96a0;
+    --text-muted: #5a5660;
+    --accent-warm: #c8a882;
+    --accent-cold: #6882a8;
+    --accent-collapse: #a86882;
+    --gradient-warm: linear-gradient(135deg, #c8a882 0%, #e8c8a0 30%, #a87858 100%);
+    --gradient-cold: linear-gradient(135deg, #6882a8 0%, #88a2c8 30%, #486288 100%);
+    --gradient-collapse: linear-gradient(135deg, #a86882 0%, #c888a2 30%, #884868 100%);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--void);
+    color: var(--text-primary);
+    font-family: 'Noto Serif SC', 'Noto Sans SC', serif;
+    line-height: 1.8;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Canvas Background ── */
+  #bg-canvas {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0; pointer-events: none;
+  }
+
+  /* ── Typography ── */
+  .serif { font-family: 'Noto Serif SC', serif; }
+  .sans { font-family: 'Noto Sans SC', sans-serif; }
+
+  h1, h2, h3 { font-weight: 300; letter-spacing: 0.04em; }
+  h1 { font-size: clamp(2.4rem, 6vw, 5rem); line-height: 1.15; }
+  h2 { font-size: clamp(1.6rem, 3.5vw, 2.8rem); }
+  h3 { font-size: 1.2rem; font-weight: 400; letter-spacing: 0.08em; color: var(--text-secondary); }
+  .quote { font-style: italic; color: var(--text-secondary); font-weight: 300; }
+
+  /* ── Layout ── */
+  section {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    padding: 6rem 2rem;
+  }
+
+  .container { max-width: 900px; width: 100%; }
+
+  /* ── Section Divider ── */
+  .divider {
+    width: 1px; height: 120px; margin: 0 auto;
+    background: linear-gradient(to bottom, transparent, var(--border), transparent);
+  }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center; min-height: 100vh;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(200,168,130,0.06) 0%, transparent 70%);
+  }
+  .hero .title-word {
+    display: inline-block; opacity: 0;
+    animation: fadeUpWord 0.8s ease-out forwards;
+  }
+  .hero .title-word:nth-child(1) { animation-delay: 0.1s; }
+  .hero .title-word:nth-child(2) { animation-delay: 0.3s; }
+  .hero .title-word:nth-child(3) { animation-delay: 0.5s; }
+  .hero .title-word:nth-child(4) { animation-delay: 0.7s; }
+  @keyframes fadeUpWord {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero .subtitle {
+    margin-top: 2rem; font-size: 1.1rem; color: var(--text-muted);
+    opacity: 0; animation: fadeUp 1s ease-out 1s forwards;
+  }
+  .hero .brand {
+    margin-top: 4rem; font-size: 4rem; font-weight: 900;
+    letter-spacing: 0.2em;
+    background: var(--gradient-collapse);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0; animation: fadeUp 1s ease-out 1.4s forwards;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .scroll-hint {
+    position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%);
+    opacity: 0; animation: fadeUp 1s ease-out 1.8s forwards;
+  }
+  .scroll-hint span { display: block; width: 1px; height: 40px; background: var(--border); margin: 0 auto 0.5rem; }
+  .scroll-hint p { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em; }
+
+  /* ── Module Cards ── */
+  .module-section { padding: 8rem 2rem; }
+  .module-grid {
+    display: grid; grid-template-columns: 1fr;
+    gap: 4rem; max-width: 1000px; margin: 0 auto;
+  }
+  .module-card {
+    position: relative; padding: 3rem; border-radius: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: border-color 0.6s ease, box-shadow 0.6s ease, transform 0.4s ease;
+    cursor: default;
+  }
+  .module-card:hover {
+    transform: translateY(-2px);
+  }
+  .module-card.warm:hover { border-color: rgba(200,168,130,0.4); box-shadow: 0 0 60px rgba(200,168,130,0.06); }
+  .module-card.cold:hover { border-color: rgba(104,130,168,0.4); box-shadow: 0 0 60px rgba(104,130,168,0.06); }
+  .module-card.collapse:hover { border-color: rgba(168,104,130,0.4); box-shadow: 0 0 60px rgba(168,104,130,0.06); }
+
+  .module-number {
+    font-size: 0.7rem; letter-spacing: 0.2em; margin-bottom: 1.5rem;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  .module-card.warm .module-number { color: var(--accent-warm); }
+  .module-card.cold .module-number { color: var(--accent-cold); }
+  .module-card.collapse .module-number { color: var(--accent-collapse); }
+
+  .module-title {
+    font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem;
+  }
+  .module-subtitle {
+    font-size: 1rem; color: var(--text-secondary); margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  .module-body { font-size: 0.95rem; color: var(--text-secondary); }
+  .module-body p { margin-bottom: 1rem; }
+  .module-body .highlight {
+    color: var(--text-primary); font-weight: 500;
+  }
+
+  .module-features {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem;
+  }
+  .feature-item {
+    padding: 1.2rem; border-left: 1px solid var(--border);
+    transition: border-color 0.4s ease;
+  }
+  .feature-item h4 {
+    font-size: 0.85rem; font-weight: 500; margin-bottom: 0.4rem;
+    letter-spacing: 0.05em;
+  }
+  .feature-item p { font-size: 0.85rem; color: var(--text-muted); }
+
+  /* ── Quote Block ── */
+  .quote-block {
+    text-align: center; padding: 6rem 2rem;
+  }
+  .quote-block .big-quote {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-style: italic; color: var(--text-secondary);
+    max-width: 700px; margin: 0 auto; line-height: 1.8;
+  }
+  .quote-block .attribution {
+    margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── Collision Visual ── */
+  .collision-viz {
+    position: relative; width: 100%; max-width: 600px; height: 200px;
+    margin: 3rem auto 0;
+  }
+  .collision-orb {
+    position: absolute; width: 40px; height: 40px; border-radius: 50%;
+    top: 50%; transform: translateY(-50%);
+    animation: orbFloat 6s ease-in-out infinite;
+  }
+  .orb-warm {
+    left: 25%; background: radial-gradient(circle, rgba(200,168,130,0.6), transparent);
+    box-shadow: 0 0 40px rgba(200,168,130,0.3);
+    animation-delay: 0s;
+  }
+  .orb-cold {
+    right: 25%; background: radial-gradient(circle, rgba(104,130,168,0.6), transparent);
+    box-shadow: 0 0 40px rgba(104,130,168,0.3);
+    animation-delay: -3s;
+  }
+  @keyframes orbFloat {
+    0%, 100% { transform: translateY(-50%) translateX(0); }
+    25% { transform: translateY(-50%) translateX(20px); }
+    50% { transform: translateY(-50%) translateX(0); }
+    75% { transform: translateY(-50%) translateX(-20px); }
+  }
+  .collision-center {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--accent-collapse);
+    box-shadow: 0 0 20px var(--accent-collapse), 0 0 60px rgba(168,104,130,0.4);
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 20px var(--accent-collapse), 0 0 60px rgba(168,104,130,0.4); }
+    50% { box-shadow: 0 0 40px var(--accent-collapse), 0 0 100px rgba(168,104,130,0.6); }
+  }
+  .collision-line {
+    position: absolute; top: 50%; height: 1px; width: 20%;
+    background: linear-gradient(to right, transparent, var(--accent-collapse), transparent);
+    opacity: 0.3;
+  }
+  .line-left { left: 30%; }
+  .line-right { right: 30%; }
+
+  /* ── CTA ── */
+  .cta-section {
+    text-align: center; padding: 10rem 2rem;
+    background: radial-gradient(ellipse 60% 40% at 50% 80%, rgba(168,104,130,0.06) 0%, transparent 70%);
+  }
+  .cta-text {
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 300; line-height: 1.6; max-width: 700px; margin: 0 auto;
+  }
+  .cta-highlight {
+    font-weight: 600;
+    background: var(--gradient-collapse);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center; padding: 3rem 2rem 4rem;
+    font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.1em;
+  }
+
+  /* ── Fade-in on scroll ── */
+  .fade-in {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+  }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .module-features { grid-template-columns: 1fr; }
+    .module-card { padding: 2rem; }
+    .collision-viz { height: 140px; }
+    .collision-orb { width: 24px; height: 24px; }
+    section { padding: 4rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="container">
+    <h1 class="serif">
+      <span class="title-word">亲</span><span class="title-word">身</span><span class="title-word">试</span><span class="title-word">探</span>
+    </h1>
+    <p class="subtitle">认知边界的理性边缘，获得对规律更体感的直觉对应。<br>经历窒息的濒死，也找到了空气中包含维系人生存的成分。<br>对难以自发觉察、司空见惯的无形之物，因而显形。</p>
+    <div class="brand">坍 缩</div>
+  </div>
+  <div class="scroll-hint"><span></span><p>向下探索</p></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Quote ── -->
+<div class="quote-block fade-in">
+  <p class="big-quote">"鱼只有离开水的那一刻，才真正'看见'了水。"</p>
+  <p class="attribution">—— 界限体验 · Liminal Experience</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ── Module 1: 肉身 ── -->
+<section class="module-section" id="module1">
+  <div class="module-grid">
+    <div class="module-card warm fade-in">
+      <div class="module-number">模块一</div>
+      <div class="module-title serif">认知压力舱</div>
+      <div class="module-subtitle">在微型"窒息"中，让隐形之物显形</div>
+      <div class="module-body">
+        <p>维系我们生存的核心规律——空气、信任、秩序的底色——正因<span class="highlight">过于常态</span>，沉入感知的背景噪音。只有推到临界点，边界才会像撞在玻璃上的飞鸟，瞬间清晰显现。</p>
+        <p>我们不制造真正的危险。我们制造<span class="highlight">认知上的临界瞬间</span>——通过高压情境与深度推演，在精神的短暂失控中，让那些你以为早已理解、实则从未触及的隐形边界，暴露出真实的轮廓。</p>
+      </div>
+      <div class="module-features">
+        <div class="feature-item">
+          <h4 style="color: var(--accent-warm);">沉浸情境推演</h4>
+          <p>在限时压力中直面自身思维模式的反噬，经历可控范围内的认知"失序"。</p>
+        </div>
+        <div class="feature-item">
+          <h4 style="color: var(--accent-warm);">破局时刻捕捉</h4>
+          <p>在旧模型碎裂的精确瞬间暂停、凝视、记录——把冲击炼成不可逆的直觉本能。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Module 2: 数据 ── -->
+<section class="module-section" id="module2">
+  <div class="module-grid">
+    <div class="module-card cold fade-in">
+      <div class="module-number">模块二</div>
+      <div class="module-title serif">沉默的墓地</div>
+      <div class="module-subtitle">不看向成功者的幸存，而去倾听未能归来者的回响</div>
+      <div class="module-body">
+        <p>海量数据中能够被采集到的，永远是那些<span class="highlight">抵达了边缘但没有牺牲的极少数幸运儿</span>。真正致命的盲区，藏匿在那些永远沉默的样本之中。</p>
+        <p>我们搜集历史、科学与思维史上的惨烈失败——但不同于传统的案例分析，我们的焦点不是"他们如何倒下"，而是<span class="highlight">"当时有哪些隐形变量未被纳入任何人的视野"</span>。</p>
+      </div>
+      <div class="module-features">
+        <div class="feature-item">
+          <h4 style="color: var(--accent-cold);">失效模式回溯</h4>
+          <p>从海量失败样本中提取"当时不可见的关键变量"，绘制统计学上的安全空白区。</p>
+        </div>
+        <div class="feature-item">
+          <h4 style="color: var(--accent-cold);">反向盲区检测</h4>
+          <p>将你的当前构想投入失败者墓地的对照矩阵，发现潜藏的幸存者偏差。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Module 3: 坍缩 ── -->
+<section class="module-section" id="module3">
+  <div class="module-grid">
+    <div class="module-card collapse fade-in">
+      <div class="module-number">模块三</div>
+      <div class="module-title serif">双轨坍缩画布</div>
+      <div class="module-subtitle">个体的直觉与群体的概率，在此对撞</div>
+      <div class="module-body">
+        <p>肉身体感是一条轨——你的直觉告诉你该冲过去。数据推演是另一条轨——历史样本中，99% 的此类直觉都止步于第二步。两条轨道在画布上各自延展，然后<span class="highlight">交汇、摩擦、撕裂、再结晶</span>。</p>
+        <p>每个人都会在碰撞中得到属于自己的答案。这不再是一份客观的报告，也不是一个温情的心灵鸡汤——而是一次<span class="highlight">属于你的坍缩</span>。</p>
+      </div>
+      <!-- Collision Visual -->
+      <div class="collision-viz">
+        <div class="collision-orb orb-warm"></div>
+        <div class="collision-orb orb-cold"></div>
+        <div class="collision-line line-left"></div>
+        <div class="collision-line line-right"></div>
+        <div class="collision-center"></div>
+      </div>
+      <div class="module-features">
+        <div class="feature-item">
+          <h4 style="color: var(--accent-collapse);">直觉-数据对撞矩阵</h4>
+          <p>将你的体感判断与宏观统计在同一平面上呈现张力，而非给出非此即彼的答案。</p>
+        </div>
+        <div class="feature-item">
+          <h4 style="color: var(--accent-collapse);">个人决策模型析出</h4>
+          <p>在对撞的余烬中，凝结出专属于你的风险直觉——不是大众真理，而是你的真理。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── Closing Quote ── -->
+<div class="quote-block fade-in">
+  <p class="big-quote">"真正可怕的不是只选择其中一种，<br>而是在第一条路径里成为了没有归来的炮灰，<br>或者在第二条路径里把幸存者的运气，<br>误认为了自己掌握的真理。"</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ── CTA ── -->
+<section class="cta-section">
+  <div class="container">
+    <p class="cta-text serif">
+      为那些不愿在<span class="cta-highlight">亲身试错</span>中化为灰烬、<br>也拒绝在<span class="cta-highlight">二手数据</span>中安于幻觉的人。
+    </p>
+  </div>
+</section>
+
+<footer>
+  <p>坍 缩 &nbsp;·&nbsp; 认知压力与风险直觉的双轨引擎</p>
+</footer>
+
+<script>
+  // ── Background particles ──
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h;
+  const particles = [];
+  const COUNT = 80;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = document.documentElement.scrollHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  class Particle {
+    constructor() {
+      this.reset();
+      this.y = Math.random() * h;
+    }
+    reset() {
+      this.x = Math.random() * w;
+      this.y = -10;
+      this.size = Math.random() * 1.5 + 0.5;
+      this.speed = Math.random() * 0.3 + 0.1;
+      this.opacity = Math.random() * 0.4 + 0.1;
+      this.wobble = Math.random() * 0.5;
+      this.wobbleSpeed = Math.random() * 0.02 + 0.005;
+      this.wobbleOffset = Math.random() * Math.PI * 2;
+    }
+    update() {
+      this.y += this.speed;
+      this.x += Math.sin(this.y * this.wobbleSpeed + this.wobbleOffset) * this.wobble;
+      if (this.y > h + 10) { this.reset(); this.y = -10; }
+      if (this.x < -10) this.x = w + 10;
+      if (this.x > w + 10) this.x = -10;
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(180,175,170,${this.opacity})`;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < COUNT; i++) {
+    const p = new Particle();
+    p.y = Math.random() * h;
+    particles.push(p);
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, w, h);
+    for (const p of particles) { p.update(); p.draw(); }
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // Handle canvas height on scroll
+  let scrollTimeout;
+  window.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      h = canvas.height = document.documentElement.scrollHeight;
+    }, 100);
+  });
+
+  // ── Scroll-triggered fade-in ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

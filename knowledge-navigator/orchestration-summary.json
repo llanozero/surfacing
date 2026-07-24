@@ -1,0 +1,316 @@
+{
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": "2026.07.06.8",
+    "version_source": "skill-version.json",
+    "runtime_skill_dir": "c:\\Users\\llano\\.trae-cn\\builtin\\design\\default\\skills\\solo-design",
+    "recorded_at": "2026-07-24T06:13:00.000Z"
+  },
+  "project": {
+    "name": "认知导航",
+    "path": "c:\\Users\\llano\\Desktop\\龙虾\\surfacing\\knowledge-navigator",
+    "operation": "create",
+    "deviceType": "mobile",
+    "language": "zh-CN",
+    "dashboardMode": false,
+    "intentProfile": {
+      "caseFamily": "free_exploration",
+      "graphicStrategy": null,
+      "sourceType": null,
+      "routingReason": "long PRD design document for 4-layer knowledge navigation mobile app"
+    },
+    "replicationMode": null,
+    "sourceUrl": null,
+    "styleDefinitionBrief": "A warm amber-toned knowledge navigation mobile app with soft card surfaces, generous whitespace, and comfortable typography. The visual language leans calm and focused — like Notion's quiet density with warmer, earthier accents. Cards use subtle borders over shadows, rounded corners stay restrained, and the overall rhythm supports deep reading and exploration.",
+    "designRead": "Mobile knowledge navigation app / knowledge workers & learners / warm calm focus / medium-low density / avoid cold clinical blue-gray palette",
+    "designDials": {
+      "layoutVariance": 2,
+      "motionIntensity": 2,
+      "visualDensity": 3
+    },
+    "styleContinuityAnchors": {
+      "colorSystem": {
+        "primaryColorRole": "single warm amber brand hue #D4893A used for primary CTA and selected states",
+        "brandHuePolicy": "free-explore uses no secondary/accent brand hue; identities/categories use neutral or primary tints",
+        "stateColors": "success green / warning amber / error red / info blue"
+      },
+      "shapeSystem": {
+        "radiusScale": "sm:4px md:8px lg:12px full:9999px — restrained, no large rounded shapes",
+        "radiusMax": 12
+      },
+      "typographySystem": {
+        "titleStack": "Noto Sans SC, Inter, sans-serif",
+        "bodyStack": "Noto Sans SC, Inter, sans-serif",
+        "monoStack": "JetBrains Mono, monospace"
+      },
+      "spacingSystem": null,
+      "componentLanguage": "card-based with subtle borders, no shadows on static surfaces",
+      "surfaceAndDepth": {
+        "staticSurfaces": "border-led, no shadow; cards use --border for separation",
+        "floatingLayers": "shadow with alpha <= 0.05 for modals and popovers only"
+      },
+      "imageryAndIconography": {
+        "iconSource": "Lucide icons via inline SVG",
+        "emojiPolicy": "not used as functional UI icons"
+      },
+      "interactionTone": "subtle, calm — no aggressive animations, smooth transitions only"
+    },
+    "cssPreflightEvidence": {
+      "applies": true,
+      "status": "passed",
+      "brandPrefix": null,
+      "checks": {
+        "themeVars": "present",
+        "semanticTokenFallback": "present",
+        "themeInline": "present",
+        "tailwindCdn": "present",
+        "htmlClass": "present"
+      },
+      "retryCount": 0,
+      "blockingReason": null
+    },
+    "sharedProjectShellContract": {
+      "navigationShell": "mobile bottom tab bar with 4 items: 全览, 导航, 浏览, 管理. Each tab navigates to corresponding page.",
+      "primaryColorSystem": "single warm amber primary hue #D4893A",
+      "typographySystem": "Noto Sans SC + Inter sans-serif stack",
+      "radiusScale": "sm:4px md:8px lg:12px full:9999px",
+      "surfaceDepthModel": "static cards use border, no shadow; floating layers use subtle shadow alpha <= 0.05",
+      "ctaStyle": "warm amber bg on primary buttons, outline style for secondary, rounded-md 8px",
+      "alignmentRules": "mobile full-width layout, px-4 horizontal padding, content centered max-w-md"
+    },
+    "mobileNavigation": {
+      "applies": true,
+      "type": "bottom-tab",
+      "items": [
+        { "key": "global-view", "label": "全览", "icon": "globe" },
+        { "key": "path-select", "label": "导航", "icon": "route" },
+        { "key": "content-browse", "label": "浏览", "icon": "play" },
+        { "key": "tree-manager", "label": "管理", "icon": "folder-tree" }
+      ],
+      "heightPx": 56,
+      "position": "flow-bottom",
+      "activeState": "primary icon+label color only; geometry stays identical"
+    },
+    "generationTree": {
+      "root": {
+        "nodeId": "gen-project-shell",
+        "kind": "project-shell",
+        "pageIds": ["page-global-view", "page-path-select", "page-content-browse", "page-tree-manager"],
+        "output": "partials/project-shell.html",
+        "sharedRegions": ["mobile-bottom-nav", "page-frame"],
+        "privateRegions": [],
+        "mutableSlots": ["active-nav-tab"],
+        "status": "planned",
+        "children": [
+          {
+            "nodeId": "gen-page-global-view",
+            "kind": "page-leaf",
+            "pageIds": ["page-global-view"],
+            "output": "pages/global-view.html",
+            "sharedRegions": [],
+            "privateRegions": ["page-body-content"],
+            "mutableSlots": [],
+            "status": "planned",
+            "children": []
+          },
+          {
+            "nodeId": "gen-page-path-select",
+            "kind": "page-leaf",
+            "pageIds": ["page-path-select"],
+            "output": "pages/path-select.html",
+            "sharedRegions": [],
+            "privateRegions": ["page-body-content"],
+            "mutableSlots": [],
+            "status": "planned",
+            "children": []
+          },
+          {
+            "nodeId": "gen-page-content-browse",
+            "kind": "page-leaf",
+            "pageIds": ["page-content-browse"],
+            "output": "pages/content-browse.html",
+            "sharedRegions": [],
+            "privateRegions": ["page-body-content"],
+            "mutableSlots": [],
+            "status": "planned",
+            "children": []
+          },
+          {
+            "nodeId": "gen-page-tree-manager",
+            "kind": "page-leaf",
+            "pageIds": ["page-tree-manager"],
+            "output": "pages/tree-manager.html",
+            "sharedRegions": [],
+            "privateRegions": ["page-body-content"],
+            "mutableSlots": [],
+            "status": "planned",
+            "children": []
+          }
+        ]
+      }
+    }
+  },
+  "designSource": {
+    "styleConstraints": {
+      "radiusMax": 12,
+      "staticShadowAlphaMax": 0.05
+    },
+    "libraryIdentity": null
+  },
+  "pages": [
+    {
+      "nodeId": "page-global-view",
+      "title": "全局全览",
+      "pageIndex": 1,
+      "htmlSrc": "pages/global-view.html",
+      "group": 0,
+      "visualNorthStar": "Global mind-map style overview with floating cognitive card nodes connected to path hubs. Search bar at top, visual node graph in center. Warm amber accent for matched/selected cards.",
+      "compositionPattern": "search-bar-top + node-graph-center",
+      "continuityAnchors": ["bottom-tab-bar", "warm-amber-brand-color", "card-border-style"],
+      "imagePlan": [],
+      "chartsRequired": false,
+      "generationNodeId": "gen-page-global-view"
+    },
+    {
+      "nodeId": "page-path-select",
+      "title": "路径选择",
+      "pageIndex": 2,
+      "htmlSrc": "pages/path-select.html",
+      "group": 0,
+      "visualNorthStar": "Vertical path flow diagram: current node centered, previous node below, next nodes above. Pull-up panel from bottom with node details, weight editing, and new connection input. Clean card layers with directional arrows.",
+      "compositionPattern": "vertical-path-flow + pull-up-panel",
+      "continuityAnchors": ["bottom-tab-bar", "warm-amber-brand-color", "card-border-style"],
+      "imagePlan": [],
+      "chartsRequired": false,
+      "generationNodeId": "gen-page-path-select"
+    },
+    {
+      "nodeId": "page-content-browse",
+      "title": "内容浏览",
+      "pageIndex": 3,
+      "htmlSrc": "pages/content-browse.html",
+      "group": 0,
+      "visualNorthStar": "Full-screen card swipe viewer, TikTok-like vertical cards with cognitive card content. Each card shows title, description, and related metadata. Swipe indicator at side. Settings gear for swipe direction toggle.",
+      "compositionPattern": "fullscreen-stacked-cards + swipe-indicator",
+      "continuityAnchors": ["bottom-tab-bar", "warm-amber-brand-color", "card-border-style"],
+      "imagePlan": [],
+      "chartsRequired": false,
+      "generationNodeId": "gen-page-content-browse"
+    },
+    {
+      "nodeId": "page-tree-manager",
+      "title": "树形管理",
+      "pageIndex": 4,
+      "htmlSrc": "pages/tree-manager.html",
+      "group": 0,
+      "visualNorthStar": "File-explorer style tree view with root/ as root node, expandable nested cognitive cards (root/1, root/1/2). Search bar at top. Edit panel on tap for title, description, corpus editing.",
+      "compositionPattern": "tree-view-list + edit-panel-drawer",
+      "continuityAnchors": ["bottom-tab-bar", "warm-amber-brand-color", "card-border-style"],
+      "imagePlan": [],
+      "chartsRequired": false,
+      "generationNodeId": "gen-page-tree-manager"
+    }
+  ],
+  "wiringPlan": [
+    {
+      "sourceNodeId": "page-global-view",
+      "domId": "nav-path-select",
+      "targetNodeId": "page-path-select",
+      "transitionLabel": "选择路径节点",
+      "hideEdge": false
+    },
+    {
+      "sourceNodeId": "page-path-select",
+      "domId": "nav-content-browse",
+      "targetNodeId": "page-content-browse",
+      "transitionLabel": "开始浏览",
+      "hideEdge": false
+    }
+  ],
+  "hiddenInteractionPlan": [
+    {
+      "sourceNodeId": "page-global-view",
+      "domId": "tab-nav-path-select",
+      "targetNodeId": "page-path-select",
+      "transitionLabel": "底部导航-导航",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-global-view",
+      "domId": "tab-nav-content-browse",
+      "targetNodeId": "page-content-browse",
+      "transitionLabel": "底部导航-浏览",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-global-view",
+      "domId": "tab-nav-tree-manager",
+      "targetNodeId": "page-tree-manager",
+      "transitionLabel": "底部导航-管理",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-path-select",
+      "domId": "tab-nav-global-view",
+      "targetNodeId": "page-global-view",
+      "transitionLabel": "底部导航-全览",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-path-select",
+      "domId": "tab-nav-content-browse",
+      "targetNodeId": "page-content-browse",
+      "transitionLabel": "底部导航-浏览",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-path-select",
+      "domId": "tab-nav-tree-manager",
+      "targetNodeId": "page-tree-manager",
+      "transitionLabel": "底部导航-管理",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-content-browse",
+      "domId": "tab-nav-global-view",
+      "targetNodeId": "page-global-view",
+      "transitionLabel": "底部导航-全览",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-content-browse",
+      "domId": "tab-nav-path-select",
+      "targetNodeId": "page-path-select",
+      "transitionLabel": "底部导航-导航",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-content-browse",
+      "domId": "tab-nav-tree-manager",
+      "targetNodeId": "page-tree-manager",
+      "transitionLabel": "底部导航-管理",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-tree-manager",
+      "domId": "tab-nav-global-view",
+      "targetNodeId": "page-global-view",
+      "transitionLabel": "底部导航-全览",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-tree-manager",
+      "domId": "tab-nav-path-select",
+      "targetNodeId": "page-path-select",
+      "transitionLabel": "底部导航-导航",
+      "hideEdge": true
+    },
+    {
+      "sourceNodeId": "page-tree-manager",
+      "domId": "tab-nav-content-browse",
+      "targetNodeId": "page-content-browse",
+      "transitionLabel": "底部导航-浏览",
+      "hideEdge": true
+    }
+  ]
+}

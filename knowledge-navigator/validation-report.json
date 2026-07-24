@@ -1,0 +1,188 @@
+{
+  "success": true,
+  "outcome": "passed",
+  "repairable": true,
+  "terminalViolations": [],
+  "terminalBlockingSummary": null,
+  "skillProvenance": {
+    "name": "solo-design",
+    "version": "2026.07.22.00.00.00",
+    "version_source": "skill-release-manifest.json",
+    "runtime_skill_dir": "c:\\Users\\llano\\.trae-cn\\builtin\\design\\default\\skills\\solo-design",
+    "recorded_at": null,
+    "expected_version": "2026.07.22.00.00.00",
+    "status": "manifest_fallback",
+    "read_status": "ok",
+    "reason": "runtime-orchestration-summary.json missing skillProvenance; used skill-release-manifest.json"
+  },
+  "operatingMode": "free-explore",
+  "renderBlockingErrorCount": 0,
+  "softWarningCount": 17,
+  "renderBlockingErrors": [],
+  "errorSignatures": [],
+  "softWarnings": [
+    "[html-head-style] canvas-path-select.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[orchestration-summary] runtime-orchestration-summary.json is missing. Canvas validation can still pass, but quality-context checks (operatingMode, visualNorthStar, compositionPattern, continuityAnchors, miniProgramStyle) are degraded.",
+    "[mobile-bottom-overlay] pages/path-select.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"absolute left-[7px] top-0 bottom-0 w-px\"",
+    "[mobile-bottom-overlay] pages/content-browse.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"browse-card absolute left-0 right-0 bottom-0 z-10\"",
+    "[mobile-bottom-overlay] pages/tree-manager.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"fixed right-4 bottom-20 z-40 inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[var(--primary)] text-white shadow-lg transition-all durati",
+    "[mobile-bottom-overlay] pages/canvas-content-browse.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"browse-card absolute left-0 right-0 bottom-0 z-10\"",
+    "[mobile-bottom-overlay] pages/canvas-tree-manager.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/20\"",
+    "[mobile-navigation-consistency] 1 mobile page(s) do not expose a 3+ item data-nav-key nav cluster while sibling pages do. This is acceptable for detail/reward/modal pages only when planned explicitly.",
+    "[html-quality] colors_and_type.css: free-explore brand CSS must use one primary hue only; forbidden secondary/accent brand variables found (--secondary, --secondary-foreground, --accent, --accent-foreground). Use --state-success/warning/error/info only for semantic states.",
+    "[html-quality] colors_and_type.css: free-explore radius tokens must stay within the restrained 2/4/8/12/16px scale; oversized or forbidden radius tokens found (--radius-xl: 1rem). Do not use 20px+ radii unless the user explicitly requested large rounded shapes.",
+    "[html-quality] canvas-content-browse.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] canvas-content-browse.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] canvas-global-view.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] canvas-path-select.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] canvas-path-select.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] canvas-tree-manager.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] canvas-tree-manager.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states."
+  ],
+  "repairPlanHints": [
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "canvas-content-browse.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "canvas-global-view.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "canvas-path-select.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    },
+    {
+      "errorClass": "hardcoded-color-in-body",
+      "owner": "sub-agent",
+      "repairScope": "targeted-token-replace",
+      "strategy": "targeted_token_replace_once",
+      "affectedFiles": [
+        "canvas-tree-manager.html"
+      ],
+      "repairReportPath": null,
+      "repairAlreadyAttempted": false,
+      "allowSourceRead": "no-full-html-read",
+      "maxValidationRuns": 2
+    }
+  ],
+  "repairActionTable": [],
+  "errorCount": 0,
+  "warningCount": 17,
+  "errors": [],
+  "warnings": [
+    "[html-head-style] canvas-path-select.html: found 1 custom <style> block(s) in <head>. The <head> is owned by apply-html-head-contract.mjs; move custom styles before </body> or re-run apply-html-head-contract.mjs <css-path> <html-file> --replace-head to relocate them.",
+    "[orchestration-summary] runtime-orchestration-summary.json is missing. Canvas validation can still pass, but quality-context checks (operatingMode, visualNorthStar, compositionPattern, continuityAnchors, miniProgramStyle) are degraded.",
+    "[mobile-bottom-overlay] pages/path-select.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"absolute left-[7px] top-0 bottom-0 w-px\"",
+    "[mobile-bottom-overlay] pages/content-browse.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"browse-card absolute left-0 right-0 bottom-0 z-10\"",
+    "[mobile-bottom-overlay] pages/tree-manager.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"fixed right-4 bottom-20 z-40 inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[var(--primary)] text-white shadow-lg transition-all durati",
+    "[mobile-bottom-overlay] pages/canvas-content-browse.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"browse-card absolute left-0 right-0 bottom-0 z-10\"",
+    "[mobile-bottom-overlay] pages/canvas-tree-manager.html: bottom fixed/absolute CTA or navigation found. Ensure it has safe-area spacing and does not cover content. Evidence: class=\"absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/20\"",
+    "[mobile-navigation-consistency] 1 mobile page(s) do not expose a 3+ item data-nav-key nav cluster while sibling pages do. This is acceptable for detail/reward/modal pages only when planned explicitly.",
+    "[html-quality] colors_and_type.css: free-explore brand CSS must use one primary hue only; forbidden secondary/accent brand variables found (--secondary, --secondary-foreground, --accent, --accent-foreground). Use --state-success/warning/error/info only for semantic states.",
+    "[html-quality] colors_and_type.css: free-explore radius tokens must stay within the restrained 2/4/8/12/16px scale; oversized or forbidden radius tokens found (--radius-xl: 1rem). Do not use 20px+ radii unless the user explicitly requested large rounded shapes.",
+    "[html-quality] canvas-content-browse.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] canvas-content-browse.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] canvas-global-view.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] canvas-path-select.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] canvas-path-select.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states.",
+    "[html-quality] canvas-tree-manager.html: hardcoded colors are forbidden outside <style id=\"theme-vars\">. Use brand CSS variables from the token reference.",
+    "[html-quality] canvas-tree-manager.html: free-explore pages must not use secondary/accent brand variables. Use the single primary hue, neutral tints, or --state-success/warning/error/info for real semantic states."
+  ],
+  "validationRunDisciplineStatus": {
+    "declared": false,
+    "restoreMode": false,
+    "maxFullValidationRuns": null,
+    "validationHistoryCount": 0,
+    "repairLedgerCount": 0,
+    "softWarningsTriggerRepair": null,
+    "terminalState": null,
+    "nextAction": null,
+    "violations": [],
+    "success": true
+  },
+  "terminalState": null,
+  "nextCheck": {
+    "type": "finish-readiness",
+    "command": "node \"c:\\Users\\llano\\.trae-cn\\builtin\\design\\default\\skills\\solo-design\\shared-runtime\\deterministic-tooling\\validate-finish-readiness.mjs\" \"c:\\Users\\llano\\Desktop\\龙虾\\surfacing\\knowledge-navigator\" --check=all",
+    "fullValidationAllowed": false,
+    "reason": "workspace validation passed; run complete finish readiness before final delivery"
+  },
+  "repairBatch": [],
+  "repairContextPacket": {
+    "schema_version": "1.0",
+    "purpose": "small-context repair packet; read this before full validation-report.json",
+    "success": true,
+    "terminalState": null,
+    "skillProvenance": {
+      "name": "solo-design",
+      "version": "2026.07.22.00.00.00",
+      "version_source": "skill-release-manifest.json",
+      "runtime_skill_dir": "c:\\Users\\llano\\.trae-cn\\builtin\\design\\default\\skills\\solo-design",
+      "recorded_at": null,
+      "expected_version": "2026.07.22.00.00.00",
+      "status": "manifest_fallback",
+      "read_status": "ok",
+      "reason": "runtime-orchestration-summary.json missing skillProvenance; used skill-release-manifest.json"
+    },
+    "renderBlockingErrorCount": 0,
+    "softWarningCount": 17,
+    "renderBlockingErrors": [],
+    "repairActionTable": [],
+    "nextCheck": {
+      "type": "finish-readiness",
+      "command": "node \"c:\\Users\\llano\\.trae-cn\\builtin\\design\\default\\skills\\solo-design\\shared-runtime\\deterministic-tooling\\validate-finish-readiness.mjs\" \"c:\\Users\\llano\\Desktop\\龙虾\\surfacing\\knowledge-navigator\" --check=all",
+      "fullValidationAllowed": false,
+      "reason": "workspace validation passed; run complete finish readiness before final delivery"
+    },
+    "forbidden": [
+      "do not read validator source",
+      "do not rerun full validation when nextCheck.fullValidationAllowed=false",
+      "do not start preview/browser unless user explicitly asks",
+      "do not hand-edit repair ledger fields"
+    ]
+  },
+  "projectFileHashes": {
+    "knowledge-navigator.design": "8f7ce32d0065f8ab7257ccefe19fe719c0d5f36f6a81e637d9ec4d7c86dd06dd",
+    "colors_and_type.css": "7cd12be03cc0c1fa040bfcd8f027c8d0327acfd5f0c7f8c7a2ff010c45689998",
+    "pages/canvas-content-browse.html": "c7005ddd983eaa644fd3599ef8ca0923d1d36dc98fd025e6c866271e6c9e423b",
+    "pages/canvas-global-view.html": "b6ac4bc6983ccb1c280ef879d7e3b082da4249ff816ba9cd848781ab6836d273",
+    "pages/canvas-path-select.html": "0ca55d89bdd3762f6862ddf09dd550347952163629c903266ef3a97ea402f771",
+    "pages/canvas-tree-manager.html": "f3de30be2004b01f29b246367f3f051feab6b8f39e8d100fe3cb8fb486f94a7e",
+    "pages/content-browse.html": "1e8fbffba277187bd3274266e1f92a695901850c9bb5aaf393ae6ba49da7a9a6",
+    "pages/global-view.html": "e5c1b069af30b4e41b7a6326c46a41ab88a377f714d7285845c349da8aa962f1",
+    "pages/path-select.html": "c3afe9855479d7b972a8ef0378e00c15e805d5c40ac6713c13657030e2988cd9",
+    "pages/tree-manager.html": "3a09dfd4e9103716060b3e191b140cde9b2abd4dbc6fb803dfbe13a4aa302d88"
+  },
+  "designDir": "c:\\Users\\llano\\Desktop\\龙虾\\surfacing\\knowledge-navigator",
+  "expectedPages": 8,
+  "requireInteractions": "card-node-ml:global-view.html,btn-plan-path:path-select.html,canvas-node-nav:canvas-global-view.html,canvas-btn-browse:canvas-path-select.html",
+  "checkedAt": "2026-07-24T10:10:29.281Z"
+}

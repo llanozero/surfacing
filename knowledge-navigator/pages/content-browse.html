@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容浏览 - 认知导航</title>
+    <style id="theme-vars">
+/* ===== 认知导航 — 温润聚焦 品牌样式 ===== */
+
+/* ===== Primary Color Scale (Warm Amber) ===== */
+:root {
+  --color-primary-50: #FDF6EE;
+  --color-primary-100: #FBE9D3;
+  --color-primary-200: #F6D3A8;
+  --color-primary-300: #F0B672;
+  --color-primary-400: #E89D47;
+  --color-primary-500: #D4893A;
+  --color-primary-600: #BA6E2C;
+  --color-primary-700: #9B5626;
+  --color-primary-800: #7D4425;
+  --color-primary-900: #683A22;
+  --color-primary-950: #381C0F;
+}
+
+/* ===== Neutral Scale (Warm Gray) ===== */
+:root {
+  --color-neutral-50: #FAF7F4;
+  --color-neutral-100: #F3EFEA;
+  --color-neutral-200: #E8E2D8;
+  --color-neutral-300: #D4CCC0;
+  --color-neutral-400: #B0A696;
+  --color-neutral-500: #8E8476;
+  --color-neutral-600: #6E6559;
+  --color-neutral-700: #595149;
+  --color-neutral-800: #4A433D;
+  --color-neutral-900: #3D3732;
+  --color-neutral-950: #2D2420;
+}
+
+/* ===== State Colors ===== */
+:root {
+  --state-success: #5B9A5B;
+  --state-success-light: #E8F3E8;
+  --state-warning: #D4893A;
+  --state-warning-light: #FDF6EE;
+  --state-error: #C2544A;
+  --state-error-light: #FAE8E6;
+  --state-info: #5B7F9A;
+  --state-info-light: #E8EEF3;
+}
+
+/* ===== Typography ===== */
+:root {
+  --font-sans: 'Noto Sans SC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+}
+
+/* ===== Radius Scale ===== */
+:root {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+}
+
+/* ===== Semantic Aliases ===== */
+:root {
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-950);
+  --card: #FFFFFF;
+  --card-foreground: var(--color-neutral-950);
+  --popover: #FFFFFF;
+  --popover-foreground: var(--color-neutral-950);
+  --primary: var(--color-primary-500);
+  --primary-foreground: #FFFFFF;
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-500);
+  --border: var(--color-neutral-200);
+  --input: var(--color-neutral-100);
+  --ring: var(--color-primary-400);
+}
+
+/* ===== Light Mode (Default) ===== */
+.light {
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-950);
+  --card: #FFFFFF;
+  --card-foreground: var(--color-neutral-950);
+  --popover: #FFFFFF;
+  --popover-foreground: var(--color-neutral-950);
+  --primary: var(--color-primary-500);
+  --primary-foreground: #FFFFFF;
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-500);
+  --border: var(--color-neutral-200);
+  --input: var(--color-neutral-100);
+  --ring: var(--color-primary-400);
+}
+
+/* ===== Dark Mode ===== */
+.dark {
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-neutral-50);
+  --card: var(--color-neutral-900);
+  --card-foreground: var(--color-neutral-50);
+  --popover: var(--color-neutral-900);
+  --popover-foreground: var(--color-neutral-50);
+  --primary: var(--color-primary-400);
+  --primary-foreground: var(--color-neutral-950);
+  --muted: var(--color-neutral-800);
+  --muted-foreground: var(--color-neutral-400);
+  --border: var(--color-neutral-800);
+  --input: var(--color-neutral-800);
+  --ring: var(--color-primary-300);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans">
+        <!-- ===== Simulated Mobile Status Bar ===== -->
+        <div class="sticky top-0 z-40 flex items-center justify-between h-7 px-5 bg-[var(--background)] text-[11px] leading-none text-[var(--foreground)]">
+            <span class="tabular-nums font-medium">9:41</span>
+            <div class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="5" width="2" height="6" rx="0.5" fill="currentColor"/>
+                    <rect x="4.5" y="3.5" width="2" height="9" rx="0.5" fill="currentColor"/>
+                    <rect x="8" y="2" width="2" height="11" rx="0.5" fill="currentColor"/>
+                    <rect x="11.5" y="1" width="2" height="13" rx="0.5" fill="currentColor"/>
+                </svg>
+                <svg class="w-5 h-3" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0.5" y="0.5" width="20" height="12" rx="2.5" stroke="currentColor" stroke-width="1"/>
+                    <rect x="2" y="2" width="15" height="9" rx="1" fill="currentColor"/>
+                    <rect x="19" y="3" width="1.5" height="3" rx="0.75" fill="currentColor"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- ===== Content Wrapper — Full-screen card browsing ===== -->
+        <div id="page-content" class="flex-1 relative overflow-hidden">
+            <!-- Top Overlay Bar -->
+            <div class="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-2.5 bg-[var(--background)]/85 backdrop-blur-md">
+                <button data-dom-id="btn-back-path" class="flex items-center gap-1 min-w-0 text-[13px] text-[var(--muted-foreground)] transition-colors duration-150">
+                    <i data-lucide="arrow-left" class="w-4 h-4 shrink-0"></i>
+                    <span class="truncate">返回路径</span>
+                </button>
+                <span class="text-[13px] font-semibold tabular-nums text-[var(--foreground)]">3/8</span>
+                <div class="flex items-center gap-1 text-[11px] text-[var(--muted-foreground)] whitespace-nowrap">
+                    <i data-lucide="settings" class="w-3.5 h-3.5 shrink-0"></i>
+                    <span>上滑切换</span>
+                </div>
+            </div>
+
+            <!-- Card Stack Area -->
+            <div class="absolute inset-0 pt-11 flex flex-col">
+                <!-- Swipe Indicator Arrows (Right Edge) -->
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-3">
+                    <div class="card-swipe-arrow-up flex items-center justify-center w-7 h-7 rounded-full bg-[var(--card)]/90 shadow-sm border border-[var(--border)]">
+                        <i data-lucide="chevron-up" class="w-4 h-4 text-[var(--primary)]"></i>
+                    </div>
+                    <div class="card-swipe-arrow-down flex items-center justify-center w-7 h-7 rounded-full bg-[var(--card)]/90 shadow-sm border border-[var(--border)]">
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted-foreground)]"></i>
+                    </div>
+                </div>
+
+                <!-- Card Stack Container -->
+                <div class="flex-1 relative overflow-hidden px-0">
+                    <!-- Card 3 (Bottom, most offset) -->
+                    <div class="browse-card absolute left-0 right-0 bottom-0 z-10" style="top: 32%;">
+                        <div class="h-full mx-2 bg-[var(--card)] rounded-t-xl border-t border-[var(--border)] shadow-sm overflow-hidden flex flex-col">
+                            <div class="h-1.5 w-full shrink-0" style="background: linear-gradient(90deg, var(--color-primary-100), var(--color-primary-200) 50%, var(--color-primary-100)); opacity: 0.5;"></div>
+                            <div class="flex-1 flex flex-col px-4 pt-3 pb-4">
+                                <h2 class="text-[17px] font-bold text-[var(--foreground)] leading-snug truncate">精加工策略</h2>
+                                <p class="text-[13px] text-[var(--muted-foreground)] leading-relaxed mt-1.5 line-clamp-2">通过建立新旧知识之间的联系，对学习材料进行深度加工，将新信息纳入已有认知结构中，实现有意义的学习。</p>
+                                <div class="flex flex-wrap items-center gap-2 mt-2.5">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--muted)] text-[11px] text-[var(--muted-foreground)] whitespace-nowrap">
+                                        <i data-lucide="link-2" class="w-3 h-3 shrink-0"></i>
+                                        绑定认知卡 4
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--muted)] text-[11px] text-[var(--muted-foreground)] whitespace-nowrap">
+                                        权重 0.68
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 (Middle, medium offset) -->
+                    <div class="browse-card absolute left-0 right-0 z-20" style="top: 16%; bottom: 2%;">
+                        <div class="h-full mx-1.5 bg-[var(--card)] rounded-t-xl border-t border-[var(--border)] shadow-sm overflow-hidden flex flex-col">
+                            <div class="h-2 w-full shrink-0" style="background: linear-gradient(90deg, var(--color-primary-200), var(--color-primary-300) 50%, var(--color-primary-200)); opacity: 0.65;"></div>
+                            <div class="flex-1 flex flex-col px-4 pt-3 pb-4">
+                                <h2 class="text-[18px] font-bold text-[var(--foreground)] leading-snug truncate">双重编码理论</h2>
+                                <p class="text-[13px] text-[var(--muted-foreground)] leading-relaxed mt-1.5 line-clamp-2">言语信息和视觉信息通过不同通道加工，同时呈现图文材料比单一文字更有利于知识保持与迁移。</p>
+                                <div class="flex flex-wrap items-center gap-2 mt-2.5">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--muted)] text-[11px] text-[var(--muted-foreground)] whitespace-nowrap">
+                                        <i data-lucide="link-2" class="w-3 h-3 shrink-0"></i>
+                                        绑定认知卡 2
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--muted)] text-[11px] text-[var(--muted-foreground)] whitespace-nowrap">
+                                        权重 0.72
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 1 (Active, top of stack) -->
+                    <div class="browse-card-active absolute left-0 right-0 top-0 z-30" style="bottom: 0%;">
+                        <div class="h-full mx-0 bg-[var(--card)] rounded-t-xl border-t border-[var(--border)] overflow-hidden flex flex-col" style="box-shadow: 0 -4px 20px rgba(0,0,0,0.06);">
+                            <div class="h-3 w-full shrink-0" style="background: linear-gradient(90deg, var(--color-primary-300), var(--color-primary-500) 40%, var(--color-primary-400) 70%, var(--color-primary-300));"></div>
+                            <div class="flex-1 overflow-y-auto no-scrollbar px-4 pt-4 pb-6">
+                                <h2 class="text-[22px] font-bold text-[var(--foreground)] leading-snug tracking-[-0.01em]" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">认知负载理论</h2>
+                                <p class="text-[14px] text-[var(--muted-foreground)] leading-relaxed mt-2">工作记忆容量有限，学习材料的设计应减少无关认知负荷，增加相关认知负荷，促进图式构建与自动化。</p>
+                                <div class="flex flex-wrap items-center gap-2 mt-3">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--color-primary-50)] text-[12px] text-[var(--primary)] font-medium whitespace-nowrap">
+                                        <i data-lucide="link-2" class="w-3.5 h-3.5 shrink-0"></i>
+                                        绑定认知卡 3
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--muted)] text-[12px] text-[var(--muted-foreground)] whitespace-nowrap">
+                                        权重 0.85
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--state-success-light)] text-[12px] text-[var(--state-success)] font-medium whitespace-nowrap">
+                                        <i data-lucide="sparkles" class="w-3 h-3 shrink-0"></i>
+                                        核心节点
+                                    </span>
+                                </div>
+
+                                <!-- 语料库预览 -->
+                                <div class="mt-5 rounded-xl bg-[var(--muted)]/60 border border-[var(--border)] overflow-hidden">
+                                    <button class="corpus-toggle w-full flex items-center justify-between px-4 py-3 text-left transition-colors duration-150" onclick="this.parentElement.classList.toggle('corpus-expanded')">
+                                        <span class="text-[13px] font-semibold text-[var(--foreground)]">语料库预览</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-[var(--muted-foreground)] transition-transform duration-200 corpus-chevron"></i>
+                                    </button>
+                                    <div class="corpus-body px-4 pb-4 hidden">
+                                        <div class="text-[13px] text-[var(--muted-foreground)] leading-relaxed space-y-2">
+                                            <p>Sweller (1988) 提出认知负荷理论，将认知负荷分为三类：内在认知负荷（由材料本身的复杂性决定）、外在认知负荷（由教学设计方式引起）和相关认知负荷（促进图式构建的深层加工）。</p>
+                                            <p>关键教学原则：使用工作示例减少外在负荷；整合多种信息源避免注意力分散；利用视听双通道扩展工作记忆容量。</p>
+                                        </div>
+                                        <div class="flex flex-wrap gap-1.5 mt-3">
+                                            <span class="inline-flex px-2 py-0.5 rounded-md bg-[var(--background)] text-[11px] text-[var(--muted-foreground)] whitespace-nowrap">认知心理学</span>
+                                            <span class="inline-flex px-2 py-0.5 rounded-md bg-[var(--background)] text-[11px] text-[var(--muted-foreground)] whitespace-nowrap">教学设计</span>
+                                            <span class="inline-flex px-2 py-0.5 rounded-md bg-[var(--background)] text-[11px] text-[var(--muted-foreground)] whitespace-nowrap">工作记忆</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 关联节点 -->
+                                <div class="mt-4">
+                                    <p class="text-[11px] font-semibold text-[var(--muted-foreground)] uppercase tracking-wide mb-2">关联节点</p>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)]">
+                                            <div class="w-1.5 h-5 rounded-full shrink-0" style="background: var(--color-primary-400);"></div>
+                                            <span class="text-[13px] text-[var(--foreground)] truncate">图式理论</span>
+                                            <span class="text-[11px] text-[var(--muted-foreground)] ml-auto whitespace-nowrap">前置</span>
+                                        </div>
+                                        <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)]">
+                                            <div class="w-1.5 h-5 rounded-full shrink-0" style="background: var(--color-primary-300);"></div>
+                                            <span class="text-[13px] text-[var(--foreground)] truncate">多媒体学习原则</span>
+                                            <span class="text-[11px] text-[var(--muted-foreground)] ml-auto whitespace-nowrap">后置</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Action Bar (Overlaid) -->
+            <div class="absolute bottom-0 left-0 right-0 z-30 flex items-center justify-between px-5 py-3 bg-[var(--card)]/95 backdrop-blur-md border-t border-[var(--border)]" style="padding-bottom: max(12px, env(safe-area-inset-bottom));">
+                <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--color-primary-50)] text-[13px] font-semibold text-[var(--primary)] transition-colors duration-150 whitespace-nowrap">
+                    <i data-lucide="book-open" class="w-4 h-4 shrink-0"></i>
+                    查看详情
+                </button>
+                <button class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[var(--border)] bg-[var(--card)] text-[var(--muted-foreground)] transition-colors duration-150">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== Bottom Navigation Bar ===== -->
+        <nav data-mobile-nav="global" class="sticky bottom-0 left-0 right-0 z-50 bg-[var(--card)] border-t border-[var(--border)]" style="height:56px">
+            <div class="w-full max-w-md mx-auto grid grid-cols-4 h-full">
+                <!-- 全览 -->
+                <button
+                    data-nav-key="global-view"
+                    data-dom-id="tab-nav-global-view"
+                    data-active="false"
+                    class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[var(--muted-foreground)] transition-colors duration-150"
+                >
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">全览</span>
+                </button>
+                <!-- 导航 -->
+                <button
+                    data-nav-key="path-select"
+                    data-dom-id="tab-nav-path-select"
+                    data-active="false"
+                    class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[var(--muted-foreground)] transition-colors duration-150"
+                >
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="6" cy="6" r="2"/>
+                        <circle cx="18" cy="18" r="2"/>
+                        <circle cx="12" cy="12" r="2"/>
+                        <line x1="7.5" y1="5" x2="10.5" y2="11"/>
+                        <line x1="13.5" y1="13" x2="16.5" y2="17"/>
+                    </svg>
+                    <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">导航</span>
+                </button>
+                <!-- 浏览 — active -->
+                <button
+                    data-nav-key="content-browse"
+                    data-dom-id="tab-nav-content-browse"
+                    data-active="true"
+                    class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[var(--primary)] transition-colors duration-150"
+                >
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/>
+                    </svg>
+                    <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">浏览</span>
+                </button>
+                <!-- 管理 -->
+                <button
+                    data-nav-key="tree-manager"
+                    data-dom-id="tab-nav-tree-manager"
+                    data-active="false"
+                    class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[var(--muted-foreground)] transition-colors duration-150"
+                >
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 14a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v6h10v-6z"/>
+                        <path d="M6 12V6a2 2 0 0 1 2-2h1l1 2h5a1 1 0 0 1 1 1v5"/>
+                    </svg>
+                    <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">管理</span>
+                </button>
+            </div>
+        </nav>
+    </main>
+
+    <style>
+        /* Card swipe arrow pulse animation */
+        .card-swipe-arrow-up {
+            animation: swipe-hint-up 2s ease-in-out infinite;
+        }
+        .card-swipe-arrow-down {
+            animation: swipe-hint-down 2s ease-in-out infinite 0.6s;
+        }
+        @keyframes swipe-hint-up {
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(-4px); opacity: 0.5; }
+        }
+        @keyframes swipe-hint-down {
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(4px); opacity: 0.5; }
+        }
+
+        /* Corpus expand/collapse */
+        .corpus-expanded .corpus-body {
+            display: block;
+        }
+        .corpus-expanded .corpus-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Card stack transitions */
+        .browse-card,
+        .browse-card-active {
+            transition: top 0.35s cubic-bezier(0.32, 0.72, 0, 1), bottom 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .card-swipe-arrow-up,
+            .card-swipe-arrow-down {
+                animation: none;
+                opacity: 1;
+            }
+            .browse-card,
+            .browse-card-active {
+                transition: none;
+            }
+        }
+    </style>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>认知导航 — Knowledge Navigator</title>
+<style>
+/* ===== 认知导航 — 深色科技主题 ===== */
+:root {
+  --bg: #0f172a; --bg-card: #1e293b; --bd: #334155;
+  --pr: #06b6d4; --pr-h: #0891b2; --pr-g: rgba(6,182,212,.6);
+  --pr-dim: rgba(6,182,212,.12); --pr-soft: rgba(6,182,212,.25);
+  --cyan-300: #67e8f9; --cyan-400: #22d3ee;
+  --teal-400: #2dd4bf; --teal-500: #14b8a6;
+  --tx: #e2e8f0; --tx-dim: #cbd5e1; --mu: #94a3b8; --mu-dim: #64748b;
+  --font: 'Noto Sans SC','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono: 'JetBrains Mono','SF Mono','Cascadia Code',monospace;
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:18px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  font-family:var(--font);background:var(--bg);color:var(--tx);
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  -webkit-tap-highlight-color:transparent;
+}
+#app{
+  display:flex;flex-direction:column;height:100vh;height:100dvh;
+  width:100%;max-width:480px;margin:0 auto;
+  position:relative;overflow:hidden;background:var(--bg);
+}
+
+/* ===== Status Bar ===== */
+.status-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  height:28px;padding:0 16px;flex-shrink:0;
+  font-size:11px;color:var(--mu);z-index:50;
+}
+.status-bar .time{font-variant-numeric:tabular-nums;font-weight:500}
+
+/* ===== View Container ===== */
+.view{flex:1;min-height:0;position:relative;overflow:hidden;display:none}
+.view.active{display:flex;flex-direction:column}
+
+/* ===== Bottom Tab Bar ===== */
+.tab-bar{
+  display:flex;align-items:center;justify-content:space-around;
+  height:56px;padding:0 4px;flex-shrink:0;
+  background:var(--bg-card);border-top:1px solid var(--bd);
+  padding-bottom:env(safe-area-inset-bottom,0);z-index:50;
+}
+.tab-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;width:64px;height:100%;border:none;background:none;
+  color:var(--mu);font-family:var(--font);font-size:10px;
+  cursor:pointer;transition:color .15s;font-weight:500;
+}
+.tab-btn svg{width:20px;height:20px;flex-shrink:0}
+.tab-btn.active{color:var(--pr)}
+
+/* ===== Utility ===== */
+.no-scroll::-webkit-scrollbar{display:none}
+.no-scroll{-ms-overflow-style:none;scrollbar-width:none}
+
+/* ===== Buttons ===== */
+.btn-primary{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 16px;border-radius:var(--r-sm);border:none;
+  background:var(--pr);color:#0f172a;font-size:14px;font-weight:600;
+  cursor:pointer;transition:opacity .15s,transform .15s;font-family:var(--font);
+}
+.btn-primary:hover{opacity:.9}
+.btn-primary:active{opacity:.75;transform:scale(.97)}
+.btn-outline{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 16px;border-radius:var(--r-sm);
+  background:transparent;color:var(--pr);font-size:14px;font-weight:600;
+  border:1px solid var(--bd);cursor:pointer;transition:background .15s,border-color .15s;font-family:var(--font);
+}
+.btn-outline:hover{background:var(--pr-dim);border-color:var(--pr)}
+
+/* ===== Page Header ===== */
+.page-header{padding:12px 16px 8px;flex-shrink:0}
+.page-header h1{font-size:22px;font-weight:700;color:var(--pr);letter-spacing:-.01em;line-height:1.2}
+.page-header .subtitle{font-size:13px;color:var(--mu);margin-top:2px}
+
+/* ===== Search Bar ===== */
+.search-bar{padding:0 16px 10px;flex-shrink:0}
+.search-bar .search-wrap{position:relative;display:flex;align-items:center}
+.search-bar input{
+  width:100%;height:42px;padding:0 16px 0 38px;
+  background:var(--bg-card);border:1px solid var(--bd);border-radius:var(--r-sm);
+  font-size:14px;color:var(--tx);font-family:var(--font);
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.search-bar input::placeholder{color:var(--mu-dim)}
+.search-bar input:focus{border-color:var(--pr);box-shadow:0 0 0 3px var(--pr-dim)}
+.search-bar .search-icon{position:absolute;left:10px;color:var(--mu);pointer-events:none}
+
+/* ===== Toast ===== */
+.toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  padding:10px 20px;border-radius:var(--r-md);z-index:100;
+  background:var(--bg-card);border:1px solid var(--bd);color:var(--tx);
+  font-size:13px;font-family:var(--font);font-weight:500;
+  opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(8px)}
+
+/* ===== Responsive ===== */
+@media(min-width:481px){#app{border-left:1px solid var(--bd);border-right:1px solid var(--bd)}}
+
+/* ===== Animations ===== */
+@keyframes pulse-glow{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes swipe-hint-up{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(-5px);opacity:.4}}
+@keyframes swipe-hint-down{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(5px);opacity:.4}}
+
+/* ===== Tree View Styles ===== */
+.tree-row{
+  display:flex;align-items:center;gap:6px;padding:8px 12px;
+  border-radius:6px;cursor:pointer;font-size:14px;
+  transition:background .15s;min-height:40px;
+}
+.tree-row:hover{background:rgba(30,41,59,.7)}
+.tree-row[data-node-id="root"]{cursor:default;color:var(--mu-dim)}
+.tree-row-selected{background:rgba(6,182,212,.1)!important;border-left:2px solid var(--pr)!important}
+.tree-toggle{
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  background:none;border:none;color:var(--mu);cursor:pointer;
+  border-radius:4px;flex-shrink:0;transition:transform .2s,background .15s;
+}
+.tree-toggle:hover{background:rgba(51,65,85,.5)}
+.tree-toggle.expanded{transform:rotate(90deg)}
+.tree-toggle svg{width:12px;height:12px;transition:transform .2s}
+.tree-children{overflow:hidden;transition:max-height .3s ease,opacity .3s ease}
+.tree-children.collapsed{max-height:0!important;opacity:0}
+.tree-indent-guide{
+  width:20px;flex-shrink:0;position:relative;align-self:stretch;
+}
+.tree-indent-guide::before{
+  content:'';position:absolute;left:10px;top:0;bottom:0;width:1px;
+  background:rgba(6,182,212,.15);
+}
+.tree-more-btn{
+  width:24px;height:24px;border-radius:4px;background:none;border:none;
+  color:var(--mu-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  margin-left:auto;opacity:0;transition:opacity .15s;
+}
+.tree-row:hover .tree-more-btn{opacity:1}
+.tree-badge{
+  padding:1px 6px;border-radius:4px;font-size:10px;font-weight:500;
+  white-space:nowrap;
+}
+.tree-badge.branch{background:rgba(6,182,212,.12);color:var(--pr);border:1px solid rgba(6,182,212,.2)}
+.tree-badge.hierarchy{background:rgba(148,163,184,.1);color:var(--mu);border:1px solid var(--bd)}
+
+/* ===== Breadcrumb ===== */
+.breadcrumb-bar{
+  display:flex;align-items:center;gap:4px;padding:8px 16px;
+  overflow-x:auto;font-size:13px;color:var(--mu);
+  border-bottom:1px solid rgba(51,65,85,.5);flex-shrink:0;
+}
+.breadcrumb-item{
+  display:flex;align-items:center;gap:4px;cursor:pointer;
+  white-space:nowrap;border-radius:4px;padding:2px 6px;transition:background .15s;
+}
+.breadcrumb-item:hover{background:var(--bg-card)}
+.breadcrumb-item.active{color:var(--pr);font-weight:500}
+.breadcrumb-sep{color:var(--mu-dim);flex-shrink:0}
+
+/* ===== Pull-up panel ===== */
+.pull-panel{
+  position:absolute;bottom:0;left:0;right:0;z-index:40;
+  background:var(--bg-card);border-top:1px solid var(--bd);
+  border-radius:16px 16px 0 0;transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.32,.72,0,1);
+  box-shadow:0 -8px 32px rgba(0,0,0,.3);
+  max-height:60%;overflow-y:auto;padding:16px;
+}
+.pull-panel.open{transform:translateY(0)}
+.pull-panel .drag-handle{
+  width:36px;height:4px;border-radius:2px;background:var(--bd);
+  margin:0 auto 12px;
+}
+.pull-overlay{
+  position:fixed;inset:0;z-index:39;background:rgba(0,0,0,.4);
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.pull-overlay.open{opacity:1;pointer-events:auto}
+
+/* ===== Card stack browse ===== */
+.browse-card{
+  position:absolute;left:0;right:0;
+  transition:top .4s cubic-bezier(.32,.72,0,1),bottom .4s cubic-bezier(.32,.72,0,1);
+}
+.browse-card-wrap{
+  height:100%;margin:0 8px;border-radius:14px;
+  overflow:hidden;display:flex;flex-direction:column;
+  background:var(--bg-card);border-top:1px solid var(--bd);
+}
+.browse-card-bar{height:6px;flex-shrink:0}
+.browse-card-content{flex:1;overflow-y:auto;padding:14px 16px 18px}
+
+/* ===== Zoom buttons ===== */
+.zoom-btn{
+  width:30px;height:30px;border-radius:6px;
+  background:var(--bg-card);border:1px solid var(--bd);
+  color:var(--mu);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-family:var(--mono);transition:color .15s,border .15s;
+}
+.zoom-btn:hover{color:var(--pr);border-color:var(--pr)}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time" id="status-time">9:41</span>
+    <div style="display:flex;align-items:center;gap:6px">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="5" width="2" height="6" rx=".5" fill="currentColor"/><rect x="4.5" y="3.5" width="2" height="9" rx=".5" fill="currentColor"/><rect x="8" y="2" width="2" height="11" rx=".5" fill="currentColor"/><rect x="11.5" y="1" width="2" height="13" rx=".5" fill="currentColor"/></svg>
+      <svg width="20" height="12" viewBox="0 0 24 14" fill="none"><rect x=".5" y=".5" width="20" height="12" rx="2.5" stroke="currentColor" stroke-width="1"/><rect x="2" y="2" width="15" height="9" rx="1" fill="currentColor"/><rect x="19" y="3" width="1.5" height="3" rx=".75" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- ===== VIEW 0: 全局全览 ===== -->
+  <div class="view active" id="view-global">
+    <div class="page-header">
+      <h1>认知导航 <span style="color:var(--tx-dim);font-size:16px;font-weight:400;margin-left:6px">· 全览</span></h1>
+      <div class="subtitle">Knowledge Graph — 有向有环图</div>
+    </div>
+    <div class="search-bar">
+      <div class="search-wrap">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search-global" placeholder="搜索认知卡片或导航节点...">
+      </div>
+    </div>
+    <div id="global-canvas-wrap" style="flex:1;min-height:0;position:relative;margin:0 10px 10px;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--bd)">
+      <svg id="global-svg" style="width:100%;height:100%;display:block"></svg>
+      <div style="position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:10">
+        <button class="zoom-btn" id="gz-in">+</button>
+        <button class="zoom-btn" id="gz-out">−</button>
+        <button class="zoom-btn" id="gz-reset" style="font-size:13px;font-weight:700">⊡</button>
+      </div>
+    </div>
+    <div style="padding:6px 16px 10px;display:flex;align-items:center;justify-content:center;gap:16px;font-size:11px;color:var(--mu);flex-wrap:wrap;flex-shrink:0">
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;border:1.5px solid var(--pr);background:var(--bg-card)"></span>认知卡片</span>
+      <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:var(--teal-500)"></span>导航节点</span>
+      <span style="display:flex;align-items:center;gap:6px"><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="var(--pr)" stroke-width="2.5" opacity=".55"/></svg>预设权重</span>
+      <span style="display:flex;align-items:center;gap:6px"><svg width="22" height="6"><line x1="0" y1="3" x2="22" y2="3" stroke="var(--teal-500)" stroke-width="1" opacity=".35" stroke-dasharray="4 3"/></svg>浏览权重</span>
+    </div>
+  </div>
+
+  <!-- ===== VIEW 1: 路径导航 ===== -->
+  <div class="view" id="view-nav">
+    <div class="page-header">
+      <h1>路径导航</h1>
+      <div class="subtitle" id="nav-subtitle">机器学习基础 → ?</div>
+    </div>
+    <div id="dag-container" style="flex:1;min-height:0;position:relative;overflow:hidden">
+      <svg id="dag-svg" style="width:100%;height:100%;display:block"></svg>
+      <div style="position:absolute;bottom:0;left:0;right:0;display:flex;flex-direction:column;align-items:center;padding:10px 0 6px;background:linear-gradient(to top,var(--bg) 40%,transparent);pointer-events:none;z-index:5">
+        <div style="width:32px;height:4px;border-radius:2px;background:var(--bd);margin-bottom:6px"></div>
+        <span style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:2px">上拉查看详情与权重编辑</span>
+      </div>
+      <!-- Pull-up panel -->
+      <div class="pull-overlay" id="pull-overlay"></div>
+      <div class="pull-panel no-scroll" id="pull-panel">
+        <div class="drag-handle" id="drag-handle"></div>
+        <div id="pull-content"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;padding:10px 16px;border-top:1px solid var(--bd);flex-shrink:0">
+      <button class="btn-primary" id="btn-start-browse" style="flex:1">开始浏览</button>
+      <button class="btn-outline" id="btn-weight-config" style="flex:1">权重配置</button>
+    </div>
+  </div>
+
+  <!-- ===== VIEW 2: 内容浏览 ===== -->
+  <div class="view" id="view-browse">
+    <div style="position:relative;flex:1;min-height:0;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:rgba(15,23,42,.85);backdrop-filter:blur(12px)">
+        <button id="btn-back-nav" style="display:flex;align-items:center;gap:4px;background:none;border:none;color:var(--mu);font-size:13px;cursor:pointer;font-family:var(--font)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          返回
+        </button>
+        <span style="font-size:13px;font-weight:600;color:var(--pr);font-variant-numeric:tabular-nums" id="card-progress">1/5</span>
+        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mu)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          滑动模式
+        </div>
+      </div>
+      <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;align-items:center;gap:12px;pointer-events:none">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(30,41,59,.9);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--pr);animation:swipe-hint-up 2s ease-in-out infinite" id="swipe-up-hint">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(30,41,59,.9);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--mu-dim);animation:swipe-hint-down 2s ease-in-out .6s infinite" id="swipe-down-hint">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div style="position:absolute;inset:0;top:40px;display:flex;flex-direction:column" id="browse-container">
+        <div style="flex:1;position:relative;overflow:hidden" id="card-stack"></div>
+      </div>
+    </div>
+    <div style="position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(30,41,59,.95);border-top:1px solid var(--bd);padding-bottom:max(12px,env(safe-area-inset-bottom));flex-shrink:0">
+      <button class="btn-outline" id="btn-card-detail" style="border-color:var(--pr-soft)">查看详情</button>
+      <button id="btn-card-bookmark" style="width:36px;height:36px;border-radius:8px;background:var(--bg-card);border:1px solid var(--bd);color:var(--mu-dim);cursor:pointer;display:flex;align-items:center;justify-content:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== VIEW 3: 树形管理 ===== -->
+  <div class="view" id="view-tree">
+    <div style="padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid var(--bd)">
+      <div>
+        <h1 style="font-size:18px;font-weight:600;color:var(--tx)">认知卡片管理</h1>
+        <p style="font-size:12px;color:var(--mu);margin-top:2px" id="tree-stats">共 11 项 · 4 个文件夹</p>
+      </div>
+      <button id="btn-add-card" style="width:32px;height:32px;border-radius:8px;background:var(--pr);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:opacity .15s" title="添加认知卡片">+</button>
+    </div>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-bar" id="tree-breadcrumb">
+      <span class="breadcrumb-item active" data-path="root" style="display:flex;align-items:center;gap:4px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        root
+      </span>
+    </div>
+    <!-- Search -->
+    <div style="padding:10px 16px;flex-shrink:0">
+      <div style="position:relative;display:flex;align-items:center">
+        <svg style="position:absolute;left:10px;color:var(--mu-dim);pointer-events:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search-tree" placeholder="搜索认知卡片..." style="width:100%;height:38px;padding:0 16px 0 34px;background:var(--bg-card);border:1px solid var(--bd);border-radius:var(--r-sm);font-size:14px;color:var(--tx);font-family:var(--font);outline:none;transition:border-color .2s,box-shadow .2s">
+      </div>
+    </div>
+    <!-- Tree list -->
+    <div id="tree-list" class="no-scroll" style="flex:1;min-height:0;overflow-y:auto;padding:4px 8px 120px">
+      <div class="tree-row" data-node-id="root" data-type="folder" data-expanded="true" data-level="0">
+        <button class="tree-toggle expanded"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:rgba(6,182,212,.55);flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span>root/</span><span style="font-size:12px;color:var(--mu-dim);margin-left:auto">11项</span>
+      </div>
+      <div class="tree-children" id="tree-children-root" style="max-height:2000px;opacity:1"></div>
+    </div>
+    <!-- FAB -->
+    <button id="fab-tree-add" style="position:absolute;right:max(16px,calc((100vw - 480px)/2 + 16px));bottom:76px;width:52px;height:52px;border-radius:50%;background:var(--pr);border:none;color:#fff;cursor:pointer;font-size:24px;box-shadow:0 4px 20px rgba(6,182,212,.35);transition:transform .2s,opacity .2s;z-index:40;display:flex;align-items:center;justify-content:center">+</button>
+  </div>
+
+  <!-- ===== Tab Bar ===== -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-view="global">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      全览
+    </button>
+    <button class="tab-btn" data-view="nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><line x1="7.5" y1="5" x2="10.5" y2="11"/><line x1="13.5" y1="13" x2="16.5" y2="17"/></svg>
+      导航
+    </button>
+    <button class="tab-btn" data-view="browse">
+      <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      浏览
+    </button>
+    <button class="tab-btn" data-view="tree">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v6h10v-6z"/><path d="M6 12V6a2 2 0 0 1 2-2h1l1 2h5a1 1 0 0 1 1 1v5"/></svg>
+      管理
+    </button>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ===== State ===== */
+var state = {
+  activeView: 'global',
+  global: { initialized: false, nodes: null, edges: null, sim: null, zoom: null, svg: null, g: null },
+  nav: { initialized: false, currentNodeId: 'ml-basics', selectedNextLabel: null, renderFn: null },
+  browse: { currentIndex: 0, cards: [] },
+  tree: { selectedPath: 'root' }
+};
+
+/* ===== Toast ===== */
+var toastTimer;
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){el.classList.remove('show')}, 2000);
+}
+
+/* ===== Tab Navigation ===== */
+var views = {
+  global: document.getElementById('view-global'),
+  nav: document.getElementById('view-nav'),
+  browse: document.getElementById('view-browse'),
+  tree: document.getElementById('view-tree')
+};
+
+function switchView(name) {
+  if (state.activeView === name) return;
+  Object.keys(views).forEach(function(k){views[k].classList.remove('active')});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  views[name].classList.add('active');
+  var t = document.querySelector('.tab-btn[data-view="'+name+'"]');
+  if(t) t.classList.add('active');
+  state.activeView = name;
+  if(name==='global') renderGlobalView();
+  if(name==='nav') renderNavView();
+  if(name==='browse') renderBrowseView();
+  if(name==='tree') renderTreeView();
+}
+
+document.querySelectorAll('.tab-btn').forEach(function(b){
+  b.addEventListener('click',function(){switchView(this.getAttribute('data-view'))});
+});
+
+/* ===== Time ===== */
+function updateTime(){
+  var d=new Date();var h=d.getHours(),m=d.getMinutes();
+  document.getElementById('status-time').textContent=h+':'+(m<10?'0'+m:m);
+}
+updateTime();setInterval(updateTime,30000);
+
+/* ================================================================
+   VIEW 0: 全局全览 — D3 Force Graph
+   ================================================================ */
+function initGlobalView(){
+  if(state.global.initialized) return;
+  state.global.initialized = true;
+
+  var graphData = {
+    nodes: [
+      {id:'ml',label:'机器学习',type:'card',desc:'从数据中学习',w:110,h:46},
+      {id:'dl',label:'深度学习',type:'card',desc:'多层表示学习',w:100,h:46},
+      {id:'nn',label:'神经网络',type:'card',desc:'计算模型',w:100,h:46},
+      {id:'nlp',label:'自然语言处理',type:'card',desc:'理解人类语言',w:120,h:46},
+      {id:'cv',label:'计算机视觉',type:'card',desc:'图像理解',w:110,h:46},
+      {id:'kg',label:'知识图谱',type:'card',desc:'语义网络',w:100,h:46},
+      {id:'rl',label:'强化学习',type:'card',desc:'试错决策',w:100,h:46},
+      {id:'nav-ai',label:'AI 入门',type:'nav',r:22},
+      {id:'nav-adv',label:'进阶',type:'nav',r:22},
+      {id:'nav-nlp',label:'NLP 专项',type:'nav',r:22},
+      {id:'nav-cv',label:'CV 专项',type:'nav',r:22}
+    ],
+    edges: [
+      {source:'ml',target:'nav-ai',weight:8},{source:'nn',target:'nav-ai',weight:6},
+      {source:'dl',target:'nav-ai',weight:5},{source:'dl',target:'nav-adv',weight:9},
+      {source:'nn',target:'nav-adv',weight:7},{source:'ml',target:'nav-adv',weight:4},
+      {source:'nlp',target:'nav-nlp',weight:10},{source:'ml',target:'nav-nlp',weight:5},
+      {source:'dl',target:'nav-nlp',weight:6},{source:'nn',target:'nav-nlp',weight:3},
+      {source:'cv',target:'nav-cv',weight:9},{source:'dl',target:'nav-cv',weight:7},
+      {source:'nn',target:'nav-cv',weight:4},{source:'kg',target:'nav-ai',weight:4},
+      {source:'kg',target:'nav-adv',weight:3},{source:'rl',target:'nav-adv',weight:5},
+      {source:'rl',target:'nav-ai',weight:3},{source:'nlp',target:'nav-adv',weight:4},
+      {source:'cv',target:'nav-adv',weight:4},{source:'kg',target:'nav-nlp',weight:3}
+    ]
+  };
+
+  state.global.nodes = graphData.nodes;
+  state.global.edges = graphData.edges;
+
+  var nodeMap = new Map(graphData.nodes.map(function(n){return[n.id,n]}));
+  graphData.edges.forEach(function(e){
+    e.source = nodeMap.get(e.source); e.target = nodeMap.get(e.target);
+  });
+
+  var container = document.getElementById('global-canvas-wrap');
+  var svg = d3.select('#global-svg');
+  state.global.svg = svg;
+
+  function dims(){var w=container.clientWidth,h=container.clientHeight;svg.attr('viewBox','0 0 '+w+' '+h);return{w:w,h:h}}
+  var D = dims();
+
+  // Defs
+  var defs = svg.append('defs');
+  var pat = defs.append('pattern').attr('id','dot-grid').attr('width',28).attr('height',28).attr('patternUnits','userSpaceOnUse');
+  pat.append('circle').attr('cx',14).attr('cy',14).attr('r',.8).attr('fill','#334155').attr('opacity',.5);
+  svg.append('rect').attr('width','100%').attr('height','100%').attr('fill','url(#dot-grid)');
+
+  defs.append('marker').attr('id','arr-main').attr('viewBox','0 -4 8 8').attr('refX',18).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto')
+    .append('path').attr('d','M0,-4 L8,0 L0,4').attr('fill','#06b6d4').attr('opacity',.5);
+  defs.append('marker').attr('id','arr-light').attr('viewBox','0 -4 8 8').attr('refX',18).attr('refY',0).attr('markerWidth',5).attr('markerHeight',5).attr('orient','auto')
+    .append('path').attr('d','M0,-4 L8,0 L0,4').attr('fill','#14b8a6').attr('opacity',.35);
+
+  // Glow filter
+  var gf = defs.append('filter').attr('id','glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+  gf.append('feGaussianBlur').attr('stdDeviation','4').attr('result','blur');
+  gf.append('feMerge').selectAll('feMergeNode').data(['blur','SourceGraphic']).enter().append('feMergeNode').attr('in',function(d){return d});
+
+  var g = svg.append('g');
+  state.global.g = g;
+
+  // Edges
+  var lg = g.append('g');
+  var links = lg.selectAll('path').data(graphData.edges).enter().append('path')
+    .attr('fill','none')
+    .attr('stroke',function(d){return d.weight>=7?'#06b6d4':'#14b8a6'})
+    .attr('stroke-opacity',function(d){return d.weight>=8?.55:d.weight>=5?.35:.2})
+    .attr('stroke-width',function(d){return Math.max(.8,d.weight*.3)})
+    .attr('stroke-dasharray',function(d){return d.weight<=4?'4 3':null})
+    .attr('marker-end',function(d){return d.weight>=6?'url(#arr-main)':'url(#arr-light)'});
+
+  // Nodes
+  var ng = g.append('g');
+  var nodes = ng.selectAll('g').data(graphData.nodes).enter().append('g')
+    .attr('class','gnode')
+    .style('cursor',function(d){return d.type==='nav'?'pointer':'grab'});
+
+  // Card rects
+  nodes.filter(function(d){return d.type==='card'}).append('rect')
+    .attr('width',function(d){return d.w}).attr('height',function(d){return d.h})
+    .attr('x',function(d){return -d.w/2}).attr('y',function(d){return -d.h/2})
+    .attr('rx',7).attr('ry',7).attr('fill','#1e293b').attr('stroke','#06b6d4').attr('stroke-width',1.5).attr('stroke-opacity',.7);
+
+  nodes.filter(function(d){return d.type==='card'}).append('text')
+    .attr('text-anchor','middle').attr('dy','-.1em').attr('fill','#e2e8f0')
+    .attr('font-size','11px').attr('font-weight','600').text(function(d){return d.label});
+
+  nodes.filter(function(d){return d.type==='card'}).append('text')
+    .attr('text-anchor','middle').attr('dy','1.2em').attr('fill','#64748b')
+    .attr('font-size','8px').text(function(d){return d.desc});
+
+  // Nav circles
+  var navNodes = nodes.filter(function(d){return d.type==='nav'});
+  navNodes.append('circle').attr('class','pcircle').attr('r',function(d){return d.r})
+    .attr('fill','#1e293b').attr('stroke','#14b8a6').attr('stroke-width',2.5);
+  navNodes.append('circle').attr('r',function(d){return d.r-6}).attr('fill','#14b8a6').attr('opacity',.3);
+  navNodes.append('text').attr('text-anchor','middle').attr('dy',function(d){return d.r+14})
+    .attr('fill','#94a3b8').attr('font-size','10px').attr('font-weight','500').text(function(d){return d.label});
+
+  // Force simulation
+  var sim = d3.forceSimulation(graphData.nodes)
+    .force('link',d3.forceLink(graphData.edges).id(function(d){return d.id})
+      .distance(function(d){return d.weight>=7?130:190})
+      .strength(function(d){return d.weight*.06}))
+    .force('charge',d3.forceManyBody().strength(-350))
+    .force('center',d3.forceCenter(D.w/2,D.h/2))
+    .force('collide',d3.forceCollide().radius(function(d){
+      return d.type==='card'?Math.max(d.w,d.h)/1.5:d.r+20;
+    }))
+    .force('x',d3.forceX(D.w/2).strength(.03))
+    .force('y',d3.forceY(D.h/2).strength(.03));
+
+  state.global.sim = sim;
+
+  sim.on('tick',function(){
+    links.attr('d',function(d){
+      var dx=d.target.x-d.source.x,dy=d.target.y-d.source.y,dr=Math.sqrt(dx*dx+dy*dy)*1.2;
+      return'M'+d.source.x+','+d.source.y+' A'+dr+','+dr+' 0 0,1 '+d.target.x+','+d.target.y;
+    });
+    nodes.attr('transform',function(d){return'translate('+d.x+','+d.y+')'});
+  });
+
+  for(var i=0;i<300;i++) sim.tick();
+  sim.alpha(.3).alphaDecay(.02);
+
+  // Zoom
+  var zoom = d3.zoom().scaleExtent([.4,3]).on('zoom',function(e){g.attr('transform',e.transform)});
+  svg.call(zoom);
+  state.global.zoom = zoom;
+
+  // Zoom buttons
+  document.getElementById('gz-in').addEventListener('click',function(){
+    svg.transition().duration(300).call(zoom.scaleBy,1.3);
+  });
+  document.getElementById('gz-out').addEventListener('click',function(){
+    svg.transition().duration(300).call(zoom.scaleBy,.75);
+  });
+  document.getElementById('gz-reset').addEventListener('click',function(){
+    svg.transition().duration(500).call(zoom.transform,d3.zoomIdentity);
+  });
+
+  // Drag
+  nodes.filter(function(d){return d.type==='card'}).call(
+    d3.drag()
+      .on('start',function(e,d){if(!e.active)sim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y})
+      .on('drag',function(e,d){d.fx=e.x;d.fy=e.y})
+      .on('end',function(e,d){if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null})
+  );
+
+  // Click nav nodes
+  navNodes.on('click',function(e,d){
+    e.stopPropagation();
+    var el=d3.select(this);
+    el.select('.pcircle').transition().duration(150).attr('r',d.r+6).attr('stroke','#67e8f9').attr('stroke-width',4)
+      .transition().duration(500).attr('r',d.r).attr('stroke','#14b8a6').attr('stroke-width',2.5);
+    // Pulse ring
+    g.append('circle').attr('cx',d.x).attr('cy',d.y).attr('r',d.r).attr('fill','none')
+      .attr('stroke','#06b6d4').attr('stroke-width',2).attr('opacity',.8).attr('filter','url(#glow)')
+      .transition().duration(800).attr('r',d.r+30).attr('opacity',0).remove();
+    setTimeout(function(){state.nav.currentNodeId=d.id;switchView('nav')},300);
+  });
+
+  // Search
+  var searchTimer;
+  document.getElementById('search-global').addEventListener('input',function(){
+    clearTimeout(searchTimer);
+    var q=this.value.toLowerCase().trim();
+    searchTimer = setTimeout(function(){
+      nodes.selectAll('rect,circle').attr('opacity',function(d){
+        if(!q)return 1;
+        return d.label.toLowerCase().includes(q)||d.id.toLowerCase().includes(q)?1:.15;
+      });
+      if(q){
+        var match=graphData.nodes.find(function(n){return n.label.toLowerCase().includes(q)});
+        if(match&&match.x){
+          svg.transition().duration(600).call(zoom.transform,d3.zoomIdentity.translate(D.w/2-match.x*1.5,D.h/2-match.y*1.5).scale(1.5));
+        }
+      }
+    },250);
+  });
+
+  // Resize
+  var rt;
+  window.addEventListener('resize',function(){
+    clearTimeout(rt);
+    rt=setTimeout(function(){
+      D=dims();
+      sim.force('center',d3.forceCenter(D.w/2,D.h/2));
+      sim.alpha(.1).restart();
+    },200);
+  });
+}
+
+function renderGlobalView(){
+  initGlobalView();
+  if(state.global.sim) state.global.sim.alpha(.1).restart();
+}
+
+/* ================================================================
+   VIEW 1: 路径导航 — D3 DAG Flow
+   ================================================================ */
+function initNavView(){
+  if(state.nav.initialized) return;
+  state.nav.initialized = true;
+
+  var navData = {
+    currentNode: {id:'ml-basics',label:'机器学习基础',desc:'涵盖监督学习、无监督学习与强化学习的核心概念'},
+    prevNodes:[
+      {id:'probability',label:'概率论',presetWeight:.75},
+      {id:'linear-algebra',label:'线性代数',presetWeight:.82}
+    ],
+    nextNodes:[
+      {id:'supervised',label:'监督学习',presetWeight:.80,browseWeight:.55},
+      {id:'unsupervised',label:'无监督学习',presetWeight:.60,browseWeight:.42},
+      {id:'reinforcement',label:'强化学习',presetWeight:.40,browseWeight:.30}
+    ]
+  };
+
+  var container = document.getElementById('dag-container');
+  var svg = d3.select('#dag-svg');
+  var defs = svg.append('defs');
+
+  // Glow
+  var gf=defs.append('filter').attr('id','dag-glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+  gf.append('feGaussianBlur').attr('stdDeviation','5').attr('result','blur');
+  gf.append('feMerge').selectAll('feMergeNode').data(['blur','SourceGraphic']).enter().append('feMergeNode').attr('in',function(d){return d});
+
+  defs.append('marker').attr('id','dag-arr').attr('viewBox','0 0 10 10').attr('refX',10).attr('refY',5).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto')
+    .append('path').attr('d','M 0 0 L 10 5 L 0 10 z').attr('fill','#06b6d4');
+
+  var g = svg.append('g');
+  var NR=28,CR=36,LP=90;
+
+  function doRender(){
+    var W=container.clientWidth,H=container.clientHeight;
+    svg.attr('viewBox','0 0 '+W+' '+H);
+    var cx=W/2,cy=H*.46,topY=cy-LP,botY=cy+LP;
+
+    var prevs=navData.prevNodes.map(function(n,i){var gap=W/(navData.prevNodes.length+1);return{node:n,x:gap*(i+1),y:botY}});
+    var curr={node:navData.currentNode,x:cx,y:cy};
+    var nexts=navData.nextNodes.map(function(n,i){var gap=W/(navData.nextNodes.length+1);return{node:n,x:gap*(i+1),y:topY}});
+
+    var allEdges=[];
+    prevs.forEach(function(p){allEdges.push({source:p,target:curr,weight:p.node.presetWeight,etype:'preset'})});
+    nexts.forEach(function(n){allEdges.push({source:curr,target:n,weight:n.node.presetWeight,etype:n.node.presetWeight>=.6?'preset':'browse'})});
+
+    // Edges
+    var edgeSel=g.selectAll('path.dag-edge').data(allEdges,function(d){return d.source.node.id+'-'+d.target.node.id});
+    edgeSel.exit().remove();
+    edgeSel.enter().append('path').attr('class','dag-edge').attr('fill','none')
+      .attr('stroke',function(d){return d.etype==='preset'?'#06b6d4':'rgba(6,182,212,.25)'})
+      .attr('stroke-width',function(d){return d.etype==='preset'?1.5+d.weight*1.2:1})
+      .attr('stroke-dasharray',function(d){return d.etype==='preset'?null:'5 4'})
+      .attr('marker-end','url(#dag-arr)').attr('opacity',0)
+      .merge(edgeSel).transition().duration(600).ease(d3.easeCubicInOut)
+      .attr('d',function(d){
+        var dy=Math.abs(d.source.y-d.target.y),cp=dy*.55;
+        return'M'+d.source.x+','+d.source.y+' C'+d.source.x+','+(d.source.y-cp)+' '+d.target.x+','+(d.target.y+cp)+' '+d.target.x+','+d.target.y;
+      }).attr('opacity',function(d){return d.etype==='preset'?.75:.45});
+
+    // Nodes
+    var allNodes=prevs.concat([curr]).concat(nexts);
+    var nodeSel=g.selectAll('g.dag-node').data(allNodes,function(d){return d.node.id});
+    nodeSel.exit().remove();
+
+    var nodeEnter=nodeSel.enter().append('g').attr('class','dag-node')
+      .attr('transform',function(d){return'translate('+d.x+','+d.y+')'}).attr('opacity',0)
+      .style('cursor',function(d){return d.node.type==='next'||(d.node.id===curr.node.id)?'pointer':'default'});
+
+    // Glow for current
+    nodeEnter.filter(function(d){return d.node.id===curr.node.id})
+      .append('circle').attr('r',CR+6).attr('fill','none').attr('stroke','rgba(6,182,212,.5)').attr('stroke-width',2).attr('filter','url(#dag-glow)');
+
+    // Circles
+    nodeEnter.append('circle').attr('r',function(d){return d.node.id===curr.node.id?CR:NR})
+      .attr('fill',function(d){if(d.node.id===curr.node.id)return'#0e2a35';if(d.y===topY)return'#1e293b';return'#15202b'})
+      .attr('stroke',function(d){if(d.node.id===curr.node.id)return'#06b6d4';if(d.y===topY)return'rgba(6,182,212,.25)';return'#334155'})
+      .attr('stroke-width',function(d){return d.node.id===curr.node.id?2.5:1.5});
+
+    // Inner dot for prev
+    nodeEnter.filter(function(d){return d.y===botY}).append('circle').attr('r',4).attr('fill','#94a3b8');
+
+    // Labels
+    nodeEnter.append('text').attr('text-anchor','middle')
+      .attr('y',function(d){return(d.node.id===curr.node.id?CR:NR)+16})
+      .attr('fill',function(d){return d.node.id===curr.node.id?'#e2e8f0':'#94a3b8'})
+      .attr('font-size',function(d){return d.node.id===curr.node.id?'12px':'11px'})
+      .attr('font-weight',function(d){return d.node.id===curr.node.id?'700':'500'})
+      .text(function(d){return d.node.label});
+
+    // Weight labels for next
+    nodeEnter.filter(function(d){return d.y===topY}).append('text').attr('text-anchor','middle')
+      .attr('y',NR+28).attr('fill','#64748b').attr('font-size','10px').attr('font-family','JetBrains Mono,monospace')
+      .text(function(d){return'w:'+d.node.presetWeight.toFixed(1)});
+
+    // Click next nodes
+    nodeEnter.filter(function(d){return d.y===topY}).on('click',function(e,d){
+      var el=d3.select(this);
+      el.select('circle').transition().duration(150).attr('stroke','#06b6d4').attr('stroke-width',3)
+        .transition().duration(600).attr('stroke','rgba(6,182,212,.25)').attr('stroke-width',1.5);
+      el.insert('circle',':first-child').attr('r',NR+4).attr('fill','none').attr('stroke','#06b6d4').attr('stroke-width',2)
+        .attr('opacity',.8).transition().duration(800).attr('r',NR+16).attr('opacity',0).remove();
+      state.nav.selectedNextLabel = d.node.label;
+      document.getElementById('nav-subtitle').innerHTML='机器学习基础 <span style="color:var(--pr);font-weight:600">→ '+d.node.label+'</span>';
+      toast('已选择: '+d.node.label);
+    });
+
+    nodeEnter.transition().duration(400).delay(function(d,i){return i*60}).attr('opacity',1);
+    nodeSel.transition().duration(500).ease(d3.easeCubicInOut)
+      .attr('transform',function(d){return'translate('+d.x+','+d.y+')'});
+  }
+
+  state.nav.renderFn = doRender;
+  doRender();
+
+  window.addEventListener('resize',function(){
+    clearTimeout(window._prt);
+    window._prt=setTimeout(function(){if(state.activeView==='nav')doRender()},200);
+  });
+
+  // Start browse button
+  document.getElementById('btn-start-browse').addEventListener('click',function(){
+    var label = state.nav.selectedNextLabel || '监督学习';
+    initBrowseCards(label);
+    switchView('browse');
+  });
+
+  // Weight config
+  document.getElementById('btn-weight-config').addEventListener('click',function(){
+    // Show pull panel with weight editing
+    var panel = document.getElementById('pull-panel');
+    var overlay = document.getElementById('pull-overlay');
+    panel.classList.toggle('open');
+    overlay.classList.toggle('open');
+    if(panel.classList.contains('open')){
+      var html='<h3 style="font-size:15px;font-weight:600;color:var(--tx);margin-bottom:12px">权重配置</h3>';
+      navData.nextNodes.forEach(function(n){
+        html+='<div style="display:flex;align-items:center;margin-bottom:10px;gap:12px">';
+        html+='<span style="width:80px;font-size:13px;color:var(--tx)">'+n.label+'</span>';
+        html+='<input type="range" min="0" max="1" step="0.01" value="'+n.presetWeight+'" style="flex:1;accent-color:var(--pr)">';
+        html+='<span style="width:40px;font-size:12px;color:var(--mu);font-family:var(--mono);text-align:right">'+n.presetWeight.toFixed(2)+'</span>';
+        html+='</div>';
+      });
+      html+='<button class="btn-primary" style="width:100%;margin-top:8px" onclick="document.getElementById(\'pull-panel\').classList.remove(\'open\');document.getElementById(\'pull-overlay\').classList.remove(\'open\')">保存</button>';
+      document.getElementById('pull-content').innerHTML=html;
+    }
+  });
+
+  // Pull overlay click to close
+  document.getElementById('pull-overlay').addEventListener('click',function(){
+    document.getElementById('pull-panel').classList.remove('open');
+    this.classList.remove('open');
+  });
+
+  // Swipe up on dag container to open panel
+  var pullStartY=0;
+  container.addEventListener('touchstart',function(e){pullStartY=e.touches[0].clientY});
+  container.addEventListener('touchend',function(e){
+    var dy=pullStartY-e.changedTouches[0].clientY;
+    if(dy>60){
+      var panel=document.getElementById('pull-panel');
+      var overlay=document.getElementById('pull-overlay');
+      panel.classList.add('open');overlay.classList.add('open');
+    }
+  });
+}
+
+function renderNavView(){
+  initNavView();
+  if(state.nav.renderFn) state.nav.renderFn();
+}
+
+/* ================================================================
+   VIEW 2: 内容浏览 — Card Stack + Swipe
+   ================================================================ */
+var browseCardData = [
+  {title:'认知负载理论',desc:'工作记忆容量有限，学习材料的设计应减少无关认知负荷，增加相关认知负荷，促进图式构建与自动化。',tag:'核心节点',weight:.85,cards:3,corpus:['Sweller (1988) 提出认知负荷理论，将认知负荷分为三类：内在认知负荷（由材料本身的复杂性决定）、外在认知负荷（由教学设计方式引起）和相关认知负荷（促进图式构建的深层加工）。','关键教学原则：使用工作示例减少外在负荷；整合多种信息源避免注意力分散；利用视听双通道扩展工作记忆容量。'],related:[{name:'图式理论',pos:'前置'},{name:'多媒体学习原则',pos:'后置'}]},
+  {title:'双重编码理论',desc:'言语信息和视觉信息通过不同通道加工，同时呈现图文材料比单一文字更有利于知识保持与迁移。',tag:'',weight:.72,cards:2,corpus:['Paivio (1971) 提出双重编码理论，认为人类认知系统包含两个独立但相互关联的编码系统——言语系统和图像系统。','教学启示：图文并茂的材料能建立双重心理表征，提高回忆和识别率。'],related:[{name:'认知负载理论',pos:'前置'},{name:'多媒体学习原则',pos:'后置'}]},
+  {title:'精加工策略',desc:'通过建立新旧知识之间的联系，对学习材料进行深度加工，将新信息纳入已有认知结构中。',tag:'',weight:.68,cards:4,corpus:['精加工策略是信息加工理论中的重要概念，指学习者通过主动构建知识之间的联系来深化理解。','常见策略：类比、举例、总结、提问、视觉化。'],related:[{name:'双重编码理论',pos:'前置'},{name:'元认知策略',pos:'后置'}]},
+  {title:'多媒体学习原则',desc:'基于认知理论和实证研究，多媒体教学设计应遵循一致性、信号、冗余、空间接近等原则。',tag:'',weight:.55,cards:5,corpus:['Mayer (2001) 提出多媒体学习的认知理论，基于双重编码和认知负荷理论。','12条多媒体设计原则涵盖了减少无关加工、管理基本加工和促进生成加工三个方面。'],related:[{name:'双重编码理论',pos:'前置'},{name:'认知负载理论',pos:'前置'}]},
+  {title:'元认知策略',desc:'对自身认知过程的监控与调节，包括计划、监控和评估三个阶段，是高效学习的关键。',tag:'',weight:.40,cards:6,corpus:['Flavell (1979) 首次系统提出元认知概念，包括元认知知识和元认知监控两个维度。','元认知策略教学可显著提升学习者的自主学习能力和学业成就。'],related:[{name:'精加工策略',pos:'前置'},{name:'自我调节学习',pos:'后置'}]}
+];
+
+function initBrowseCards(selectedLabel) {
+  // If a specific label was selected from path view, reorder cards
+  if (selectedLabel) {
+    var idx = browseCardData.findIndex(function(c){return c.title===selectedLabel});
+    if (idx > -1) {
+      browseCardData = browseCardData.slice(idx).concat(browseCardData.slice(0, idx));
+    }
+  }
+  state.browse.cards = browseCardData;
+  state.browse.currentIndex = 0;
+}
+
+function renderBrowseCards() {
+  var stack = document.getElementById('card-stack');
+  var cards = state.browse.cards;
+  var idx = state.browse.currentIndex;
+  var total = cards.length;
+
+  document.getElementById('card-progress').textContent = (idx+1)+'/'+total;
+
+  // Update swipe hints visibility
+  var upHint = document.getElementById('swipe-up-hint');
+  var downHint = document.getElementById('swipe-down-hint');
+  upHint.style.display = idx < total-1 ? '' : 'none';
+  downHint.style.display = idx > 0 ? '' : 'none';
+
+  var html = '';
+
+  // Card 3 (bottom)
+  if (idx+2 < total) {
+    var c3 = cards[idx+2];
+    html += '<div class="browse-card" style="top:32%;bottom:0;z-index:10">';
+    html += '<div class="browse-card-wrap"><div class="browse-card-bar" style="background:linear-gradient(90deg,var(--pr-dim) 0%,var(--pr-soft) 50%,var(--pr-dim))"></div>';
+    html += '<div class="browse-card-content"><h3 style="font-size:17px;font-weight:700;color:var(--tx-dim)">'+c3.title+'</h3>';
+    html += '<p style="font-size:13px;color:var(--mu-dim);margin-top:6px;line-height:1.5">'+c3.desc.substring(0,60)+'...</p>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">';
+    html += '<span style="padding:2px 8px;border-radius:4px;background:var(--pr-dim);color:var(--pr);font-size:11px;border:1px solid var(--pr-soft)">绑定认知卡 '+(idx+4)+'</span>';
+    html += '<span style="padding:2px 8px;border-radius:4px;background:rgba(148,163,184,.08);color:var(--mu-dim);font-size:11px">权重 '+c3.weight+'</span>';
+    html += '</div></div></div>';
+  }
+
+  // Card 2 (middle)
+  if (idx+1 < total) {
+    var c2 = cards[idx+1];
+    html += '<div class="browse-card" style="top:16%;bottom:2%;z-index:20">';
+    html += '<div class="browse-card-wrap"><div class="browse-card-bar" style="background:linear-gradient(90deg,var(--pr-soft),var(--pr) 50%,var(--pr-soft));opacity:.7;height:8px"></div>';
+    html += '<div class="browse-card-content"><h3 style="font-size:18px;font-weight:700;color:var(--tx)">'+c2.title+'</h3>';
+    html += '<p style="font-size:13px;color:var(--mu-dim);margin-top:6px;line-height:1.5">'+c2.desc+'</p>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">';
+    html += '<span style="padding:2px 8px;border-radius:4px;background:var(--pr-dim);color:var(--pr);font-size:11px;border:1px solid var(--pr-soft)">绑定认知卡 '+(idx+3)+'</span>';
+    html += '<span style="padding:2px 8px;border-radius:4px;background:rgba(148,163,184,.08);color:var(--mu-dim);font-size:11px">权重 '+c2.weight+'</span>';
+    html += '</div></div></div></div>';
+  }
+
+  // Card 1 (active)
+  var c1 = cards[idx];
+  html += '<div style="position:absolute;left:0;right:0;top:0;bottom:0;z-index:30;transition:all .4s cubic-bezier(.32,.72,0,1)">';
+  html += '<div style="height:100%;margin:0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;background:var(--bg-card);border-top:1px solid var(--bd);box-shadow:0 -8px 32px var(--pr-dim)">';
+  html += '<div style="height:12px;flex-shrink:0;background:linear-gradient(90deg,var(--pr-soft),var(--pr) 30%,var(--cyan-400) 60%,var(--pr-soft))"></div>';
+  html += '<div class="no-scroll" style="flex:1;overflow-y:auto;padding:16px 16px 24px">';
+  html += '<h2 style="font-size:22px;font-weight:700;color:var(--tx)" id="card-title">'+c1.title+'</h2>';
+  html += '<p style="font-size:14px;color:var(--mu);margin-top:8px;line-height:1.6" id="card-desc">'+c1.desc+'</p>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">';
+  html += '<span style="padding:4px 10px;border-radius:6px;background:var(--pr-dim);color:var(--pr);font-size:12px;font-weight:600;border:1px solid var(--pr-soft)">绑定认知卡 '+(idx+2)+'</span>';
+  html += '<span style="padding:4px 10px;border-radius:6px;background:rgba(148,163,184,.08);color:var(--mu-dim);font-size:12px">权重 '+c1.weight+'</span>';
+  if(c1.tag) html += '<span style="padding:4px 10px;border-radius:6px;background:rgba(6,182,212,.15);color:var(--cyan-400);font-size:12px;font-weight:600;border:1px solid var(--pr-soft)">'+c1.tag+'</span>';
+  html += '</div>';
+
+  // Corpus
+  if (c1.corpus && c1.corpus.length) {
+    html += '<div style="margin-top:16px;border-radius:12px;overflow:hidden;border:1px solid var(--bd);background:rgba(15,23,42,.5)">';
+    html += '<button class="corpus-toggle" onclick="this.parentElement.classList.toggle(\'open\')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:none;border:none;color:var(--tx);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">';
+    html += '语料库预览<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg></button>';
+    html += '<div style="display:none;padding:0 16px 16px" class="corpus-body">';
+    c1.corpus.forEach(function(p){html += '<p style="font-size:13px;color:var(--mu);line-height:1.6;margin-bottom:8px">'+p+'</p>'});
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">';
+    html += '<span style="padding:2px 8px;border-radius:4px;background:rgba(15,23,42,.6);color:var(--mu-dim);font-size:11px">认知心理学</span>';
+    html += '<span style="padding:2px 8px;border-radius:4px;background:rgba(15,23,42,.6);color:var(--mu-dim);font-size:11px">教学设计</span>';
+    html += '</div></div></div>';
+  }
+
+  // Related nodes
+  if (c1.related && c1.related.length) {
+    html += '<div style="margin-top:16px"><p style="font-size:11px;font-weight:600;color:var(--mu-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">关联节点</p><div style="display:flex;flex-direction:column;gap:6px">';
+    c1.related.forEach(function(r){
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(15,23,42,.5);border:1px solid var(--bd)">';
+      html += '<div style="width:6px;height:20px;border-radius:3px;flex-shrink:0;background:linear-gradient(180deg,var(--pr),var(--pr-h))"></div>';
+      html += '<span style="font-size:13px;color:var(--tx-dim)">'+r.name+'</span>';
+      html += '<span style="font-size:11px;color:var(--mu-dim);margin-left:auto">'+r.pos+'</span></div>';
+    });
+    html += '</div></div>';
+  }
+  html += '</div></div></div>';
+
+  // Corpus toggle styles
+  html += '<style>.corpus-toggle.open+.corpus-body,.corpus-toggle.open+div{display:block!important}.corpus-toggle.open svg{transform:rotate(180deg)}</style>';
+  stack.innerHTML = html;
+}
+
+function renderBrowseView() {
+  if (!state.browse.cards.length) initBrowseCards(null);
+  renderBrowseCards();
+}
+
+// Swipe handling for card stack
+(function setupBrowseSwipe() {
+  var touchStartY = 0;
+  var stack = document.getElementById('card-stack');
+  stack.addEventListener('touchstart', function(e) {
+    touchStartY = e.touches[0].clientY;
+  }, {passive: true});
+  stack.addEventListener('touchend', function(e) {
+    var dy = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(dy) < 40) return;
+    if (dy > 0) browseNext(); else browsePrev();
+  });
+  // Mouse wheel
+  stack.addEventListener('wheel', function(e) {
+    if (Math.abs(e.deltaY) < 30) return;
+    if (e.deltaY > 0) browseNext(); else browsePrev();
+  });
+  // Arrow key hints for desktop
+  document.getElementById('browse-container').addEventListener('click', function(e) {
+    var h = this.clientHeight;
+    if (e.clientY < h * 0.4) browsePrev();
+    else if (e.clientY > h * 0.6) browseNext();
+  });
+})();
+
+function browseNext() {
+  if (state.browse.currentIndex < state.browse.cards.length - 1) {
+    state.browse.currentIndex++;
+    renderBrowseCards();
+    toast('下一张 · '+(state.browse.currentIndex+1)+'/'+state.browse.cards.length);
+  }
+}
+function browsePrev() {
+  if (state.browse.currentIndex > 0) {
+    state.browse.currentIndex--;
+    renderBrowseCards();
+  }
+}
+
+document.getElementById('btn-back-nav').addEventListener('click', function() { switchView('nav'); });
+document.getElementById('btn-card-detail').addEventListener('click', function() {
+  var c = state.browse.cards[state.browse.currentIndex];
+  toast('查看详情: '+c.title);
+});
+document.getElementById('btn-card-bookmark').addEventListener('click', function() {
+  toast('已收藏');
+});
+
+/* ================================================================
+   VIEW 3: 树形管理 — Folder Tree + Breadcrumb + Search
+   ================================================================ */
+var treeData = [
+  {id:'root/1',label:'机器学习',type:'folder'},
+  {id:'root/1/1',label:'监督学习',type:'leaf',tag:'决策分支'},
+  {id:'root/1/2',label:'无监督学习',type:'leaf',tag:'层级分类'},
+  {id:'root/1/3',label:'强化学习',type:'leaf',tag:'决策分支'},
+  {id:'root/2',label:'神经网络',type:'folder'},
+  {id:'root/2/1',label:'CNN',type:'leaf',tag:'决策分支'},
+  {id:'root/2/2',label:'RNN',type:'leaf',tag:'层级分类'},
+  {id:'root/3',label:'深度学习',type:'leaf',tag:'决策分支'},
+  {id:'root/4',label:'自然语言处理',type:'folder'},
+  {id:'root/4/1',label:'词嵌入',type:'leaf',tag:'决策分支'},
+  {id:'root/4/2',label:'注意力机制',type:'leaf',tag:'决策分支'}
+];
+
+function getTreeNode(id) { return treeData.find(function(n){return n.id===id}); }
+function deriveParent(id) { var i=id.lastIndexOf('/'); return id.substring(0,i); }
+function getTreeChildren(parentId) { return treeData.filter(function(n){return deriveParent(n.id)===parentId}); }
+function getFullPath(nodeId) {
+  var parts = nodeId.split('/'); var result = []; var cum = '';
+  for (var i = 0; i < parts.length; i++) {
+    cum += (i===0?parts[i]:'/'+parts[i]);
+    result.push({path:cum, label: cum==='root'?'root':(getTreeNode(cum)||{}).label||parts[i]});
+  }
+  return result;
+}
+
+function createTreeRowHTML(node, level) {
+  var indent = '';
+  for (var j = 0; j < level; j++) indent += '<div class="tree-indent-guide"></div>';
+  var isFolder = node.type === 'folder';
+  var toggleBtn = isFolder
+    ? '<button class="tree-toggle expanded"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>'
+    : '<span style="width:20px;flex-shrink:0"></span>';
+  var icon = isFolder
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:rgba(6,182,212,.55);flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
+    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--mu);flex-shrink:0"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>';
+  var badge = '';
+  if (node.tag) {
+    badge = '<span class="tree-badge '+(node.tag==='决策分支'?'branch':'hierarchy')+'">'+node.tag+'</span>';
+  }
+  var extra = isFolder
+    ? '<span style="font-size:12px;color:var(--mu-dim);margin-left:auto">'+getTreeChildren(node.id).length+'</span>'
+    : '';
+  return '<div class="tree-row" data-node-id="'+node.id+'" data-type="'+node.type+'" data-expanded="true" data-level="'+level+'">'
+    + indent + toggleBtn + icon + '<span style="margin-left:2px">'+node.label+'</span>' + badge + extra
+    + '<button class="tree-more-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>'
+    + '</div><div class="tree-children" id="tree-children-'+node.id.replace(/\//g,'-')+'" style="max-height:2000px;opacity:1"></div>';
+}
+
+function buildTree(containerId, parentId, level) {
+  var children = getTreeChildren(parentId);
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var html = '';
+  children.forEach(function(c) { html += createTreeRowHTML(c, level); });
+  container.innerHTML = html;
+  children.forEach(function(c) {
+    if (c.type === 'folder') buildTree('tree-children-'+c.id.replace(/\//g,'-'), c.id, level+1);
+  });
+}
+
+function attachTreeEvents() {
+  // Toggle
+  document.querySelectorAll('#tree-list .tree-toggle').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var row = this.closest('.tree-row');
+      var nodeId = row.getAttribute('data-node-id');
+      var childrenEl = document.getElementById('tree-children-'+nodeId.replace(/\//g,'-'));
+      if (!childrenEl) return;
+      var expanded = row.getAttribute('data-expanded') === 'true';
+      if (expanded) {
+        row.setAttribute('data-expanded', 'false');
+        this.classList.remove('expanded');
+        childrenEl.classList.add('collapsed');
+      } else {
+        row.setAttribute('data-expanded', 'true');
+        this.classList.add('expanded');
+        childrenEl.classList.remove('collapsed');
+      }
+    });
+  });
+
+  // Row click
+  document.querySelectorAll('#tree-list .tree-row').forEach(function(row) {
+    row.addEventListener('click', function(e) {
+      if (e.target.closest('.tree-toggle') || e.target.closest('.tree-more-btn')) return;
+      var nodeId = this.getAttribute('data-node-id');
+      if (nodeId === 'root') return;
+      document.querySelectorAll('#tree-list .tree-row-selected').forEach(function(r){r.classList.remove('tree-row-selected')});
+      this.classList.add('tree-row-selected');
+      state.tree.selectedPath = nodeId;
+      updateBreadcrumb(nodeId);
+    });
+  });
+}
+
+function updateBreadcrumb(nodeId) {
+  var bar = document.getElementById('tree-breadcrumb');
+  var pathItems = getFullPath(nodeId);
+  var html = '';
+  pathItems.forEach(function(p, i) {
+    if (i > 0) html += '<span class="breadcrumb-sep">/</span>';
+    var isLast = i === pathItems.length - 1;
+    html += '<span class="breadcrumb-item'+(isLast?' active':'')+'" data-path="'+p.path+'">'
+      + (i===0?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>':'')
+      + p.label + '</span>';
+  });
+  bar.innerHTML = html;
+  bar.querySelectorAll('.breadcrumb-item').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var path = this.getAttribute('data-path');
+      // Expand parents
+      var parts = path.split('/');
+      for (var j=1;j<=parts.length;j++) {
+        var sub = parts.slice(0,j).join('/');
+        var row = document.querySelector('#tree-list .tree-row[data-node-id="'+sub+'"]');
+        if (row && row.getAttribute('data-type')==='folder') {
+          row.setAttribute('data-expanded','true');
+          var toggle = row.querySelector('.tree-toggle');
+          if (toggle) toggle.classList.add('expanded');
+          var cel = document.getElementById('tree-children-'+sub.replace(/\//g,'-'));
+          if (cel) cel.classList.remove('collapsed');
+        }
+      }
+      var targetRow = document.querySelector('#tree-list .tree-row[data-node-id="'+path+'"]');
+      if (targetRow) {
+        document.querySelectorAll('#tree-list .tree-row-selected').forEach(function(r){r.classList.remove('tree-row-selected')});
+        targetRow.classList.add('tree-row-selected');
+        targetRow.scrollIntoView({behavior:'smooth',block:'center'});
+        state.tree.selectedPath = path;
+      }
+    });
+  });
+}
+
+function renderTreeView() {
+  buildTree('tree-children-root', 'root', 1);
+  attachTreeEvents();
+}
+
+// Tree search
+document.getElementById('search-tree').addEventListener('input', function() {
+  var q = this.value.toLowerCase().trim();
+  document.querySelectorAll('#tree-list .tree-row').forEach(function(row) {
+    if (row.getAttribute('data-node-id')==='root') return;
+    var text = (row.textContent||'').toLowerCase();
+    row.style.display = !q || text.indexOf(q)>-1 ? '' : 'none';
+    if (q && text.indexOf(q)>-1) {
+      var parent = row.parentElement;
+      while (parent && parent.id!=='tree-list') {
+        if (parent.classList.contains('tree-children')) {
+          parent.classList.remove('collapsed');
+          var prevRow = parent.previousElementSibling;
+          if (prevRow && prevRow.classList.contains('tree-row')) {
+            prevRow.setAttribute('data-expanded','true');
+            var toggle = prevRow.querySelector('.tree-toggle');
+            if (toggle) toggle.classList.add('expanded');
+          }
+        }
+        parent = parent.parentElement;
+      }
+    }
+  });
+});
+
+// Add card buttons
+document.getElementById('fab-tree-add').addEventListener('click', function(){toast('添加认知卡片（功能开发中）')});
+document.getElementById('btn-add-card').addEventListener('click', function(){toast('添加认知卡片（功能开发中）')});
+
+/* ================================================================
+   Initialization
+   ================================================================ */
+renderGlobalView();
+
+// Keyboard: 1-4 to switch views
+document.addEventListener('keydown', function(e) {
+  var keys = {'1':'global','2':'nav','3':'browse','4':'tree'};
+  if (keys[e.key] && !e.target.closest('input')) switchView(keys[e.key]);
+  // Arrow keys in browse view
+  if (state.activeView==='browse') {
+    if (e.key==='ArrowUp'){e.preventDefault();browsePrev()}
+    if (e.key==='ArrowDown'){e.preventDefault();browseNext()}
+  }
+});
+
+})();
+</script>
+</body>
+</html>

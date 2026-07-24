@@ -1,0 +1,58 @@
+{
+  "root": {
+    "nodeId": "gen-project-shell",
+    "kind": "project-shell",
+    "pageIds": ["page-global-view", "page-path-select", "page-content-browse", "page-tree-manager"],
+    "output": "partials/project-shell.html",
+    "sharedRegions": ["mobile-bottom-nav", "page-frame"],
+    "privateRegions": [],
+    "mutableSlots": ["active-nav-tab"],
+    "status": "planned",
+    "children": [
+      {
+        "nodeId": "gen-page-global-view",
+        "kind": "page-leaf",
+        "pageIds": ["page-global-view"],
+        "output": "pages/global-view.html",
+        "sharedRegions": [],
+        "privateRegions": ["page-body-content"],
+        "mutableSlots": [],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-path-select",
+        "kind": "page-leaf",
+        "pageIds": ["page-path-select"],
+        "output": "pages/path-select.html",
+        "sharedRegions": [],
+        "privateRegions": ["page-body-content"],
+        "mutableSlots": [],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-content-browse",
+        "kind": "page-leaf",
+        "pageIds": ["page-content-browse"],
+        "output": "pages/content-browse.html",
+        "sharedRegions": [],
+        "privateRegions": ["page-body-content"],
+        "mutableSlots": [],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-tree-manager",
+        "kind": "page-leaf",
+        "pageIds": ["page-tree-manager"],
+        "output": "pages/tree-manager.html",
+        "sharedRegions": [],
+        "privateRegions": ["page-body-content"],
+        "mutableSlots": [],
+        "status": "planned",
+        "children": []
+      }
+    ]
+  }
+}

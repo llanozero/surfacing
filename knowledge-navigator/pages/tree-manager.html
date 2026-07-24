@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>树形管理 - 认知导航</title>
+    <style id="theme-vars">
+/* ===== 认知导航 — 温润聚焦 品牌样式 ===== */
+
+/* ===== Primary Color Scale (Warm Amber) ===== */
+:root {
+  --color-primary-50: #FDF6EE;
+  --color-primary-100: #FBE9D3;
+  --color-primary-200: #F6D3A8;
+  --color-primary-300: #F0B672;
+  --color-primary-400: #E89D47;
+  --color-primary-500: #D4893A;
+  --color-primary-600: #BA6E2C;
+  --color-primary-700: #9B5626;
+  --color-primary-800: #7D4425;
+  --color-primary-900: #683A22;
+  --color-primary-950: #381C0F;
+}
+
+/* ===== Neutral Scale (Warm Gray) ===== */
+:root {
+  --color-neutral-50: #FAF7F4;
+  --color-neutral-100: #F3EFEA;
+  --color-neutral-200: #E8E2D8;
+  --color-neutral-300: #D4CCC0;
+  --color-neutral-400: #B0A696;
+  --color-neutral-500: #8E8476;
+  --color-neutral-600: #6E6559;
+  --color-neutral-700: #595149;
+  --color-neutral-800: #4A433D;
+  --color-neutral-900: #3D3732;
+  --color-neutral-950: #2D2420;
+}
+
+/* ===== State Colors ===== */
+:root {
+  --state-success: #5B9A5B;
+  --state-success-light: #E8F3E8;
+  --state-warning: #D4893A;
+  --state-warning-light: #FDF6EE;
+  --state-error: #C2544A;
+  --state-error-light: #FAE8E6;
+  --state-info: #5B7F9A;
+  --state-info-light: #E8EEF3;
+}
+
+/* ===== Typography ===== */
+:root {
+  --font-sans: 'Noto Sans SC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+}
+
+/* ===== Radius Scale ===== */
+:root {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+}
+
+/* ===== Semantic Aliases ===== */
+:root {
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-950);
+  --card: #FFFFFF;
+  --card-foreground: var(--color-neutral-950);
+  --popover: #FFFFFF;
+  --popover-foreground: var(--color-neutral-950);
+  --primary: var(--color-primary-500);
+  --primary-foreground: #FFFFFF;
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-500);
+  --border: var(--color-neutral-200);
+  --input: var(--color-neutral-100);
+  --ring: var(--color-primary-400);
+}
+
+/* ===== Light Mode (Default) ===== */
+.light {
+  --background: var(--color-neutral-50);
+  --foreground: var(--color-neutral-950);
+  --card: #FFFFFF;
+  --card-foreground: var(--color-neutral-950);
+  --popover: #FFFFFF;
+  --popover-foreground: var(--color-neutral-950);
+  --primary: var(--color-primary-500);
+  --primary-foreground: #FFFFFF;
+  --muted: var(--color-neutral-100);
+  --muted-foreground: var(--color-neutral-500);
+  --border: var(--color-neutral-200);
+  --input: var(--color-neutral-100);
+  --ring: var(--color-primary-400);
+}
+
+/* ===== Dark Mode ===== */
+.dark {
+  --background: var(--color-neutral-950);
+  --foreground: var(--color-neutral-50);
+  --card: var(--color-neutral-900);
+  --card-foreground: var(--color-neutral-50);
+  --popover: var(--color-neutral-900);
+  --popover-foreground: var(--color-neutral-50);
+  --primary: var(--color-primary-400);
+  --primary-foreground: var(--color-neutral-950);
+  --muted: var(--color-neutral-800);
+  --muted-foreground: var(--color-neutral-400);
+  --border: var(--color-neutral-800);
+  --input: var(--color-neutral-800);
+  --ring: var(--color-primary-300);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="flex flex-col min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans">
+        <!-- ===== Simulated Mobile Status Bar ===== -->
+        <div class="sticky top-0 z-40 flex items-center justify-between h-7 px-5 bg-[var(--background)] text-[11px] leading-none text-[var(--foreground)]">
+            <span class="tabular-nums font-medium">9:41</span>
+            <div class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="5" width="2" height="6" rx="0.5" fill="currentColor"/>
+                    <rect x="4.5" y="3.5" width="2" height="9" rx="0.5" fill="currentColor"/>
+                    <rect x="8" y="2" width="2" height="11" rx="0.5" fill="currentColor"/>
+                    <rect x="11.5" y="1" width="2" height="13" rx="0.5" fill="currentColor"/>
+                </svg>
+                <svg class="w-5 h-3" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="0.5" y="0.5" width="20" height="12" rx="2.5" stroke="currentColor" stroke-width="1"/>
+                    <rect x="2" y="2" width="15" height="9" rx="1" fill="currentColor"/>
+                    <rect x="19" y="3" width="1.5" height="3" rx="0.75" fill="currentColor"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- ===== Tree Manager Page Content ===== -->
+        <div id="page-content" class="flex-1 pb-[56px]">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-4 pt-3 pb-2">
+                <h1 class="text-lg font-semibold tracking-[-0.01em] text-[var(--foreground)]">认知卡片管理</h1>
+                <button
+                    data-dom-id="btn-add-card"
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--primary)] text-white transition-colors duration-150 hover:opacity-90 active:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+                    aria-label="添加认知卡片"
+                >
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="px-4 pt-1 pb-3">
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted-foreground)]"></i>
+                    <input
+                        type="text"
+                        placeholder="搜索认知卡片..."
+                        class="w-full h-10 pl-9 pr-4 rounded-lg text-sm bg-[var(--muted)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] border border-transparent transition-colors duration-150 focus:outline-none focus:border-[var(--primary)]/30 focus:bg-[var(--card)]"
+                    />
+                </div>
+            </div>
+
+            <!-- Tree View -->
+            <div class="px-0 pb-24">
+
+                <!-- root/ — root directory -->
+                <div class="flex items-center h-11 px-4 text-[var(--muted-foreground)] cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50"
+                     onclick="toggleTreeFolder(this)"
+                     data-folder="root"
+                     data-expanded="true"
+                >
+                    <button class="inline-flex items-center justify-center w-5 h-5 shrink-0 transition-transform duration-200" aria-label="展开root">
+                        <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200 rotate-90" data-folder-chevron="root"></i>
+                    </button>
+                    <span class="ml-1 shrink-0">
+                        <svg class="w-4 h-4 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </span>
+                    <span class="ml-2 text-sm">root</span>
+                    <span class="text-xs ml-0.5 opacity-60">/</span>
+                </div>
+
+                <!-- Children of root/ -->
+                <div data-folder-children="root">
+
+                    <!-- ======= root/1 — 机器学习 (folder) ======= -->
+                    <div class="ml-5 border-l" style="border-color: var(--color-primary-200);">
+                        <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50"
+                             onclick="toggleTreeFolder(this)"
+                             data-folder="root-1"
+                             data-expanded="true"
+                        >
+                            <div class="absolute left-5 top-1/2 w-3 border-t" style="border-color: var(--color-primary-200);"></div>
+                            <button class="inline-flex items-center justify-center w-5 h-5 shrink-0 transition-transform duration-200 relative ml-[-3px]" aria-label="展开机器学习">
+                                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200 rotate-90" data-folder-chevron="root-1"></i>
+                            </button>
+                            <span class="ml-1 shrink-0">
+                                <svg class="w-4 h-4 text-[var(--color-primary-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v1"/>
+                                    <path d="M12 14l-2 2-2-2"/>
+                                    <path d="M10 16V9"/>
+                                </svg>
+                            </span>
+                            <span class="ml-2 text-sm font-medium text-[var(--foreground)] truncate">root/1</span>
+                            <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">机器学习</span>
+                            <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <!-- Children of root/1 -->
+                        <div class="ml-5 border-l" style="border-color: var(--color-primary-300);" data-folder-children="root-1">
+
+                            <!-- root/1/1 — 监督学习 (leaf) -->
+                            <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50 border-l-[3px] border-l-transparent hover:border-l-[var(--primary)]/30"
+                                 onclick="selectTreeItem(this)"
+                            >
+                                <span class="shrink-0 ml-[-3px]">
+                                    <svg class="w-4 h-4 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <line x1="10" y1="9" x2="8" y2="9"/>
+                                    </svg>
+                                </span>
+                                <span class="ml-2 text-sm text-[var(--foreground)] truncate">root/1/1</span>
+                                <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">监督学习</span>
+                                <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                    <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <!-- root/1/2 — 无监督学习 (leaf) -->
+                            <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50 border-l-[3px] border-l-transparent hover:border-l-[var(--primary)]/30"
+                                 onclick="selectTreeItem(this)"
+                            >
+                                <span class="shrink-0 ml-[-3px]">
+                                    <svg class="w-4 h-4 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <line x1="10" y1="9" x2="8" y2="9"/>
+                                    </svg>
+                                </span>
+                                <span class="ml-2 text-sm text-[var(--foreground)] truncate">root/1/2</span>
+                                <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">无监督学习</span>
+                                <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                    <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <!-- root/1/3 — 强化学习 (leaf) -->
+                            <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50 border-l-[3px] border-l-transparent hover:border-l-[var(--primary)]/30"
+                                 onclick="selectTreeItem(this)"
+                            >
+                                <span class="shrink-0 ml-[-3px]">
+                                    <svg class="w-4 h-4 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <line x1="10" y1="9" x2="8" y2="9"/>
+                                    </svg>
+                                </span>
+                                <span class="ml-2 text-sm text-[var(--foreground)] truncate">root/1/3</span>
+                                <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">强化学习</span>
+                                <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                    <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ======= root/2 — 神经网络 (folder) ======= -->
+                    <div class="ml-5 border-l" style="border-color: var(--color-primary-200);">
+                        <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50"
+                             onclick="toggleTreeFolder(this)"
+                             data-folder="root-2"
+                             data-expanded="true"
+                        >
+                            <button class="inline-flex items-center justify-center w-5 h-5 shrink-0 transition-transform duration-200 ml-[-3px]" aria-label="展开神经网络">
+                                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200 rotate-90" data-folder-chevron="root-2"></i>
+                            </button>
+                            <span class="ml-1 shrink-0">
+                                <svg class="w-4 h-4 text-[var(--color-primary-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v1"/>
+                                    <path d="M12 14l-2 2-2-2"/>
+                                    <path d="M10 16V9"/>
+                                </svg>
+                            </span>
+                            <span class="ml-2 text-sm font-medium text-[var(--foreground)] truncate">root/2</span>
+                            <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">神经网络</span>
+                            <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <!-- Children of root/2 -->
+                        <div class="ml-5 border-l" style="border-color: var(--color-primary-300);" data-folder-children="root-2">
+
+                            <!-- root/2/1 — CNN (leaf) -->
+                            <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50 border-l-[3px] border-l-transparent hover:border-l-[var(--primary)]/30"
+                                 onclick="selectTreeItem(this)"
+                            >
+                                <span class="shrink-0 ml-[-3px]">
+                                    <svg class="w-4 h-4 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <line x1="10" y1="9" x2="8" y2="9"/>
+                                    </svg>
+                                </span>
+                                <span class="ml-2 text-sm text-[var(--foreground)] truncate">root/2/1</span>
+                                <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">CNN</span>
+                                <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                    <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <!-- root/2/2 — RNN (leaf) -->
+                            <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50 border-l-[3px] border-l-transparent hover:border-l-[var(--primary)]/30"
+                                 onclick="selectTreeItem(this)"
+                            >
+                                <span class="shrink-0 ml-[-3px]">
+                                    <svg class="w-4 h-4 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <line x1="10" y1="9" x2="8" y2="9"/>
+                                    </svg>
+                                </span>
+                                <span class="ml-2 text-sm text-[var(--foreground)] truncate">root/2/2</span>
+                                <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">RNN</span>
+                                <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                    <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ======= root/3 — 深度学习 (leaf) ======= -->
+                    <div class="ml-5 border-l" style="border-color: var(--color-primary-200);">
+                        <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50 border-l-[3px] border-l-transparent hover:border-l-[var(--primary)]/30"
+                             onclick="selectTreeItem(this)"
+                        >
+                            <span class="shrink-0 ml-[-3px]">
+                                <svg class="w-4 h-4 text-[var(--color-primary-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                    <line x1="10" y1="9" x2="8" y2="9"/>
+                                </svg>
+                            </span>
+                            <span class="ml-2 text-sm text-[var(--foreground)] truncate">root/3</span>
+                            <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">深度学习</span>
+                            <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ======= root/4 — 自然语言处理 (folder) ======= -->
+                    <div class="ml-5 border-l" style="border-color: var(--color-primary-200);">
+                        <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50"
+                             onclick="toggleTreeFolder(this)"
+                             data-folder="root-4"
+                             data-expanded="false"
+                        >
+                            <button class="inline-flex items-center justify-center w-5 h-5 shrink-0 transition-transform duration-200 ml-[-3px]" aria-label="展开自然语言处理">
+                                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200" data-folder-chevron="root-4"></i>
+                            </button>
+                            <span class="ml-1 shrink-0">
+                                <svg class="w-4 h-4 text-[var(--color-primary-400)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v1"/>
+                                    <path d="M12 14l-2 2-2-2"/>
+                                    <path d="M10 16V9"/>
+                                </svg>
+                            </span>
+                            <span class="ml-2 text-sm font-medium text-[var(--foreground)] truncate">root/4</span>
+                            <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">自然语言处理</span>
+                            <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <!-- Children of root/4 (collapsed by default) -->
+                        <div class="ml-5 border-l hidden" style="border-color: var(--color-primary-300);" data-folder-children="root-4">
+
+                            <!-- root/4/1 — 词嵌入 (leaf) -->
+                            <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50 border-l-[3px] border-l-transparent hover:border-l-[var(--primary)]/30"
+                                 onclick="selectTreeItem(this)"
+                            >
+                                <span class="shrink-0 ml-[-3px]">
+                                    <svg class="w-4 h-4 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <line x1="10" y1="9" x2="8" y2="9"/>
+                                    </svg>
+                                </span>
+                                <span class="ml-2 text-sm text-[var(--foreground)] truncate">root/4/1</span>
+                                <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">词嵌入</span>
+                                <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                    <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <!-- root/4/2 — 注意力机制 (leaf) -->
+                            <div class="flex items-center h-11 pl-3 pr-4 cursor-pointer select-none transition-colors duration-120 hover:bg-[var(--muted)]/50 border-l-[3px] border-l-transparent hover:border-l-[var(--primary)]/30"
+                                 onclick="selectTreeItem(this)"
+                            >
+                                <span class="shrink-0 ml-[-3px]">
+                                    <svg class="w-4 h-4 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <line x1="10" y1="9" x2="8" y2="9"/>
+                                    </svg>
+                                </span>
+                                <span class="ml-2 text-sm text-[var(--foreground)] truncate">root/4/2</span>
+                                <span class="ml-1.5 text-xs text-[var(--muted-foreground)] truncate">注意力机制</span>
+                                <button class="ml-auto inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--muted-foreground)] transition-colors duration-120 hover:bg-[var(--muted)] active:bg-[var(--border)] shrink-0" aria-label="更多操作" onclick="event.stopPropagation()">
+                                    <i data-lucide="ellipsis" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- end root/ children -->
+            </div>
+
+            <!-- Floating Action Button -->
+            <button
+                data-dom-id="fab-add-tree-node"
+                class="fixed right-4 bottom-20 z-40 inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[var(--primary)] text-white shadow-lg transition-all duration-200 hover:opacity-90 active:scale-95 active:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+                style="box-shadow: 0 4px 16px rgba(212,137,58,.35);"
+                aria-label="快速添加认知卡片"
+            >
+                <i data-lucide="plus" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <!-- ===== Bottom Navigation Bar ===== -->
+        <nav data-mobile-nav="global" class="sticky bottom-0 left-0 right-0 z-50 bg-[var(--card)] border-t border-[var(--border)]" style="height:56px">
+            <div class="w-full max-w-md mx-auto grid grid-cols-4 h-full">
+                <!-- 全览 -->
+                <button
+                    data-nav-key="global-view"
+                    data-dom-id="tab-nav-global-view"
+                    data-active="false"
+                    class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[var(--muted-foreground)] transition-colors duration-150"
+                >
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="2" y1="12" x2="22" y2="12"/>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">全览</span>
+                </button>
+                <!-- 导航 -->
+                <button
+                    data-nav-key="path-select"
+                    data-dom-id="tab-nav-path-select"
+                    data-active="false"
+                    class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[var(--muted-foreground)] transition-colors duration-150"
+                >
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="6" cy="6" r="2"/>
+                        <circle cx="18" cy="18" r="2"/>
+                        <circle cx="12" cy="12" r="2"/>
+                        <line x1="7.5" y1="5" x2="10.5" y2="11"/>
+                        <line x1="13.5" y1="13" x2="16.5" y2="17"/>
+                    </svg>
+                    <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">导航</span>
+                </button>
+                <!-- 浏览 -->
+                <button
+                    data-nav-key="content-browse"
+                    data-dom-id="tab-nav-content-browse"
+                    data-active="false"
+                    class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[var(--muted-foreground)] transition-colors duration-150"
+                >
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/>
+                    </svg>
+                    <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">浏览</span>
+                </button>
+                <!-- 管理 (active) -->
+                <button
+                    data-nav-key="tree-manager"
+                    data-active="true"
+                    class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[var(--primary)] transition-colors duration-150"
+                >
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 14a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v6h10v-6z"/>
+                        <path d="M6 12V6a2 2 0 0 1 2-2h1l1 2h5a1 1 0 0 1 1 1v5"/>
+                    </svg>
+                    <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">管理</span>
+                </button>
+            </div>
+        </nav>
+    </main>
+
+    <style>
+        /* Tree toggle interaction styling */
+        .tree-selected {
+            background-color: rgba(212, 137, 58, 0.08) !important;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .transition-colors,
+            .transition-transform,
+            .transition-all {
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+
+    <script>
+        function toggleTreeFolder(el) {
+            var folderKey = el.getAttribute('data-folder');
+            var isExpanded = el.getAttribute('data-expanded') === 'true';
+            var children = document.querySelector('[data-folder-children="' + folderKey + '"]');
+            var chevron = document.querySelector('[data-folder-chevron="' + folderKey + '"]');
+
+            if (isExpanded) {
+                if (children) children.classList.add('hidden');
+                if (chevron) chevron.classList.remove('rotate-90');
+                el.setAttribute('data-expanded', 'false');
+            } else {
+                if (children) children.classList.remove('hidden');
+                if (chevron) chevron.classList.add('rotate-90');
+                el.setAttribute('data-expanded', 'true');
+            }
+        }
+
+        function selectTreeItem(el) {
+            var allItems = document.querySelectorAll('#page-content .tree-selected');
+            for (var i = 0; i < allItems.length; i++) {
+                allItems[i].classList.remove('tree-selected');
+            }
+            el.classList.add('tree-selected');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

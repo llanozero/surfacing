@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画布路径 - 认知导航</title>
+    <style id="theme-vars">
+:root {
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+  --card: #1e293b;
+  --card-foreground: #e2e8f0;
+  --popover: #1e293b;
+  --popover-foreground: #e2e8f0;
+  --primary: #06b6d4;
+  --primary-foreground: #ffffff;
+  --secondary: #334155;
+  --secondary-foreground: #e2e8f0;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #e2e8f0;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #334155;
+  --ring: #06b6d4;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+    --radius-xl: var(--radius-xl);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-secondary { background-color: var(--secondary); }
+      .text-secondary { color: var(--secondary); }
+      .border-secondary { border-color: var(--secondary); }
+      .ring-secondary { --tw-ring-color: var(--secondary); }
+      .bg-secondary-foreground { background-color: var(--secondary-foreground); }
+      .text-secondary-foreground { color: var(--secondary-foreground); }
+      .border-secondary-foreground { border-color: var(--secondary-foreground); }
+      .ring-secondary-foreground { --tw-ring-color: var(--secondary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-accent { background-color: var(--accent); }
+      .text-accent { color: var(--accent); }
+      .border-accent { border-color: var(--accent); }
+      .ring-accent { --tw-ring-color: var(--accent); }
+      .bg-accent-foreground { background-color: var(--accent-foreground); }
+      .text-accent-foreground { color: var(--accent-foreground); }
+      .border-accent-foreground { border-color: var(--accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--accent-foreground); }
+      .bg-destructive { background-color: var(--destructive); }
+      .text-destructive { color: var(--destructive); }
+      .border-destructive { border-color: var(--destructive); }
+      .ring-destructive { --tw-ring-color: var(--destructive); }
+      .bg-destructive-foreground { background-color: var(--destructive-foreground); }
+      .text-destructive-foreground { color: var(--destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--destructive-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    <style id="critical-layout">
+/* ===== 认知导航 — 深色科技主题 (Canvas Path Select) ===== */
+:root {
+  --bg: #0f172a;
+  --bg-card: #1e293b;
+  --bd: #334155;
+  --pr: #06b6d4;
+  --pr-glow: rgba(6,182,212,0.4);
+  --pr-dim: rgba(6,182,212,0.12);
+  --tx: #e2e8f0;
+  --mu: #94a3b8;
+  --fn-sans: 'Noto Sans SC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --fn-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: var(--fn-sans);
+  background: var(--bg);
+  color: var(--tx);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+}
+.status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 28px; padding: 0 16px; background: var(--bg);
+  font-size: 11px; flex-shrink: 0;
+}
+.status-bar .time { font-variant-numeric: tabular-nums; font-weight: 500; }
+.page-header { padding: 12px 16px 8px; flex-shrink: 0; }
+.page-header h1 { font-size: 22px; font-weight: 700; color: var(--pr); letter-spacing: -0.01em; line-height: 1.2; }
+.page-header .subtitle { font-size: 13px; color: var(--mu); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+.page-header .subtitle .path-arrow { color: var(--pr); font-weight: 600; }
+.dag-container { flex: 1; position: relative; overflow: hidden; min-height: 0; }
+.dag-container svg { width: 100%; height: 100%; display: block; }
+.pull-hint {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 10px 0 6px;
+  background: linear-gradient(to top, var(--bg) 40%, transparent);
+  pointer-events: none; z-index: 5;
+}
+.pull-hint .handle { width: 32px; height: 4px; border-radius: 2px; background: var(--bd); margin-bottom: 6px; }
+.pull-hint span { font-size: 11px; color: var(--mu); display: flex; align-items: center; gap: 2px; }
+.action-bar {
+  display: flex; gap: 10px; padding: 10px 16px; flex-shrink: 0;
+  border-top: 1px solid var(--bd); background: var(--bg);
+}
+.btn-primary {
+  flex: 1; padding: 10px 16px; border-radius: var(--r-sm);
+  background: var(--pr); color: #0f172a; font-size: 15px;
+  font-weight: 600; border: none; cursor: pointer;
+  transition: opacity 0.15s; text-align: center; font-family: var(--fn-sans);
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:active { opacity: 0.75; }
+.btn-outline {
+  flex: 1; padding: 10px 16px; border-radius: var(--r-sm);
+  background: transparent; color: var(--pr); font-size: 15px;
+  font-weight: 600; border: 1px solid var(--bd); cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: center; font-family: var(--fn-sans);
+}
+.btn-outline:hover { background: var(--pr-dim); border-color: var(--pr); }
+@keyframes pulse-glow { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+.dag-node-label { font-size: 11px; fill: var(--tx); text-anchor: middle; pointer-events: none; font-family: var(--fn-sans); }
+.dag-node-weight { font-size: 10px; fill: var(--mu); text-anchor: middle; pointer-events: none; font-family: var(--fn-mono); }
+.dag-current-label { font-size: 13px; fill: var(--tx); text-anchor: middle; pointer-events: none; font-weight: 700; font-family: var(--fn-sans); }
+.dag-prev-label { font-size: 11px; fill: var(--mu); text-anchor: middle; pointer-events: none; font-family: var(--fn-sans); }
+.edge-preset { stroke-dasharray: none; }
+.edge-browse { stroke-dasharray: 5 4; opacity: 0.55; }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+<div id="app" data-node-id="page-canvas-path-select">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="5" width="2" height="6" rx="0.5" fill="currentColor"/><rect x="4.5" y="3.5" width="2" height="9" rx="0.5" fill="currentColor"/><rect x="8" y="2" width="2" height="11" rx="0.5" fill="currentColor"/><rect x="11.5" y="1" width="2" height="13" rx="0.5" fill="currentColor"/></svg>
+      <svg width="20" height="12" viewBox="0 0 24 14" fill="none"><rect x="0.5" y="0.5" width="20" height="12" rx="2.5" stroke="currentColor" stroke-width="1"/><rect x="2" y="2" width="15" height="9" rx="1" fill="currentColor"/><rect x="19" y="3" width="1.5" height="3" rx="0.75" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>路径导航</h1>
+    <div class="subtitle">
+      <span>机器学习基础</span>
+      <span class="path-arrow">→ ?</span>
+    </div>
+  </div>
+
+  <!-- DAG Canvas -->
+  <div class="dag-container" id="dag-container">
+    <svg id="dag-svg"></svg>
+    <div class="pull-hint">
+      <div class="handle"></div>
+      <span>上拉查看详情与权重编辑</span>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <button class="btn-primary" data-dom-id="canvas-btn-browse">开始路径浏览</button>
+    <button class="btn-outline">权重配置</button>
+  </div>
+
+  <!-- Bottom Tab Bar -->
+  <nav data-mobile-nav="canvas" class="sticky bottom-0 left-0 right-0 z-50 bg-[#1e293b] border-t border-[#334155]" style="height:56px">
+    <div class="w-full max-w-md mx-auto grid grid-cols-4 h-full">
+      <button data-nav-key="global-view" data-dom-id="tab-nav-global-view" data-active="false" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[#94a3b8] transition-colors duration-150">
+        <i data-lucide="globe" class="w-5 h-5 shrink-0"></i>
+        <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">全览</span>
+      </button>
+      <button data-nav-key="path-select" data-active="true" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[#06b6d4] transition-colors duration-150">
+        <i data-lucide="git-branch" class="w-5 h-5 shrink-0"></i>
+        <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">导航</span>
+      </button>
+      <button data-nav-key="content-browse" data-dom-id="tab-nav-content-browse" data-active="false" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[#94a3b8] transition-colors duration-150">
+        <i data-lucide="play" class="w-5 h-5 shrink-0"></i>
+        <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">浏览</span>
+      </button>
+      <button data-nav-key="tree-manager" data-dom-id="tab-nav-tree-manager" data-active="false" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full text-[#94a3b8] transition-colors duration-150">
+        <i data-lucide="folder-tree" class="w-5 h-5 shrink-0"></i>
+        <span class="text-[11px] leading-none whitespace-nowrap max-w-full truncate">管理</span>
+      </button>
+    </div>
+  </nav>
+
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  var graphData = {
+    currentNode: { id: "ml-basics", label: "机器学习基础", type: "current", desc: "涵盖监督学习、无监督学习与强化学习" },
+    prevNodes: [
+      { id: "probability", label: "概率论", type: "prev", presetWeight: 0.75, browseWeight: 0 },
+      { id: "linear-algebra", label: "线性代数", type: "prev", presetWeight: 0.82, browseWeight: 0 }
+    ],
+    nextNodes: [
+      { id: "supervised", label: "监督学习", type: "next", presetWeight: 0.80, browseWeight: 0.55 },
+      { id: "unsupervised", label: "无监督学习", type: "next", presetWeight: 0.60, browseWeight: 0.42 },
+      { id: "reinforcement", label: "强化学习", type: "next", presetWeight: 0.40, browseWeight: 0.30 }
+    ]
+  };
+
+  var CYAN = "#06b6d4";
+  var CYAN_DIM = "rgba(6,182,212,0.25)";
+  var CYAN_GLOW = "rgba(6,182,212,0.6)";
+  var TXT = "#e2e8f0";
+  var MUT = "#94a3b8";
+  var CARD = "#1e293b";
+  var BORD = "#334155";
+  var NODE_R = 28;
+  var CURRENT_NODE_R = 36;
+  var LAYER_PAD = 90;
+
+  var container = document.getElementById("dag-container");
+  var svgEl = document.getElementById("dag-svg");
+  var svg = d3.select(svgEl);
+  var defs = svg.append("defs");
+
+  var glowFilter = defs.append("filter")
+    .attr("id", "cyan-glow").attr("x", "-50%").attr("y", "-50%")
+    .attr("width", "200%").attr("height", "200%");
+  glowFilter.append("feGaussianBlur").attr("stdDeviation", "6").attr("result", "blur");
+  glowFilter.append("feMerge").selectAll("feMergeNode")
+    .data(["blur", "SourceGraphic"]).enter().append("feMergeNode")
+    .attr("in", function(d) { return d; });
+
+  defs.append("marker").attr("id", "arrow-cyan")
+    .attr("viewBox", "0 0 10 10").attr("refX", 10).attr("refY", 5)
+    .attr("markerWidth", 7).attr("markerHeight", 7).attr("orient", "auto-start-reverse")
+    .append("path").attr("d", "M 0 0 L 10 5 L 0 10 z").attr("fill", CYAN);
+
+  defs.append("marker").attr("id", "arrow-cyan-dim")
+    .attr("viewBox", "0 0 10 10").attr("refX", 10).attr("refY", 5)
+    .attr("markerWidth", 7).attr("markerHeight", 7).attr("orient", "auto-start-reverse")
+    .append("path").attr("d", "M 0 0 L 10 5 L 0 10 z").attr("fill", CYAN_DIM);
+
+  var g = svg.append("g").attr("class", "dag-group");
+
+  function layoutDims() {
+    var W = container.clientWidth;
+    var H = container.clientHeight;
+    svg.attr("viewBox", "0 0 " + W + " " + H);
+    return { W: W, H: H, cx: W / 2 };
+  }
+
+  function getPositions(dims) {
+    var cx = dims.cx, H = dims.H;
+    var centerY = H * 0.48;
+    var topY = centerY - LAYER_PAD;
+    var bottomY = centerY + LAYER_PAD;
+
+    var nextSpacing = dims.W / 4;
+    var nextNodes = graphData.nextNodes.map(function(n, i) {
+      return { node: n, x: nextSpacing * (i + 1), y: topY };
+    });
+    var current = { node: graphData.currentNode, x: cx, y: centerY };
+    var prevSpacing = dims.W / 3;
+    var prevNodes = graphData.prevNodes.map(function(n, i) {
+      return { node: n, x: prevSpacing * (i + 1), y: bottomY };
+    });
+    return { nextNodes: nextNodes, current: current, prevNodes: prevNodes };
+  }
+
+  function edgePath(d) {
+    var sx = d.source.x, sy = d.source.y;
+    var tx = d.target.x, ty = d.target.y;
+    var dy = Math.abs(sy - ty);
+    var cpY = dy * 0.6;
+    var c1x = sx, c1y = sy - cpY;
+    var c2x = tx, c2y = ty + cpY;
+    return "M" + sx + "," + sy + " C" + c1x + "," + c1y + " " + c2x + "," + c2y + " " + tx + "," + ty;
+  }
+
+  function render() {
+    var dims = layoutDims();
+    var pos = getPositions(dims);
+
+    // Build edges
+    var allEdges = [];
+    pos.prevNodes.forEach(function(p) {
+      allEdges.push({ source: p, target: pos.current, weight: p.node.presetWeight, edgeType: "preset" });
+    });
+    pos.nextNodes.forEach(function(n) {
+      var type = n.node.presetWeight >= 0.6 ? "preset" : "browse";
+      allEdges.push({ source: pos.current, target: n, weight: n.node.presetWeight, edgeType: type });
+    });
+
+    var edgeGroup = g.selectAll("g.edge-group").data([0]);
+    edgeGroup = edgeGroup.enter().append("g").attr("class", "edge-group").merge(edgeGroup);
+
+    var edges = edgeGroup.selectAll("path.dag-edge").data(allEdges, function(d) {
+      return d.source.node.id + "-" + d.target.node.id;
+    });
+
+    edges.exit().transition().duration(350).attr("opacity", 0).remove();
+
+    var edgesEnter = edges.enter().append("path")
+      .attr("class", function(d) { return "dag-edge " + (d.edgeType === "preset" ? "edge-preset" : "edge-browse"); })
+      .attr("fill", "none")
+      .attr("stroke", function(d) { return d.edgeType === "preset" ? CYAN : CYAN_DIM; })
+      .attr("stroke-width", function(d) { return d.edgeType === "preset" ? 1.8 + d.weight * 1.5 : 1.2; })
+      .attr("stroke-dasharray", function(d) { return d.edgeType === "preset" ? null : "5 4"; })
+      .attr("marker-end", function(d) { return d.edgeType === "preset" ? "url(#arrow-cyan)" : "url(#arrow-cyan-dim)"; })
+      .attr("opacity", 0);
+
+    edgesEnter.merge(edges).transition().duration(600).ease(d3.easeCubicInOut)
+      .attr("d", edgePath)
+      .attr("opacity", function(d) { return d.edgeType === "preset" ? 0.8 : 0.5; });
+
+    // Nodes
+    var allNodes = pos.prevNodes.concat([pos.current]).concat(pos.nextNodes);
+    var nodeGroup = g.selectAll("g.node-group").data([0]);
+    nodeGroup = nodeGroup.enter().append("g").attr("class", "node-group").merge(nodeGroup);
+
+    var nodes = nodeGroup.selectAll("g.dag-node").data(allNodes, function(d) { return d.node.id; });
+    nodes.exit().transition().duration(350).attr("opacity", 0).remove();
+
+    var nodesEnter = nodes.enter().append("g")
+      .attr("class", function(d) { return "dag-node dag-node-" + d.node.type; })
+      .attr("data-node-id", function(d) { return d.node.id; })
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+      .attr("opacity", 0)
+      .style("cursor", function(d) { return d.node.type === "next" ? "pointer" : "default"; });
+
+    // Glow ring for current
+    nodesEnter.filter(function(d) { return d.node.type === "current"; })
+      .append("circle")
+      .attr("r", CURRENT_NODE_R + 6).attr("fill", "none")
+      .attr("stroke", CYAN_GLOW).attr("stroke-width", 2)
+      .attr("filter", "url(#cyan-glow)").attr("class", "current-glow-ring");
+
+    // Node circle
+    nodesEnter.append("circle")
+      .attr("r", function(d) { return d.node.type === "current" ? CURRENT_NODE_R : NODE_R; })
+      .attr("fill", function(d) {
+        if (d.node.type === "current") return "#0e2a35";
+        if (d.node.type === "next") return CARD;
+        return "#15202b";
+      })
+      .attr("stroke", function(d) {
+        if (d.node.type === "current") return CYAN;
+        if (d.node.type === "next") return CYAN_DIM;
+        return BORD;
+      })
+      .attr("stroke-width", function(d) { return d.node.type === "current" ? 2.5 : 1.5; })
+      .attr("class", "node-circle");
+
+    // Inner dot for prev
+    nodesEnter.filter(function(d) { return d.node.type === "prev"; })
+      .append("circle").attr("r", 4).attr("fill", MUT).attr("class", "prev-dot");
+
+    // Label
+    nodesEnter.append("text")
+      .attr("class", function(d) {
+        if (d.node.type === "current") return "dag-current-label";
+        if (d.node.type === "prev") return "dag-prev-label";
+        return "dag-node-label";
+      })
+      .attr("y", function(d) { return (d.node.type === "current" ? CURRENT_NODE_R : NODE_R) + (d.node.type === "current" ? 18 : 16); })
+      .text(function(d) { return d.node.label; });
+
+    // Weight label for next
+    nodesEnter.filter(function(d) { return d.node.type === "next" && d.node.presetWeight; })
+      .append("text").attr("class", "dag-node-weight").attr("y", NODE_R + 30)
+      .text(function(d) { return "权重 " + d.node.presetWeight.toFixed(1); });
+
+    // Click: next nodes pulse glow
+    nodesEnter.filter(function(d) { return d.node.type === "next"; })
+      .on("click", function(event, d) {
+        var el = d3.select(this);
+        var circle = el.select(".node-circle");
+        circle.transition().duration(150)
+          .attr("stroke", CYAN).attr("stroke-width", 3).attr("fill", "#0a2a35")
+          .transition().duration(600)
+          .attr("stroke", CYAN_DIM).attr("stroke-width", 1.5).attr("fill", CARD);
+        var ring = el.select(".pulse-ring");
+        if (ring.empty()) {
+          el.insert("circle", ".node-circle")
+            .attr("r", NODE_R + 4).attr("fill", "none")
+            .attr("stroke", CYAN).attr("stroke-width", 2)
+            .attr("opacity", 0.8).attr("class", "pulse-ring")
+            .transition().duration(800)
+            .attr("r", NODE_R + 16).attr("opacity", 0)
+            .on("end", function() { d3.select(this).remove(); });
+        }
+      });
+
+    nodesEnter.transition().duration(500).delay(function(d, i) { return 100 + i * 80; })
+      .attr("opacity", 1);
+
+    nodes.transition().duration(600).ease(d3.easeCubicInOut)
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  }
+
+  function setupTabs() {
+    var tabs = document.querySelectorAll("button[data-nav-key]");
+    var routes = {
+      "global-view": "canvas-global-view.html",
+      "path-select": "canvas-path-select.html",
+      "content-browse": "canvas-content-browse.html",
+      "tree-manager": "canvas-tree-manager.html"
+    };
+    tabs.forEach(function(tab) {
+      tab.addEventListener("click", function() {
+        var key = this.getAttribute("data-nav-key");
+        var target = routes[key];
+        if (target && target !== "canvas-path-select.html") {
+          window.location.href = target;
+        }
+      });
+    });
+  }
+
+  function init() {
+    lucide.createIcons();
+    render();
+    setupTabs();
+    var rt;
+    window.addEventListener("resize", function() {
+      clearTimeout(rt);
+      rt = setTimeout(render, 150);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

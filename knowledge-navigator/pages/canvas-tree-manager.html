@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画布管理 - 认知导航</title>
+    <style id="theme-vars">
+:root {
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+  --card: #1e293b;
+  --card-foreground: #e2e8f0;
+  --popover: #1e293b;
+  --popover-foreground: #e2e8f0;
+  --primary: #06b6d4;
+  --primary-foreground: #ffffff;
+  --secondary: #334155;
+  --secondary-foreground: #e2e8f0;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #e2e8f0;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #334155;
+  --input: #334155;
+  --ring: #06b6d4;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+    --radius-xl: var(--radius-xl);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--background); }
+      .text-background { color: var(--background); }
+      .border-background { border-color: var(--background); }
+      .ring-background { --tw-ring-color: var(--background); }
+      .bg-foreground { background-color: var(--foreground); }
+      .text-foreground { color: var(--foreground); }
+      .border-foreground { border-color: var(--foreground); }
+      .ring-foreground { --tw-ring-color: var(--foreground); }
+      .bg-card { background-color: var(--card); }
+      .text-card { color: var(--card); }
+      .border-card { border-color: var(--card); }
+      .ring-card { --tw-ring-color: var(--card); }
+      .bg-card-foreground { background-color: var(--card-foreground); }
+      .text-card-foreground { color: var(--card-foreground); }
+      .border-card-foreground { border-color: var(--card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--card-foreground); }
+      .bg-popover { background-color: var(--popover); }
+      .text-popover { color: var(--popover); }
+      .border-popover { border-color: var(--popover); }
+      .ring-popover { --tw-ring-color: var(--popover); }
+      .bg-popover-foreground { background-color: var(--popover-foreground); }
+      .text-popover-foreground { color: var(--popover-foreground); }
+      .border-popover-foreground { border-color: var(--popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--popover-foreground); }
+      .bg-primary { background-color: var(--primary); }
+      .text-primary { color: var(--primary); }
+      .border-primary { border-color: var(--primary); }
+      .ring-primary { --tw-ring-color: var(--primary); }
+      .bg-primary-foreground { background-color: var(--primary-foreground); }
+      .text-primary-foreground { color: var(--primary-foreground); }
+      .border-primary-foreground { border-color: var(--primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--primary-foreground); }
+      .bg-secondary { background-color: var(--secondary); }
+      .text-secondary { color: var(--secondary); }
+      .border-secondary { border-color: var(--secondary); }
+      .ring-secondary { --tw-ring-color: var(--secondary); }
+      .bg-secondary-foreground { background-color: var(--secondary-foreground); }
+      .text-secondary-foreground { color: var(--secondary-foreground); }
+      .border-secondary-foreground { border-color: var(--secondary-foreground); }
+      .ring-secondary-foreground { --tw-ring-color: var(--secondary-foreground); }
+      .bg-muted { background-color: var(--muted); }
+      .text-muted { color: var(--muted); }
+      .border-muted { border-color: var(--muted); }
+      .ring-muted { --tw-ring-color: var(--muted); }
+      .bg-muted-foreground { background-color: var(--muted-foreground); }
+      .text-muted-foreground { color: var(--muted-foreground); }
+      .border-muted-foreground { border-color: var(--muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--muted-foreground); }
+      .bg-accent { background-color: var(--accent); }
+      .text-accent { color: var(--accent); }
+      .border-accent { border-color: var(--accent); }
+      .ring-accent { --tw-ring-color: var(--accent); }
+      .bg-accent-foreground { background-color: var(--accent-foreground); }
+      .text-accent-foreground { color: var(--accent-foreground); }
+      .border-accent-foreground { border-color: var(--accent-foreground); }
+      .ring-accent-foreground { --tw-ring-color: var(--accent-foreground); }
+      .bg-destructive { background-color: var(--destructive); }
+      .text-destructive { color: var(--destructive); }
+      .border-destructive { border-color: var(--destructive); }
+      .ring-destructive { --tw-ring-color: var(--destructive); }
+      .bg-destructive-foreground { background-color: var(--destructive-foreground); }
+      .text-destructive-foreground { color: var(--destructive-foreground); }
+      .border-destructive-foreground { border-color: var(--destructive-foreground); }
+      .ring-destructive-foreground { --tw-ring-color: var(--destructive-foreground); }
+      .bg-border { background-color: var(--border); }
+      .text-border { color: var(--border); }
+      .border-border { border-color: var(--border); }
+      .ring-border { --tw-ring-color: var(--border); }
+      .bg-input { background-color: var(--input); }
+      .text-input { color: var(--input); }
+      .border-input { border-color: var(--input); }
+      .ring-input { --tw-ring-color: var(--input); }
+      .bg-ring { background-color: var(--ring); }
+      .text-ring { color: var(--ring); }
+      .border-ring { border-color: var(--ring); }
+      .ring-ring { --tw-ring-color: var(--ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main id="page-canvas-tree-manager" class="flex flex-col min-h-screen pb-16">
+      <!-- Status Bar + Header -->
+      <header class="sticky top-0 z-30 bg-[#0f172a]/95 backdrop-blur-sm border-b border-[#334155]">
+        <div class="flex items-center justify-between px-4 py-3">
+          <div>
+            <h1 class="text-lg font-semibold text-[#e2e8f0]">认知卡片管理</h1>
+            <p class="text-xs text-[#94a3b8] mt-0.5">共 8 项 · 3 个文件夹</p>
+          </div>
+          <button id="btn-add-card" class="flex items-center justify-center w-8 h-8 rounded-lg bg-[#06b6d4] text-white hover:bg-[#0891b2] active:scale-95 transition-all shadow-lg shadow-[#06b6d4]/25" aria-label="添加认知卡片">
+            <i data-lucide="plus" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Breadcrumb Navigation Bar -->
+      <nav id="breadcrumb-bar" class="flex items-center gap-1 px-4 py-2.5 overflow-x-auto no-scrollbar text-sm border-b border-[#334155]/50 bg-[#0f172a]/80">
+        <button class="breadcrumb-segment flex items-center gap-1 px-2 py-1 rounded-md text-[#94a3b8] hover:text-[#e2e8f0] hover:bg-[#1e293b] transition-colors whitespace-nowrap" data-path="root">
+          <i data-lucide="folder-root" class="w-3.5 h-3.5"></i>
+          <span>root</span>
+        </button>
+        <i data-lucide="chevron-right" class="w-3 h-3 text-[#475569] flex-shrink-0"></i>
+        <button class="breadcrumb-segment flex items-center gap-1 px-2 py-1 rounded-md text-[#94a3b8] hover:text-[#e2e8f0] hover:bg-[#1e293b] transition-colors whitespace-nowrap" data-path="root/1">
+          <span>机器学习</span>
+        </button>
+        <i data-lucide="chevron-right" class="w-3 h-3 text-[#475569] flex-shrink-0"></i>
+        <button class="breadcrumb-segment flex items-center gap-1 px-2 py-1 rounded-md text-[#06b6d4] font-medium whitespace-nowrap" data-path="root/1/1">
+          <span>监督学习</span>
+        </button>
+      </nav>
+
+      <!-- Search Bar -->
+      <div class="px-4 py-3">
+        <div class="relative">
+          <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#64748b] pointer-events-none"></i>
+          <input id="search-input" type="text" placeholder="搜索认知卡片..." class="w-full h-10 pl-9 pr-4 bg-[#1e293b] border border-[#334155] rounded-lg text-sm text-[#e2e8f0] placeholder:text-[#64748b] outline-none transition-all focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/30">
+        </div>
+      </div>
+
+      <!-- Tree View List (scroll region) -->
+      <div data-scroll-region="primary" class="flex-1 overflow-y-auto px-2 py-2">
+        <div id="tree-view" class="select-none">
+
+          <!-- Root Directory -->
+          <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 text-[#64748b] cursor-default" data-level="0" data-node-id="root" data-type="folder" data-expanded="true">
+            <button class="expand-toggle flex items-center justify-center w-4 h-4 transition-transform duration-200" aria-label="展开/折叠">
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </button>
+            <i data-lucide="folder" class="w-4 h-4 flex-shrink-0 text-[#475569]"></i>
+            <span class="text-sm ml-1">root/</span>
+            <span class="text-xs text-[#475569] ml-auto">8项</span>
+          </div>
+
+          <!-- Children wrapper for root -->
+          <div class="tree-children">
+
+            <!-- root/1 — 机器学习 (folder, 3 children) -->
+            <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="1" data-node-id="root/1" data-type="folder" data-expanded="true">
+              <div class="indent-guide w-4 flex-shrink-0 relative">
+                <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/20"></div>
+              </div>
+              <button class="expand-toggle flex items-center justify-center w-4 h-4 transition-transform duration-200" aria-label="展开/折叠">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#94a3b8]"></i>
+              </button>
+              <i data-lucide="folder" class="w-4 h-4 flex-shrink-0 text-[#06b6d4]/60"></i>
+              <span class="text-sm text-[#e2e8f0] ml-1">机器学习</span>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/20 ml-2">层级分类</span>
+              <span class="text-xs text-[#475569] ml-auto">3</span>
+              <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-1" aria-label="更多操作">
+                <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+              </button>
+            </div>
+
+            <!-- Children of root/1 -->
+            <div class="tree-children">
+              <!-- root/1/1 — 监督学习 (selected) -->
+              <div class="tree-row tree-row-selected flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 cursor-pointer" data-level="2" data-node-id="root/1/1" data-type="leaf">
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/25"></div>
+                </div>
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/30"></div>
+                </div>
+                <span class="w-4 flex-shrink-0"></span>
+                <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-[#06b6d4]/70"></i>
+                <span class="text-sm text-[#06b6d4] font-medium ml-1">监督学习</span>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/20 ml-2">决策分支</span>
+                <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-auto" aria-label="更多操作">
+                  <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+                </button>
+              </div>
+
+              <!-- root/1/2 — 无监督学习 -->
+              <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="2" data-node-id="root/1/2" data-type="leaf">
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/25"></div>
+                </div>
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/30 last"></div>
+                </div>
+                <span class="w-4 flex-shrink-0"></span>
+                <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-[#94a3b8]"></i>
+                <span class="text-sm text-[#e2e8f0] ml-1">无监督学习</span>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#64748b]/20 text-[#94a3b8] border border-[#334155] ml-2">层级分类</span>
+                <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-auto" aria-label="更多操作">
+                  <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+                </button>
+              </div>
+
+              <!-- root/1/3 — 强化学习 -->
+              <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="2" data-node-id="root/1/3" data-type="leaf">
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/25"></div>
+                </div>
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/30 last"></div>
+                </div>
+                <span class="w-4 flex-shrink-0"></span>
+                <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-[#94a3b8]"></i>
+                <span class="text-sm text-[#e2e8f0] ml-1">强化学习</span>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#64748b]/20 text-[#94a3b8] border border-[#334155] ml-2">决策分支</span>
+                <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-auto" aria-label="更多操作">
+                  <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- root/2 — 神经网络 (folder, 2 children) -->
+            <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="1" data-node-id="root/2" data-type="folder" data-expanded="true">
+              <div class="indent-guide w-4 flex-shrink-0 relative">
+                <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/20"></div>
+              </div>
+              <button class="expand-toggle flex items-center justify-center w-4 h-4 transition-transform duration-200" aria-label="展开/折叠">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#94a3b8]"></i>
+              </button>
+              <i data-lucide="folder" class="w-4 h-4 flex-shrink-0 text-[#06b6d4]/60"></i>
+              <span class="text-sm text-[#e2e8f0] ml-1">神经网络</span>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/20 ml-2">层级分类</span>
+              <span class="text-xs text-[#475569] ml-auto">2</span>
+              <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-1" aria-label="更多操作">
+                <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+              </button>
+            </div>
+
+            <!-- Children of root/2 -->
+            <div class="tree-children">
+              <!-- root/2/1 — CNN -->
+              <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="2" data-node-id="root/2/1" data-type="leaf">
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/25"></div>
+                </div>
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/30"></div>
+                </div>
+                <span class="w-4 flex-shrink-0"></span>
+                <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-[#94a3b8]"></i>
+                <span class="text-sm text-[#e2e8f0] ml-1">CNN</span>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#64748b]/20 text-[#94a3b8] border border-[#334155] ml-2">决策分支</span>
+                <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-auto" aria-label="更多操作">
+                  <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+                </button>
+              </div>
+
+              <!-- root/2/2 — RNN -->
+              <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="2" data-node-id="root/2/2" data-type="leaf">
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/25"></div>
+                </div>
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/30 last"></div>
+                </div>
+                <span class="w-4 flex-shrink-0"></span>
+                <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-[#94a3b8]"></i>
+                <span class="text-sm text-[#e2e8f0] ml-1">RNN</span>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#64748b]/20 text-[#94a3b8] border border-[#334155] ml-2">层级分类</span>
+                <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-auto" aria-label="更多操作">
+                  <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- root/3 — 深度学习 -->
+            <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="1" data-node-id="root/3" data-type="leaf">
+              <div class="indent-guide w-4 flex-shrink-0 relative">
+                <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/20"></div>
+              </div>
+              <span class="w-4 flex-shrink-0"></span>
+              <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-[#94a3b8]"></i>
+              <span class="text-sm text-[#e2e8f0] ml-1">深度学习</span>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#64748b]/20 text-[#94a3b8] border border-[#334155] ml-2">决策分支</span>
+              <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-auto" aria-label="更多操作">
+                <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+              </button>
+            </div>
+
+            <!-- root/4 — 自然语言处理 (folder) -->
+            <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="1" data-node-id="root/4" data-type="folder" data-expanded="false">
+              <div class="indent-guide w-4 flex-shrink-0 relative">
+                <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/20"></div>
+              </div>
+              <button class="expand-toggle flex items-center justify-center w-4 h-4 transition-transform duration-200" aria-label="展开/折叠">
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#94a3b8]"></i>
+              </button>
+              <i data-lucide="folder" class="w-4 h-4 flex-shrink-0 text-[#06b6d4]/60"></i>
+              <span class="text-sm text-[#e2e8f0] ml-1">自然语言处理</span>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#06b6d4]/15 text-[#06b6d4] border border-[#06b6d4]/20 ml-2">层级分类</span>
+              <span class="text-xs text-[#475569] ml-auto">2</span>
+              <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-1" aria-label="更多操作">
+                <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+              </button>
+            </div>
+
+            <!-- Children of root/4 (collapsed by default) -->
+            <div class="tree-children hidden">
+              <!-- root/4/1 — 词嵌入 -->
+              <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="2" data-node-id="root/4/1" data-type="leaf">
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/25"></div>
+                </div>
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/30"></div>
+                </div>
+                <span class="w-4 flex-shrink-0"></span>
+                <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-[#94a3b8]"></i>
+                <span class="text-sm text-[#e2e8f0] ml-1">词嵌入</span>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#64748b]/20 text-[#94a3b8] border border-[#334155] ml-2">决策分支</span>
+                <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-auto" aria-label="更多操作">
+                  <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+                </button>
+              </div>
+
+              <!-- root/4/2 — 注意力机制 -->
+              <div class="tree-row flex items-center gap-1.5 px-3 py-2 rounded-md mx-1 hover:bg-[#1e293b]/70 transition-colors cursor-pointer" data-level="2" data-node-id="root/4/2" data-type="leaf">
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/25"></div>
+                </div>
+                <div class="indent-guide w-4 flex-shrink-0 relative">
+                  <div class="absolute left-2 top-0 bottom-0 w-px bg-[#06b6d4]/30 last"></div>
+                </div>
+                <span class="w-4 flex-shrink-0"></span>
+                <i data-lucide="file-text" class="w-4 h-4 flex-shrink-0 text-[#94a3b8]"></i>
+                <span class="text-sm text-[#e2e8f0] ml-1">注意力机制</span>
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#64748b]/20 text-[#94a3b8] border border-[#334155] ml-2">决策分支</span>
+                <button class="more-btn flex items-center justify-center w-6 h-6 rounded hover:bg-[#334155]/50 transition-colors ml-auto" aria-label="更多操作">
+                  <i data-lucide="more-horizontal" class="w-3.5 h-3.5 text-[#64748b]"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Action Button -->
+      <button id="fab-add" class="fixed right-5 bottom-20 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-[#06b6d4] text-white shadow-xl shadow-[#06b6d4]/30 hover:bg-[#0891b2] hover:scale-105 active:scale-95 transition-all" aria-label="快速添加">
+        <i data-lucide="plus" class="w-6 h-6"></i>
+      </button>
+
+      <!-- Bottom Tab Bar -->
+      <nav id="bottom-tab-bar" class="fixed bottom-0 left-0 right-0 z-30 bg-[#0f172a]/95 backdrop-blur-sm border-t border-[#334155]">
+        <div class="flex items-center justify-around h-14 px-2 max-w-lg mx-auto">
+          <button id="tab-nav-global-view" class="tab-item flex flex-col items-center justify-center gap-0.5 w-16 py-1 rounded-lg text-[#64748b] hover:text-[#e2e8f0] transition-colors" data-tab-key="global-view" data-nav-target="page-canvas-global-view">
+            <i data-lucide="globe" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">全览</span>
+          </button>
+          <button id="tab-nav-path-select" class="tab-item flex flex-col items-center justify-center gap-0.5 w-16 py-1 rounded-lg text-[#64748b] hover:text-[#e2e8f0] transition-colors" data-tab-key="path-select" data-nav-target="page-canvas-path-select">
+            <i data-lucide="git-branch" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">导航</span>
+          </button>
+          <button id="tab-nav-content-browse" class="tab-item flex flex-col items-center justify-center gap-0.5 w-16 py-1 rounded-lg text-[#64748b] hover:text-[#e2e8f0] transition-colors" data-tab-key="content-browse" data-nav-target="page-canvas-content-browse">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">浏览</span>
+          </button>
+          <button class="tab-item flex flex-col items-center justify-center gap-0.5 w-16 py-1 rounded-lg text-[#06b6d4] transition-colors" data-tab-key="tree-manager" data-nav-target="page-canvas-tree-manager" data-active="true">
+            <i data-lucide="folder-tree" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">管理</span>
+          </button>
+        </div>
+      </nav>
+    </main>
+
+    <style>
+      /* === Tree View Styles === */
+      .tree-row-selected {
+        background-color: rgba(6, 182, 212, 0.1) !important;
+        border-left: 2px solid #06b6d4;
+      }
+
+      .tree-row[data-expanded="true"] > .expand-toggle {
+        transform: rotate(90deg);
+      }
+
+      .indent-guide .last {
+        height: 50%;
+      }
+
+      /* === Expand/Collapse Animation === */
+      .tree-children {
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+        max-height: 2000px;
+        opacity: 1;
+      }
+      .tree-children.hidden {
+        max-height: 0;
+        opacity: 0;
+      }
+
+      /* === Breadcrumb active === */
+      .breadcrumb-segment:last-child {
+        color: #06b6d4;
+        font-weight: 500;
+      }
+
+      /* === Tab active indicator === */
+      .tab-item[data-active="true"] {
+        color: #06b6d4;
+      }
+
+      /* === Search focus glow === */
+      #search-input:focus {
+        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+      }
+
+      /* === Bottom safe area for mobile === */
+      #bottom-tab-bar {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      /* === FAB transition === */
+      #fab-add {
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                    background-color 0.2s ease,
+                    box-shadow 0.2s ease;
+      }
+    </style>
+
+    <script>
+      (function() {
+        /* ===== Tree Expand/Collapse ===== */
+        document.querySelectorAll('.expand-toggle').forEach(function(toggle) {
+          toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var row = this.closest('.tree-row');
+            var children = row.nextElementSibling;
+            if (!children || !children.classList.contains('tree-children')) return;
+
+            if (row.dataset.expanded === 'true') {
+              row.dataset.expanded = 'false';
+              children.classList.add('hidden');
+            } else {
+              row.dataset.expanded = 'true';
+              children.classList.remove('hidden');
+            }
+          });
+        });
+
+        /* ===== Tree Row Selection ===== */
+        document.getElementById('tree-view').addEventListener('click', function(e) {
+          var row = e.target.closest('.tree-row');
+          if (!row) return;
+
+          /* Don't select root or if clicking expand/more */
+          if (row.dataset.nodeId === 'root') return;
+          if (e.target.closest('.expand-toggle') || e.target.closest('.more-btn')) return;
+
+          /* Update selection */
+          document.querySelectorAll('.tree-row-selected').forEach(function(r) {
+            r.classList.remove('tree-row-selected');
+          });
+          row.classList.add('tree-row-selected');
+
+          /* Update breadcrumb */
+          updateBreadcrumb(row.dataset.nodeId);
+        });
+
+        function updateBreadcrumb(nodeId) {
+          var bar = document.getElementById('breadcrumb-bar');
+          var parts = nodeId.split('/');
+          var segments = [];
+          var cumulative = '';
+
+          for (var i = 0; i < parts.length; i++) {
+            cumulative += (i === 0 ? parts[i] : '/' + parts[i]);
+            var name = getNodeName(cumulative);
+            segments.push({ path: cumulative, name: name });
+          }
+
+          var html = '';
+          for (var j = 0; j < segments.length; j++) {
+            if (j > 0) {
+              html += '<i data-lucide="chevron-right" class="w-3 h-3 text-[#475569] flex-shrink-0 mx-0.5"></i>';
+            }
+            var isLast = j === segments.length - 1;
+            var classes = 'breadcrumb-segment flex items-center gap-1 px-2 py-1 rounded-md transition-colors whitespace-nowrap cursor-pointer text-sm';
+            if (isLast) {
+              classes += ' text-[#06b6d4] font-medium';
+            } else {
+              classes += ' text-[#94a3b8] hover:text-[#e2e8f0] hover:bg-[#1e293b]';
+            }
+            var icon = '';
+            if (j === 0) {
+              icon = '<i data-lucide="folder-root" class="w-3.5 h-3.5"></i>';
+            }
+            html += '<button class="' + classes + '" data-path="' + segments[j].path + '">' + icon + '<span>' + segments[j].name + '</span></button>';
+          }
+
+          bar.innerHTML = html;
+          lucide.createIcons();
+
+          /* Re-attach breadcrumb click handlers */
+          bar.querySelectorAll('.breadcrumb-segment').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+              var path = this.dataset.path;
+              var targetRow = document.querySelector('.tree-row[data-node-id="' + path + '"]');
+              if (targetRow) {
+                document.querySelectorAll('.tree-row-selected').forEach(function(r) {
+                  r.classList.remove('tree-row-selected');
+                });
+                targetRow.classList.add('tree-row-selected');
+                targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                /* Expand parent if needed */
+                var parent = targetRow.parentElement;
+                while (parent && parent.id !== 'tree-view') {
+                  if (parent.classList.contains('tree-children') && parent.classList.contains('hidden')) {
+                    parent.classList.remove('hidden');
+                    var parentRow = parent.previousElementSibling;
+                    if (parentRow && parentRow.dataset.expanded) {
+                      parentRow.dataset.expanded = 'true';
+                    }
+                  }
+                  parent = parent.parentElement;
+                }
+                updateBreadcrumb(path);
+              }
+            });
+          });
+        }
+
+        function getNodeName(nodeId) {
+          var names = {
+            'root': 'root',
+            'root/1': '机器学习',
+            'root/1/1': '监督学习',
+            'root/1/2': '无监督学习',
+            'root/1/3': '强化学习',
+            'root/2': '神经网络',
+            'root/2/1': 'CNN',
+            'root/2/2': 'RNN',
+            'root/3': '深度学习',
+            'root/4': '自然语言处理',
+            'root/4/1': '词嵌入',
+            'root/4/2': '注意力机制'
+          };
+          return names[nodeId] || nodeId.split('/').pop();
+        }
+
+        /* ===== Tab Navigation ===== */
+        document.querySelectorAll('.tab-item').forEach(function(tab) {
+          tab.addEventListener('click', function() {
+            var target = this.dataset.navTarget;
+            if (!target) return;
+
+            /* Update active state */
+            document.querySelectorAll('.tab-item').forEach(function(t) {
+              t.dataset.active = 'false';
+              t.classList.remove('text-[#06b6d4]');
+              t.classList.add('text-[#64748b]');
+            });
+            this.dataset.active = 'true';
+            this.classList.add('text-[#06b6d4]');
+            this.classList.remove('text-[#64748b]');
+
+            /* Dispatch navigation event */
+            window.dispatchEvent(new CustomEvent('canvas-navigate', {
+              detail: { target: target, source: 'page-canvas-tree-manager' }
+            }));
+          });
+        });
+
+        /* ===== Search Filter ===== */
+        document.getElementById('search-input').addEventListener('input', function() {
+          var query = this.value.toLowerCase().trim();
+          var rows = document.querySelectorAll('#tree-view .tree-row');
+
+          rows.forEach(function(row) {
+            if (row.dataset.nodeId === 'root') return;
+
+            var text = row.textContent.toLowerCase();
+            if (!query) {
+              row.style.display = '';
+              return;
+            }
+            row.style.display = text.includes(query) ? '' : 'none';
+          });
+        });
+
+        /* ===== Bottom tab bar safe area adjustment ===== */
+        function adjustBottomPadding() {
+          var main = document.querySelector('[data-scroll-region="primary"]');
+          if (main) {
+            main.style.paddingBottom = '4rem';
+          }
+        }
+        adjustBottomPadding();
+
+        /* Initial lucide icons refresh */
+        lucide.createIcons();
+      })();
+    </script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

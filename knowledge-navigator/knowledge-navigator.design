@@ -1,0 +1,231 @@
+{
+  "data": [
+    {
+      "id": "page-global-view",
+      "title": "全局全览",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1753809200000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/global-view.html",
+        "interactions": [
+          {
+            "domId": "card-node-ml",
+            "targetPageId": "page-path-select",
+            "transitionLabel": "探索机器学习路径"
+          },
+          {
+            "domId": "tab-nav-path-select",
+            "targetPageId": "page-path-select",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-nav-content-browse",
+            "targetPageId": "page-content-browse",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-nav-tree-manager",
+            "targetPageId": "page-tree-manager",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-path-select",
+      "title": "路径选择",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1753809200000,
+      "canvasData": {
+        "x": 309,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/path-select.html",
+        "interactions": [
+          {
+            "domId": "btn-plan-path",
+            "targetPageId": "page-content-browse",
+            "transitionLabel": "开始浏览"
+          },
+          {
+            "domId": "tab-nav-global-view",
+            "targetPageId": "page-global-view",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-nav-content-browse",
+            "targetPageId": "page-content-browse",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-nav-tree-manager",
+            "targetPageId": "page-tree-manager",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-content-browse",
+      "title": "内容浏览",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1753809200000,
+      "canvasData": {
+        "x": 618,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/content-browse.html",
+        "interactions": [
+          {
+            "domId": "btn-back-path",
+            "targetPageId": "page-path-select",
+            "hideEdge": true,
+            "transitionLabel": "返回路径"
+          },
+          {
+            "domId": "tab-nav-global-view",
+            "targetPageId": "page-global-view",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-nav-path-select",
+            "targetPageId": "page-path-select",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-nav-tree-manager",
+            "targetPageId": "page-tree-manager",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-tree-manager",
+      "title": "树形管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1753809200000,
+      "canvasData": {
+        "x": 0,
+        "y": 773,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/tree-manager.html",
+        "interactions": [
+          {
+            "domId": "tab-nav-global-view",
+            "targetPageId": "page-global-view",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-nav-path-select",
+            "targetPageId": "page-path-select",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-nav-content-browse",
+            "targetPageId": "page-content-browse",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-canvas-global-view",
+      "title": "画布 · 全局全览",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 0,
+        "y": 397,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/canvas-global-view.html",
+        "interactions": [
+          {
+            "domId": "canvas-node-nav",
+            "targetPageId": "page-canvas-path-select",
+            "transitionLabel": "进入路径导航"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-canvas-path-select",
+      "title": "画布 · 路径选择",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 309,
+        "y": 397,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/canvas-path-select.html",
+        "interactions": [
+          {
+            "domId": "canvas-btn-browse",
+            "targetPageId": "page-canvas-content-browse",
+            "transitionLabel": "开始浏览"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-canvas-content-browse",
+      "title": "画布 · 内容浏览",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 618,
+        "y": 397,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/canvas-content-browse.html",
+        "interactions": []
+      }
+    },
+    {
+      "id": "page-canvas-tree-manager",
+      "title": "画布 · 树形管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1754880000000,
+      "canvasData": {
+        "x": 309,
+        "y": 773,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/canvas-tree-manager.html",
+        "interactions": []
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "mobile",
+    "projectName": "认知导航",
+    "showEdge": true,
+    "visualEditorEnabled": false
+  }
+}

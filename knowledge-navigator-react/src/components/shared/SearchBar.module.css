@@ -1,0 +1,41 @@
+.box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 40px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-md);
+  color: var(--label-tertiary);
+  transition: border-color 0.2s;
+}
+.box:focus-within {
+  border-color: var(--status-kimiblue);
+  color: var(--label-secondary);
+}
+.input {
+  flex: 1;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--label-primary);
+  font-size: 14px;
+  font-family: var(--font-sans);
+}
+.input::placeholder {
+  color: var(--label-tertiary);
+}
+.clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--fill-f2);
+  color: var(--label-secondary);
+  cursor: pointer;
+}

@@ -1,0 +1,61 @@
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--separator);
+}
+.stop {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stopHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stopIndex {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+  font-size: 11px;
+  font-weight: 600;
+}
+.stopLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label-primary);
+}
+.stopDesc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--label-tertiary);
+  padding-left: 26px;
+}
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-left: 26px;
+}
+.cardChip {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  background: var(--fill-f1);
+  border: 1px solid var(--separator);
+  color: var(--label-secondary);
+}
+.algorithm {
+  font-size: 10px;
+  color: var(--label-quaternary);
+  font-family: var(--font-mono);
+  text-align: right;
+}

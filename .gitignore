@@ -11,3 +11,13 @@ log
 __pycache__/
 *.pyc
 .env
+
+# 依赖目录
+node_modules/
+
+# 日志文件
+*.log
+
+# 构建输出
+dist/
+build/

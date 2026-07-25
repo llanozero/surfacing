@@ -1,0 +1,26 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+}
+.label {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--label-tertiary);
+}
+.track {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0;
+}
+.track::-webkit-scrollbar {
+  height: 3px;
+}
+.empty {
+  font-size: 12px;
+  color: var(--label-quaternary);
+}

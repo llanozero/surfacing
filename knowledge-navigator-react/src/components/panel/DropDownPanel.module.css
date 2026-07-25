@@ -1,0 +1,122 @@
+.panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 88%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--separator);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+  z-index: 20;
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+.dragging {
+  transition: none;
+}
+.handleZone {
+  flex-shrink: 0;
+  padding: 10px 0 8px;
+  cursor: ns-resize;
+  touch-action: none;
+  display: flex;
+  justify-content: center;
+}
+.handle {
+  width: 36px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--fill-f3);
+}
+.collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 16px;
+}
+.collapsedLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--label-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 16px 16px;
+  overflow-y: auto;
+}
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.nodeLabel {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--label-primary);
+}
+.nodeDesc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--label-secondary);
+}
+.stats {
+  display: flex;
+  gap: 8px;
+}
+.stat {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--fill-f1);
+  color: var(--label-tertiary);
+}
+.expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.panelSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--label-tertiary);
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--fill-f1);
+  border-radius: var(--radius-sm);
+}
+.rowMain {
+  font-size: 13px;
+  color: var(--label-primary);
+}
+.rowMeta {
+  font-size: 11px;
+  color: var(--label-quaternary);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.actions {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  gap: 8px;
+}

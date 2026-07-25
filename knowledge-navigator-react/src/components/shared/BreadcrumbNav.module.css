@@ -1,0 +1,29 @@
+.nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 0;
+}
+.item {
+  background: none;
+  border: none;
+  color: var(--label-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-sans);
+}
+.item:hover {
+  background: var(--fill-f1);
+  color: var(--label-primary);
+}
+.current {
+  color: var(--status-kimiblue);
+  font-weight: 500;
+}
+.sep {
+  color: var(--label-quaternary);
+  font-size: 12px;
+}

@@ -1,0 +1,17 @@
+.hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--label-quaternary);
+  animation: breathe 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+.up {
+  order: -1;
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
+}

@@ -1,0 +1,202 @@
+/* ===========================================
+   Knowledge Navigator — Global Styles
+   Dark theme based on Kimi Design Tokens
+   =========================================== */
+
+/* CSS Variables — Kimi Dark Mode Tokens */
+:root {
+  /* Background */
+  --bg-primary: #121212;
+  --bg-primary-hover: rgba(30, 30, 30, 1);
+  --bg-primary-active: rgba(42, 42, 42, 1);
+  --bg-secondary: #1f1f1f;
+  --bg-secondary-hover: rgba(42, 42, 42, 1);
+  --bg-secondary-active: rgba(53, 53, 53, 1);
+  --bg-tertiary: #292929;
+  --bg-tertiary-hover: rgba(52, 52, 52, 1);
+  --bg-tertiary-active: rgba(62, 62, 62, 1);
+  --bg-quaternary: #4d4d4d;
+
+  /* Labels (Text) */
+  --label-primary: rgba(255, 255, 255, 0.84);
+  --label-primary-hover: rgba(255, 255, 255, 0.848);
+  --label-secondary: rgba(255, 255, 255, 0.56);
+  --label-secondary-hover: rgba(255, 255, 255, 0.582);
+  --label-tertiary: rgba(255, 255, 255, 0.42);
+  --label-quaternary: rgba(255, 255, 255, 0.26);
+
+  /* Fills */
+  --fill-f1: rgba(255, 255, 255, 0.05);
+  --fill-f1-hover: rgba(255, 255, 255, 0.098);
+  --fill-f2: rgba(255, 255, 255, 0.1);
+  --fill-f2-hover: rgba(255, 255, 255, 0.145);
+  --fill-f3: rgba(255, 255, 255, 0.18);
+  --fill-f3-hover: rgba(255, 255, 255, 0.221);
+
+  /* Separator */
+  --separator: rgba(255, 255, 255, 0.12);
+  --separator-hover: rgba(255, 255, 255, 0.164);
+
+  /* Status */
+  --status-kimiblue: #1a88ff;
+  --status-kimiblue-hover: rgba(37, 142, 255, 1);
+  --status-danger: #ff4756;
+  --status-positive: #16c456;
+  --status-orange: #ff9f0a;
+  --status-purple: #a16bff;
+  --status-yellow: #ffd230;
+
+  /* Mask */
+  --mask-base: rgba(0, 0, 0, 0.6);
+  --mask-light: rgba(0, 0, 0, 0.3);
+
+  /* Always */
+  --always-white: #ffffff;
+  --always-black: #000000;
+
+  /* Syntax / Mark */
+  --mark-bg: rgba(26, 136, 255, 0.2);
+
+  /* Typography */
+  --font-sans: "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", "SF Mono", "Cascadia Code", monospace;
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Z-Index Layers */
+  --z-header: 500;
+  --z-modal-backdrop: 800;
+  --z-modal: 810;
+  --z-dialog-backdrop: 850;
+  --z-dialog: 860;
+  --z-tooltip: 900;
+  --z-toast: 1000;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--label-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* App Shell */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--bg-primary);
+  position: relative;
+}
+
+.view-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--fill-f2);
+  border-radius: var(--radius-full);
+}
+
+/* Typography Utilities */
+.text-t2 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+.text-t2-em {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+.text-b1 {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 400;
+}
+.text-b1-em {
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+}
+.text-b2 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+.text-b2-em {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+.text-c1 {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+}
+.text-c1-em {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+}
+
+/* Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* NavCanvas 选中节点脉冲环（2s 呼吸动画） */
+@keyframes nc-pulse {
+  0%, 100% { r: 36px; opacity: 0.3; }
+  50% { r: 44px; opacity: 0.15; }
+}
+circle.nc-pulse {
+  animation: nc-pulse 2s ease-in-out infinite;
+  fill: none;
+  stroke: #06b6d4;
+  stroke-width: 1.5;
+  pointer-events: none;
+}

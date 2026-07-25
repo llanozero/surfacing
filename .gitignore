@@ -21,3 +21,6 @@ node_modules/
 # 构建输出
 dist/
 build/
+
+# 后端运行时持久化数据
+knowledge-navigator-react/backend/data.yaml

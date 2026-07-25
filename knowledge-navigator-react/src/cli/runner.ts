@@ -1,4 +1,5 @@
 import { KnowledgeNavigatorAPI } from '../api/index'
+import { initBackendConfig } from '../config/backend'
 import { parseArgs } from './parser'
 import { errMsg } from './formatter'
 import type { CommandModule } from './types'
@@ -49,6 +50,9 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     console.error(`可用命令: ${Object.keys(COMMANDS).join(', ')}（kn-cli help 查看详情）`)
     return
   }
+
+  // 读取 KN_BACKEND_MODE / KN_BACKEND_URL 环境变量（远程模式走 HTTP 后端）
+  initBackendConfig()
 
   const api = new KnowledgeNavigatorAPI()
   await mod.run(api, _.slice(1), flags)

@@ -76,4 +76,16 @@ export function initBackendConfig(): void {
       _config.baseUrl = baseUrl
     }
   }
+
+  // Node（CLI）环境：环境变量 KN_BACKEND_MODE / KN_BACKEND_URL（最高优先级）
+  if (typeof process !== 'undefined' && process.env) {
+    const envMode = process.env.KN_BACKEND_MODE
+    if (envMode === 'local' || envMode === 'remote') {
+      _config.mode = envMode
+    }
+    const envUrl = process.env.KN_BACKEND_URL
+    if (envUrl) {
+      _config.baseUrl = envUrl
+    }
+  }
 }

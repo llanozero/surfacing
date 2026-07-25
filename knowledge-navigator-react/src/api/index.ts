@@ -36,9 +36,11 @@ import {
   aiNodeDescription,
 } from '../utils/aiGenerateCore'
 import type { RoutePlan, WaypointMode, WeightMode } from '../utils/routePlanner'
+import { isRemoteMode } from '../config/backend'
+import { BackendAdapter, ApiError } from './BackendAdapter'
 
 // ============================================================
-// 辅助类型
+// 辅助类型与工具
 // ============================================================
 
 export type ApiResult<T> = { ok: true; data: T } | { ok: false; error: string }
@@ -57,17 +59,40 @@ const err = <T>(message: string): ApiResult<T> => ({ ok: false, error: message }
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
-/** 连接变更后同步画布与节点管理状态 */
+const enc = encodeURIComponent
+
+/** 远程错误 → 中文提示（404 视为"后端暂未实现"，网络/超时视为连接问题） */
+function remoteErrorMessage(e: unknown): string {
+  if (e instanceof ApiError) {
+    if (e.status === 404) return '该功能后端暂未实现'
+    return `后端错误 (${e.status}): ${e.message}`
+  }
+  return '后端服务不可用，请检查连接'
+}
+
+/** 包装远程调用为 ApiResult */
+async function remoteResult<T>(fn: () => Promise<T>): Promise<ApiResult<T>> {
+  try {
+    return ok(await fn())
+  } catch (e) {
+    return err(remoteErrorMessage(e))
+  }
+}
+
+/** 本地连接变更后同步画布与节点管理状态 */
 function syncAfterConnectionMutation(): void {
   useNavStore.getState().syncFromSource()
   useNavNodeStore.setState({ allNodes: [...allNavNodes] })
 }
 
 /**
- * Knowledge Navigator 程序化 API。
- * 封装所有 Zustand Store 与共享数据源的操作，浏览器与 Node（CLI）环境通用。
+ * Knowledge Navigator 程序化 API（async 全异步签名）。
+ * 本地模式：操作 Zustand Store 与共享数据源；
+ * 远程模式：通过 BackendAdapter 调用 Python FastAPI 后端（backend-architecture.md §4.2）。
  */
 export class KnowledgeNavigatorAPI {
+  private adapter = BackendAdapter.getInstance()
+
   /** AI 生成中的请求计数（isGenerating 用） */
   private generatingCount = 0
 
@@ -75,16 +100,28 @@ export class KnowledgeNavigatorAPI {
   // 认知卡片
   // ============================================================
 
-  getAllCards(): CognitiveCard[] {
+  async getAllCards(): Promise<CognitiveCard[]> {
+    if (isRemoteMode()) return this.adapter.get<CognitiveCard[]>('/api/cards')
     return useCardStore.getState().allCards
   }
 
-  getCard(id: string): CognitiveCard | undefined {
+  async getCard(id: string): Promise<CognitiveCard | undefined> {
+    if (isRemoteMode()) {
+      try {
+        return await this.adapter.get<CognitiveCard>(`/api/cards/${enc(id)}`)
+      } catch {
+        return undefined
+      }
+    }
     return getCard(id)
   }
 
-  getChildCards(parentId: string): CognitiveCard[] {
-    return this.getAllCards().filter((c) => {
+  async getChildCards(parentId: string): Promise<CognitiveCard[]> {
+    if (isRemoteMode()) {
+      return this.adapter.get<CognitiveCard[]>(`/api/cards/${enc(parentId)}/children`)
+    }
+    const all = await this.getAllCards()
+    return all.filter((c) => {
       if (c.id === parentId) return false
       try {
         return deriveParent(c.id) === parentId
@@ -94,46 +131,78 @@ export class KnowledgeNavigatorAPI {
     })
   }
 
-  createCard(parentId?: string): ApiResult<CognitiveCard> {
+  async createCard(parentId?: string): Promise<ApiResult<CognitiveCard>> {
+    if (isRemoteMode()) {
+      return remoteResult(() => this.adapter.post<CognitiveCard>('/api/cards', { parent_id: parentId }))
+    }
     try {
       if (parentId && !getCard(parentId)) return err(`父卡片 ${parentId} 不存在`)
-      const card = useCardStore.getState().createCard(parentId ?? null)
-      return ok(card)
+      return ok(useCardStore.getState().createCard(parentId ?? null))
     } catch (e) {
       return err((e as Error).message)
     }
   }
 
-  deleteCard(id: string): ApiResult<void> {
+  async deleteCard(id: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.delete(`/api/cards/${enc(id)}`)
+        return undefined
+      })
+    }
     if (!getCard(id)) return err(`卡片 ${id} 不存在`)
     const result = useCardStore.getState().deleteCard(id)
     return result.ok ? ok(undefined) : err(result.reason ?? '删除失败')
   }
 
-  updateCardField(id: string, field: string, value: unknown): ApiResult<void> {
+  async updateCardField(id: string, field: string, value: unknown): Promise<ApiResult<void>> {
     if (field === 'id') return err('id 字段只读')
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.put(`/api/cards/${enc(id)}`, { [field]: value })
+        return undefined
+      })
+    }
     if (!getCard(id)) return err(`卡片 ${id} 不存在`)
     useCardStore.getState().updateField(id, field as keyof CognitiveCard, value as never)
     return ok(undefined)
   }
 
-  updateCardFields(id: string, updates: Partial<CognitiveCard>): ApiResult<void> {
-    if (!getCard(id)) return err(`卡片 ${id} 不存在`)
+  async updateCardFields(id: string, updates: Partial<CognitiveCard>): Promise<ApiResult<void>> {
     const { id: _ignored, ...rest } = updates
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.put(`/api/cards/${enc(id)}`, rest)
+        return undefined
+      })
+    }
+    if (!getCard(id)) return err(`卡片 ${id} 不存在`)
     for (const [field, value] of Object.entries(rest)) {
       useCardStore.getState().updateField(id, field as keyof CognitiveCard, value as never)
     }
     return ok(undefined)
   }
 
-  addCardCorpus(id: string, text: string): ApiResult<void> {
-    if (!getCard(id)) return err(`卡片 ${id} 不存在`)
+  async addCardCorpus(id: string, text: string): Promise<ApiResult<void>> {
     if (!text.trim()) return err('语料内容不能为空')
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.post(`/api/cards/${enc(id)}/corpus`, { text })
+        return undefined
+      })
+    }
+    if (!getCard(id)) return err(`卡片 ${id} 不存在`)
     useCardStore.getState().addCorpus(id, text)
     return ok(undefined)
   }
 
-  updateCardCorpus(id: string, index: number, text: string): ApiResult<void> {
+  async updateCardCorpus(id: string, index: number, text: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.put(`/api/cards/${enc(id)}/corpus/${index}`, { text })
+        return undefined
+      })
+    }
     const card = getCard(id)
     if (!card) return err(`卡片 ${id} 不存在`)
     if (index < 0 || index >= card.corpus.length) return err(`语料索引 ${index} 超出范围`)
@@ -141,7 +210,13 @@ export class KnowledgeNavigatorAPI {
     return ok(undefined)
   }
 
-  removeCardCorpus(id: string, index: number): ApiResult<void> {
+  async removeCardCorpus(id: string, index: number): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.delete(`/api/cards/${enc(id)}/corpus/${index}`)
+        return undefined
+      })
+    }
     const card = getCard(id)
     if (!card) return err(`卡片 ${id} 不存在`)
     if (index < 0 || index >= card.corpus.length) return err(`语料索引 ${index} 超出范围`)
@@ -149,14 +224,34 @@ export class KnowledgeNavigatorAPI {
     return ok(undefined)
   }
 
-  addCardBoundNode(cardId: string, nodeId: string): ApiResult<void> {
+  /** 卡片绑定节点：远程模式经整卡字段更新（后端 cards 路由无独立 bind 端点） */
+  async addCardBoundNode(cardId: string, nodeId: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        const card = await this.adapter.get<CognitiveCard>(`/api/cards/${enc(cardId)}`)
+        const bound = card.bound_nodes ?? []
+        if (!bound.includes(nodeId)) {
+          await this.adapter.put(`/api/cards/${enc(cardId)}`, { bound_nodes: [...bound, nodeId] })
+        }
+        return undefined
+      })
+    }
     if (!getCard(cardId)) return err(`卡片 ${cardId} 不存在`)
     if (!getNavNode(nodeId)) return err(`节点 ${nodeId} 不存在`)
     useCardStore.getState().addBoundNode(cardId, nodeId)
     return ok(undefined)
   }
 
-  removeCardBoundNode(cardId: string, nodeId: string): ApiResult<void> {
+  async removeCardBoundNode(cardId: string, nodeId: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        const card = await this.adapter.get<CognitiveCard>(`/api/cards/${enc(cardId)}`)
+        await this.adapter.put(`/api/cards/${enc(cardId)}`, {
+          bound_nodes: (card.bound_nodes ?? []).filter((nid) => nid !== nodeId),
+        })
+        return undefined
+      })
+    }
     if (!getCard(cardId)) return err(`卡片 ${cardId} 不存在`)
     useCardStore.getState().removeBoundNode(cardId, nodeId)
     return ok(undefined)
@@ -166,19 +261,31 @@ export class KnowledgeNavigatorAPI {
   // 导航节点
   // ============================================================
 
-  getAllNavNodes(): NavNode[] {
+  async getAllNavNodes(): Promise<NavNode[]> {
+    if (isRemoteMode()) return this.adapter.get<NavNode[]>('/api/nodes')
     return useNavNodeStore.getState().allNodes
   }
 
-  getNavNode(id: string): NavNode | undefined {
+  async getNavNode(id: string): Promise<NavNode | undefined> {
+    if (isRemoteMode()) {
+      try {
+        return await this.adapter.get<NavNode>(`/api/nodes/${enc(id)}`)
+      } catch {
+        return undefined
+      }
+    }
     return getNavNode(id)
   }
 
-  searchNavNodes(query: string): NavNode[] {
-    return filterNodes(this.getAllNavNodes(), query)
+  async searchNavNodes(query: string): Promise<NavNode[]> {
+    if (isRemoteMode()) return this.adapter.get<NavNode[]>(`/api/nodes?q=${enc(query)}`)
+    return filterNodes(useNavNodeStore.getState().allNodes, query)
   }
 
-  createNavNode(): ApiResult<NavNode> {
+  async createNavNode(): Promise<ApiResult<NavNode>> {
+    if (isRemoteMode()) {
+      return remoteResult(() => this.adapter.post<NavNode>('/api/nodes', {}))
+    }
     try {
       return ok(useNavNodeStore.getState().createNavNode())
     } catch (e) {
@@ -186,23 +293,40 @@ export class KnowledgeNavigatorAPI {
     }
   }
 
-  deleteNavNode(id: string): ApiResult<void> {
+  async deleteNavNode(id: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.delete(`/api/nodes/${enc(id)}`)
+        return undefined
+      })
+    }
     if (!getNavNode(id)) return err(`节点 ${id} 不存在`)
-    const store = useNavNodeStore.getState()
-    store.selectNode(id)
+    useNavNodeStore.getState().selectNode(id)
     const result = useNavNodeStore.getState().deleteNavNode()
     return result.ok ? ok(undefined) : err(result.reason ?? '删除失败')
   }
 
-  updateNavNodeField(id: string, field: string, value: unknown): ApiResult<void> {
+  async updateNavNodeField(id: string, field: string, value: unknown): Promise<ApiResult<void>> {
     if (field === 'id') return err('id 字段只读')
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.put(`/api/nodes/${enc(id)}`, { [field]: value })
+        return undefined
+      })
+    }
     if (!getNavNode(id)) return err(`节点 ${id} 不存在`)
     useNavNodeStore.getState().selectNode(id)
     useNavNodeStore.getState().updateField(field as keyof NavNode, value as never)
     return ok(undefined)
   }
 
-  addNavNodeBoundCard(nodeId: string, cardId: string): ApiResult<void> {
+  async addNavNodeBoundCard(nodeId: string, cardId: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.post(`/api/nodes/${enc(nodeId)}/bind-card`, { card_id: cardId })
+        return undefined
+      })
+    }
     if (!getNavNode(nodeId)) return err(`节点 ${nodeId} 不存在`)
     if (!getCard(cardId)) return err(`卡片 ${cardId} 不存在`)
     useNavNodeStore.getState().selectNode(nodeId)
@@ -210,7 +334,13 @@ export class KnowledgeNavigatorAPI {
     return ok(undefined)
   }
 
-  removeNavNodeBoundCard(nodeId: string, cardId: string): ApiResult<void> {
+  async removeNavNodeBoundCard(nodeId: string, cardId: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.delete(`/api/nodes/${enc(nodeId)}/bind-card/${enc(cardId)}`)
+        return undefined
+      })
+    }
     if (!getNavNode(nodeId)) return err(`节点 ${nodeId} 不存在`)
     useNavNodeStore.getState().selectNode(nodeId)
     useNavNodeStore.getState().removeBoundCard(cardId)
@@ -221,15 +351,23 @@ export class KnowledgeNavigatorAPI {
   // 出向连接
   // ============================================================
 
-  getNextNodes(nodeId: string): NextNodeItem[] {
+  async getNextNodes(nodeId: string): Promise<NextNodeItem[]> {
+    if (isRemoteMode()) return this.adapter.get<NextNodeItem[]>(`/api/nodes/${enc(nodeId)}/next`)
     return useNavStore.getState().getNextNodes(nodeId)
   }
 
-  getPrevNodes(nodeId: string): NextNodeItem[] {
+  async getPrevNodes(nodeId: string): Promise<NextNodeItem[]> {
+    if (isRemoteMode()) return this.adapter.get<NextNodeItem[]>(`/api/nodes/${enc(nodeId)}/prev`)
     return useNavStore.getState().getPrevNodes(nodeId)
   }
 
-  addNextNodeRef(fromId: string, ref: NextNodeRefInput): ApiResult<void> {
+  async addNextNodeRef(fromId: string, ref: NextNodeRefInput): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.post(`/api/nodes/${enc(fromId)}/next`, ref)
+        return undefined
+      })
+    }
     const from = getNavNode(fromId)
     if (!from) return err(`节点 ${fromId} 不存在`)
     if (!getNavNode(ref.target_id)) return err(`目标节点 ${ref.target_id} 不存在`)
@@ -247,7 +385,17 @@ export class KnowledgeNavigatorAPI {
     return ok(undefined)
   }
 
-  updateNextNodeRef(fromId: string, targetId: string, updates: Partial<NextNodeRefInput>): ApiResult<void> {
+  async updateNextNodeRef(
+    fromId: string,
+    targetId: string,
+    updates: Partial<NextNodeRefInput>,
+  ): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.put(`/api/nodes/${enc(fromId)}/next/${enc(targetId)}`, updates)
+        return undefined
+      })
+    }
     const from = getNavNode(fromId)
     if (!from) return err(`节点 ${fromId} 不存在`)
     const idx = from.next_nodes.findIndex((e) => e.target_id === targetId)
@@ -269,21 +417,46 @@ export class KnowledgeNavigatorAPI {
     return ok(undefined)
   }
 
-  removeNextNodeRef(fromId: string, targetId: string): ApiResult<void> {
+  async removeNextNodeRef(fromId: string, targetId: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.delete(`/api/nodes/${enc(fromId)}/next/${enc(targetId)}`)
+        return undefined
+      })
+    }
     if (!getNavNode(fromId)) return err(`节点 ${fromId} 不存在`)
     const removed = removeQuickConnection(fromId, targetId)
     return removed ? ok(undefined) : err(`连接 ${fromId} → ${targetId} 不存在`)
   }
 
-  getConnectionStatus(fromId: string, toId: string): ConnectionStatusResult {
+  async getConnectionStatus(fromId: string, toId: string): Promise<ConnectionStatusResult> {
+    if (isRemoteMode()) {
+      return this.adapter.get<ConnectionStatusResult>(
+        `/api/connections/status/${enc(fromId)}/${enc(toId)}`,
+      )
+    }
     return getConnectionStatus(fromId, toId)
   }
 
-  ensureQuickConnection(fromId: string, toId: string): boolean {
+  async ensureQuickConnection(fromId: string, toId: string): Promise<boolean> {
+    if (isRemoteMode()) {
+      try {
+        await this.adapter.post('/api/connections/ensure', { from_id: fromId, to_id: toId })
+        return true
+      } catch {
+        return false
+      }
+    }
     return ensureQuickConnection(fromId, toId)
   }
 
-  fillAllMissingConnections(waypointIds: string[]): number {
+  async fillAllMissingConnections(waypointIds: string[]): Promise<number> {
+    if (isRemoteMode()) {
+      const result = await this.adapter.post<{ count: number }>('/api/connections/fill-all', {
+        waypoint_ids: waypointIds,
+      })
+      return result.count
+    }
     const nodes = waypointIds.map((id) => getNavNode(id)).filter((n): n is NavNode => Boolean(n))
     return fillAllMissingConnections(nodes)
   }
@@ -292,10 +465,12 @@ export class KnowledgeNavigatorAPI {
   // 导航图
   // ============================================================
 
-  getAllEdges(): GraphEdge[] {
+  async getAllEdges(): Promise<GraphEdge[]> {
+    if (isRemoteMode()) return this.adapter.get<GraphEdge[]>('/api/graph/edges')
     return useNavStore.getState().allEdges
   }
 
+  /** 中心节点 / 导航模式 / 途经点为会话内 UI 状态，两种模式均本地处理 */
   setCurrentNode(nodeId: string): void {
     useNavStore.getState().setCurrentNode(nodeId)
   }
@@ -304,8 +479,8 @@ export class KnowledgeNavigatorAPI {
     useNavStore.getState().setMode(mode)
   }
 
-  addWaypoint(nodeId: string): ApiResult<void> {
-    const node = getNavNode(nodeId)
+  async addWaypoint(nodeId: string): Promise<ApiResult<void>> {
+    const node = await this.getNavNode(nodeId)
     if (!node) return err(`节点 ${nodeId} 不存在`)
     useNavStore.getState().addWaypoint(node)
     return ok(undefined)
@@ -323,12 +498,17 @@ export class KnowledgeNavigatorAPI {
     return useNavStore.getState().waypoints
   }
 
-  getWeightedNextNodes(nodeId: string): WeightedRef[] {
+  async getWeightedNextNodes(nodeId: string): Promise<WeightedRef[]> {
+    if (isRemoteMode()) return this.adapter.get<WeightedRef[]>(`/api/nodes/${enc(nodeId)}/next`)
     const node = getNavNode(nodeId)
     return node ? composeWeights(node) : []
   }
 
-  syncGraphFromSource(): void {
+  async syncGraphFromSource(): Promise<void> {
+    if (isRemoteMode()) {
+      await this.adapter.post('/api/graph/sync')
+      return
+    }
     useNavStore.getState().syncFromSource()
   }
 
@@ -336,6 +516,7 @@ export class KnowledgeNavigatorAPI {
   // 路线规划
   // ============================================================
 
+  /** 排序 / 权重模式为会话状态，两种模式均本地处理 */
   setWaypointMode(mode: WaypointMode): void {
     usePlanStore.getState().setWaypointMode(mode)
   }
@@ -344,7 +525,17 @@ export class KnowledgeNavigatorAPI {
     usePlanStore.getState().setWeightMode(mode)
   }
 
-  generatePlans(waypointIds?: string[]): ApiResult<RoutePlan[]> {
+  async generatePlans(waypointIds?: string[]): Promise<ApiResult<RoutePlan[]>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        const plans = await this.adapter.post<RoutePlan[]>('/api/plan/generate', {
+          waypoint_ids: waypointIds,
+        })
+        // 镜像到本地 store，保证 getSelectedPlan / getRecommendedPlan 可用
+        usePlanStore.setState({ plans, selectedPlanId: plans.find((p) => p.isRecommended)?.id ?? plans[0]?.id ?? null })
+        return plans
+      })
+    }
     let nodes: NavNode[]
     if (waypointIds && waypointIds.length > 0) {
       const missing = waypointIds.filter((id) => !getNavNode(id))
@@ -360,7 +551,14 @@ export class KnowledgeNavigatorAPI {
     return ok(usePlanStore.getState().plans)
   }
 
-  selectPlan(planId: string): ApiResult<void> {
+  async selectPlan(planId: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.post(`/api/plan/plans/${enc(planId)}/select`)
+        usePlanStore.setState({ selectedPlanId: planId })
+        return undefined
+      })
+    }
     if (!usePlanStore.getState().plans.some((p) => p.id === planId)) {
       return err(`计划 ${planId} 不存在`)
     }
@@ -368,20 +566,31 @@ export class KnowledgeNavigatorAPI {
     return ok(undefined)
   }
 
-  getAllPlans(): RoutePlan[] {
+  async getAllPlans(): Promise<RoutePlan[]> {
+    if (isRemoteMode()) return this.adapter.get<RoutePlan[]>('/api/plan/plans')
     return usePlanStore.getState().plans
   }
 
-  getSelectedPlan(): RoutePlan | undefined {
+  async getSelectedPlan(): Promise<RoutePlan | undefined> {
     const { plans, selectedPlanId } = usePlanStore.getState()
+    if (isRemoteMode()) {
+      const remotePlans = await this.getAllPlans()
+      return remotePlans.find((p) => p.id === selectedPlanId)
+    }
     return plans.find((p) => p.id === selectedPlanId)
   }
 
-  getRecommendedPlan(): RoutePlan | undefined {
-    return usePlanStore.getState().plans.find((p) => p.isRecommended)
+  async getRecommendedPlan(): Promise<RoutePlan | undefined> {
+    const plans = await this.getAllPlans()
+    return plans.find((p) => p.isRecommended)
   }
 
-  replan(): void {
+  async replan(): Promise<void> {
+    if (isRemoteMode()) {
+      const plans = await this.adapter.post<RoutePlan[]>('/api/plan/replan')
+      usePlanStore.setState({ plans })
+      return
+    }
     usePlanStore.getState().replan()
   }
 
@@ -389,50 +598,82 @@ export class KnowledgeNavigatorAPI {
   // 浏览
   // ============================================================
 
-  initBrowseFromPlan(planId: string): ApiResult<void> {
+  async initBrowseFromPlan(planId: string): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.post('/api/browse/start', { plan_id: planId })
+        return undefined
+      })
+    }
     const plan = usePlanStore.getState().plans.find((p) => p.id === planId)
     if (!plan) return err(`计划 ${planId} 不存在`)
     useBrowseStore.getState().initFromSequence(plan.sequence)
     return ok(undefined)
   }
 
-  initBrowseFromSequence(nodeIds: string[]): ApiResult<void> {
+  async initBrowseFromSequence(nodeIds: string[]): Promise<ApiResult<void>> {
+    if (nodeIds.length === 0) return err('节点序列不能为空')
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.post('/api/browse/start', { sequence: nodeIds })
+        return undefined
+      })
+    }
     const missing = nodeIds.filter((id) => !getNavNode(id))
     if (missing.length > 0) return err(`节点不存在: ${missing.join(', ')}`)
-    if (nodeIds.length === 0) return err('节点序列不能为空')
     useBrowseStore.getState().initFromSequence(nodeIds.map((id) => getNavNode(id)!))
     return ok(undefined)
   }
 
-  getCurrentBrowseCards(): BrowseCard[] {
+  async getCurrentBrowseCards(): Promise<BrowseCard[]> {
+    if (isRemoteMode()) return this.adapter.get<BrowseCard[]>('/api/browse/cards')
     return useBrowseStore.getState().cards
   }
 
-  getBrowseProgress(): {
+  async getBrowseProgress(): Promise<{
     waypointIndex: number
     totalWaypoints: number
     cardIndex: number
     totalCards: number
-  } {
+  }> {
+    if (isRemoteMode()) return this.adapter.get('/api/browse/status')
     const { wpIndex, waypoints, currentIndex, cards } = useBrowseStore.getState()
     return { waypointIndex: wpIndex, totalWaypoints: waypoints.length, cardIndex: currentIndex, totalCards: cards.length }
   }
 
-  nextCard(): ApiResult<void> {
+  async nextCard(): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.post('/api/browse/next')
+        return undefined
+      })
+    }
     const { currentIndex, cards } = useBrowseStore.getState()
     if (currentIndex >= cards.length - 1) return err('已经是最后一张卡片')
     useBrowseStore.getState().nextCard()
     return ok(undefined)
   }
 
-  prevCard(): ApiResult<void> {
+  async prevCard(): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.post('/api/browse/prev')
+        return undefined
+      })
+    }
     const { currentIndex } = useBrowseStore.getState()
     if (currentIndex <= 0) return err('已经是第一张卡片')
     useBrowseStore.getState().prevCard()
     return ok(undefined)
   }
 
-  nextWaypoint(): ApiResult<void> {
+  async nextWaypoint(): Promise<ApiResult<void>> {
+    if (isRemoteMode()) {
+      return remoteResult(async () => {
+        await this.adapter.post('/api/browse/waypoint')
+        return undefined
+      })
+    }
     const { wpIndex, waypoints } = useBrowseStore.getState()
     if (wpIndex >= waypoints.length - 1) return err('已经是最后一站')
     useBrowseStore.getState().nextWaypoint()
@@ -451,8 +692,13 @@ export class KnowledgeNavigatorAPI {
     useSearchStore.getState().setMatchMode(mode)
   }
 
-  /** 执行搜索：关键词模式走 300ms 防抖，向量模式等待异步匹配完成 */
+  /** 执行搜索：本地走防抖+异步匹配；远程调用 /api/search/query 并镜像结果到本地 store */
   async search(query: string, mode?: MatchMode): Promise<MatchedCard[]> {
+    if (isRemoteMode()) {
+      const results = await this.adapter.post<MatchedCard[]>('/api/search/query', { query, mode })
+      useSearchStore.setState({ query, matchedCards: results, ...(mode ? { matchMode: mode } : {}) })
+      return results
+    }
     const store = useSearchStore.getState()
     if (mode && mode !== store.matchMode) store.setMatchMode(mode)
     useSearchStore.getState().setQuery(query)
@@ -466,8 +712,9 @@ export class KnowledgeNavigatorAPI {
     return useSearchStore.getState().matchedCards
   }
 
-  selectMatchedCard(cardId: string): ApiResult<void> {
-    if (!getCard(cardId)) return err(`卡片 ${cardId} 不存在`)
+  async selectMatchedCard(cardId: string): Promise<ApiResult<void>> {
+    const card = await this.getCard(cardId)
+    if (!card) return err(`卡片 ${cardId} 不存在`)
     useSearchStore.getState().selectCard(cardId)
     return ok(undefined)
   }
@@ -481,6 +728,12 @@ export class KnowledgeNavigatorAPI {
   }
 
   async retryVectorMatch(): Promise<void> {
+    if (isRemoteMode()) {
+      const query = useSearchStore.getState().query
+      const results = await this.adapter.post<MatchedCard[]>('/api/search/vector-match', { query })
+      useSearchStore.setState({ matchedCards: results })
+      return
+    }
     useSearchStore.getState().retryVectorMatch()
     const deadline = Date.now() + 10000
     while (useSearchStore.getState().isVectorLoading && Date.now() < deadline) {
@@ -492,22 +745,27 @@ export class KnowledgeNavigatorAPI {
   // 树形管理
   // ============================================================
 
-  getTreeFlatData(): TreeNodeData[] {
+  async getTreeFlatData(): Promise<TreeNodeData[]> {
+    if (isRemoteMode()) {
+      const cards = await this.adapter.get<CognitiveCard[]>('/api/cards')
+      return cards.map((c) => ({ id: c.id, title: c.title, type: c.type, tag: c.tag }))
+    }
     return useTreeStore.getState().flatData
   }
 
-  getRootNodes(): TreeNodeData[] {
-    return getRootNodes(this.getTreeFlatData())
+  async getRootNodes(): Promise<TreeNodeData[]> {
+    return getRootNodes(await this.getTreeFlatData())
   }
 
-  getTreeChildren(parentId: string): TreeNodeData[] {
-    return getTreeChildren(this.getTreeFlatData(), parentId)
+  async getTreeChildren(parentId: string): Promise<TreeNodeData[]> {
+    return getTreeChildren(await this.getTreeFlatData(), parentId)
   }
 
-  getTreePath(nodeId: string): { path: string; label: string }[] {
-    return getFullPath(this.getTreeFlatData(), nodeId)
+  async getTreePath(nodeId: string): Promise<{ path: string; label: string }[]> {
+    return getFullPath(await this.getTreeFlatData(), nodeId)
   }
 
+  /** 展开 / 选中 / 搜索为纯 UI 状态，两种模式均本地处理 */
   toggleTreeNode(nodeId: string): void {
     useTreeStore.getState().toggleNode(nodeId)
   }
@@ -528,37 +786,56 @@ export class KnowledgeNavigatorAPI {
   // YAML 导入导出
   // ============================================================
 
-  exportToYAML(): string {
-    return exportAllToYAML(this.getAllCards(), this.getAllNavNodes())
+  async exportToYAML(): Promise<string> {
+    if (isRemoteMode()) {
+      const result = await this.adapter.get<{ yaml: string } | string>('/api/yaml/export')
+      return typeof result === 'string' ? result : result.yaml
+    }
+    return exportAllToYAML(useCardStore.getState().allCards, useNavNodeStore.getState().allNodes)
   }
 
   /** 浏览器端触发下载；Node 环境请直接写文件（CLI yaml export --file） */
-  downloadYAML(filename?: string): void {
+  async downloadYAML(filename?: string): Promise<void> {
     if (typeof document === 'undefined') {
       throw new Error('downloadYAML 仅在浏览器环境可用；Node 环境请将 exportToYAML() 的结果写入文件')
     }
-    browserDownloadYAML(this.exportToYAML(), filename)
+    browserDownloadYAML(await this.exportToYAML(), filename)
   }
 
-  parseYAML(raw: string): ApiResult<YamlData> {
-    const result = parseAndValidateYAML(raw, this.getAllCards(), this.getAllNavNodes())
+  async parseYAML(raw: string): Promise<ApiResult<YamlData>> {
+    if (isRemoteMode()) {
+      return remoteResult(() => this.adapter.post<YamlData>('/api/yaml/validate', { raw }))
+    }
+    const result = parseAndValidateYAML(raw, useCardStore.getState().allCards, useNavNodeStore.getState().allNodes)
     if (!result.ok) {
       return err(result.errors.map((e) => `[${e.type}]${e.itemId ? ` ${e.itemId}:` : ' '}${e.message}`).join('\n'))
     }
     return ok(result.data)
   }
 
-  computeImportPreview(raw: string): ApiResult<ImportPreview> {
-    const parsed = this.parseYAML(raw)
+  async computeImportPreview(raw: string): Promise<ApiResult<ImportPreview>> {
+    if (isRemoteMode()) {
+      return remoteResult(() => this.adapter.post<ImportPreview>('/api/yaml/preview', { raw }))
+    }
+    const parsed = await this.parseYAML(raw)
     if (!parsed.ok) return err(parsed.error)
-    return ok(computeImportPreview(parsed.data, this.getAllCards(), this.getAllNavNodes()))
+    return ok(
+      computeImportPreview(parsed.data, useCardStore.getState().allCards, useNavNodeStore.getState().allNodes),
+    )
   }
 
-  /** 执行导入合并（upsert）并同步所有 Store */
-  importYAML(raw: string): ApiResult<ImportPreview> {
-    const parsed = this.parseYAML(raw)
+  /** 执行导入合并（upsert）；本地模式同步所有 Store */
+  async importYAML(raw: string): Promise<ApiResult<ImportPreview>> {
+    if (isRemoteMode()) {
+      return remoteResult(() => this.adapter.post<ImportPreview>('/api/yaml/import', { raw }))
+    }
+    const parsed = await this.parseYAML(raw)
     if (!parsed.ok) return err(parsed.error)
-    const preview = computeImportPreview(parsed.data, this.getAllCards(), this.getAllNavNodes())
+    const preview = computeImportPreview(
+      parsed.data,
+      useCardStore.getState().allCards,
+      useNavNodeStore.getState().allNodes,
+    )
 
     mergeImportedData(parsed.data, {
       onCardsMerged: (cards) => {
@@ -588,10 +865,21 @@ export class KnowledgeNavigatorAPI {
     }
   }
 
+  /** 远程 AI 生成统一入口 */
+  private async remoteAiGenerate(endpoint: string, id: string): Promise<ApiResult<string>> {
+    return remoteResult(async () => {
+      const result = await this.adapter.post<{ result: string }>(`/api/ai/generate/${endpoint}`, { id })
+      return result.result
+    })
+  }
+
   async generateCardTitle(cardId: string): Promise<ApiResult<string>> {
+    if (isRemoteMode()) {
+      return this.trackGeneration(() => this.remoteAiGenerate('card-title', cardId))
+    }
     const card = getCard(cardId)
     if (!card) return err(`卡片 ${cardId} 不存在`)
-    const children = this.getChildCards(cardId)
+    const children = await this.getChildCards(cardId)
     if (card.corpus.length === 0 && children.length === 0) {
       return err('缺少生成依据，请先添加语料或子卡片')
     }
@@ -600,9 +888,12 @@ export class KnowledgeNavigatorAPI {
   }
 
   async generateCardDescription(cardId: string): Promise<ApiResult<string>> {
+    if (isRemoteMode()) {
+      return this.trackGeneration(() => this.remoteAiGenerate('card-desc', cardId))
+    }
     const card = getCard(cardId)
     if (!card) return err(`卡片 ${cardId} 不存在`)
-    const children = this.getChildCards(cardId)
+    const children = await this.getChildCards(cardId)
     if (card.corpus.length === 0 && children.length === 0) {
       return err('缺少生成依据，请先添加语料或子卡片')
     }
@@ -611,6 +902,9 @@ export class KnowledgeNavigatorAPI {
   }
 
   async generateNodeLabel(nodeId: string): Promise<ApiResult<string>> {
+    if (isRemoteMode()) {
+      return this.trackGeneration(() => this.remoteAiGenerate('node-label', nodeId))
+    }
     const node = getNavNode(nodeId)
     if (!node) return err(`节点 ${nodeId} 不存在`)
     const boundCards = (node.bound_cards ?? [])
@@ -622,6 +916,9 @@ export class KnowledgeNavigatorAPI {
   }
 
   async generateNodeDescription(nodeId: string): Promise<ApiResult<string>> {
+    if (isRemoteMode()) {
+      return this.trackGeneration(() => this.remoteAiGenerate('node-desc', nodeId))
+    }
     const node = getNavNode(nodeId)
     if (!node) return err(`节点 ${nodeId} 不存在`)
     const boundCards = (node.bound_cards ?? [])
@@ -649,14 +946,21 @@ export class KnowledgeNavigatorAPI {
   // 视图与面板
   // ============================================================
 
+  /** 切换视图：本地即时生效；远程模式同时通知后端（失败不阻塞） */
   switchView(viewName: ViewName): void {
     useViewStore.getState().switchView(viewName)
+    if (isRemoteMode()) {
+      this.adapter.post('/api/view/switch', { view: viewName }).catch(() => {
+        /* 后端视图同步失败不阻塞本地切换 */
+      })
+    }
   }
 
   getActiveView(): ViewName {
     return useViewStore.getState().activeView
   }
 
+  /** 面板为纯 UI 状态，两种模式均本地处理 */
   getPanelState(): { node: NavNode | null; position: PanelPosition; hidden: boolean } {
     const { node, position, hidden } = usePanelStore.getState()
     return { node, position, hidden }

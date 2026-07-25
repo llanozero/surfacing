@@ -9,14 +9,14 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
 
   switch (sub) {
     case 'list': {
-      const cards = api.getAllCards()
+      const cards = await api.getAllCards()
       if (json) return printJson(cards)
       console.log(`共 ${cards.length} 张卡片：`)
       printLines(cards.map((c) => `${c.id}  ${c.title}  [${c.type}]${c.tag ? `  #${c.tag}` : ''}`))
       return
     }
     case 'get': {
-      const card = rest[0] ? api.getCard(rest[0]) : undefined
+      const card = rest[0] ? await api.getCard(rest[0]) : undefined
       if (!card) return errMsg(`卡片 ${rest[0] ?? ''} 不存在`)
       if (json) return printJson(card)
       console.log(`${card.id}  ${card.title}  [${card.type}]`)
@@ -27,13 +27,13 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       return
     }
     case 'create': {
-      const result = unwrap(api.createCard(flagString(flags, 'parent')))
+      const result = unwrap(await api.createCard(flagString(flags, 'parent')))
       if (!result) return
       const title = flagString(flags, 'title')
       const type = flagString(flags, 'type') as 'folder' | 'leaf' | undefined
-      if (title) api.updateCardField(result.id, 'title', title)
-      if (type) api.updateCardField(result.id, 'type', type)
-      const card = api.getCard(result.id)!
+      if (title) await api.updateCardField(result.id, 'title', title)
+      if (type) await api.updateCardField(result.id, 'type', type)
+      const card = (await api.getCard(result.id))!
       if (json) return printJson({ ok: true, data: card })
       okMsg(`已创建卡片 ${card.id}`)
       console.log(`  title: "${card.title}"`)
@@ -41,36 +41,36 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       return
     }
     case 'delete': {
-      if (succeed(api.deleteCard(rest[0]))) okMsg(`已删除卡片 ${rest[0]}`)
+      if (succeed(await api.deleteCard(rest[0]))) okMsg(`已删除卡片 ${rest[0]}`)
       return
     }
     case 'update': {
       const [id, field, ...valueParts] = rest
       const value = valueParts.join(' ')
       if (!id || !field || !value) return errMsg('用法: card update <id> <field> <value>')
-      if (succeed(api.updateCardField(id, field, value))) okMsg(`已更新 ${id} 的 ${field}`)
+      if (succeed(await api.updateCardField(id, field, value))) okMsg(`已更新 ${id} 的 ${field}`)
       return
     }
     case 'corpus': {
       const [op, id, ...vals] = rest
       if (!id) return errMsg('用法: card corpus <list|add|update|remove> <id> ...')
       if (op === 'list') {
-        const card = api.getCard(id)
+        const card = await api.getCard(id)
         if (!card) return errMsg(`卡片 ${id} 不存在`)
         if (json) return printJson(card.corpus)
         return printLines(card.corpus.map((t, i) => `[${i}] ${t}`), '（暂无语料）')
       }
       if (op === 'add') {
-        if (succeed(api.addCardCorpus(id, vals.join(' ')))) okMsg(`已为 ${id} 添加语料`)
+        if (succeed(await api.addCardCorpus(id, vals.join(' ')))) okMsg(`已为 ${id} 添加语料`)
         return
       }
       if (op === 'update') {
         const [index, ...text] = vals
-        if (succeed(api.updateCardCorpus(id, Number(index), text.join(' ')))) okMsg(`已更新 ${id} 的语料[${index}]`)
+        if (succeed(await api.updateCardCorpus(id, Number(index), text.join(' ')))) okMsg(`已更新 ${id} 的语料[${index}]`)
         return
       }
       if (op === 'remove') {
-        if (succeed(api.removeCardCorpus(id, Number(vals[0])))) okMsg(`已删除 ${id} 的语料[${vals[0]}]`)
+        if (succeed(await api.removeCardCorpus(id, Number(vals[0])))) okMsg(`已删除 ${id} 的语料[${vals[0]}]`)
         return
       }
       return errMsg(`未知子命令: corpus ${op}`)
@@ -78,7 +78,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
     case 'bind': {
       const [op, id, nodeId] = rest
       if (op === 'list') {
-        const card = api.getCard(id)
+        const card = await api.getCard(id)
         if (!card) return errMsg(`卡片 ${id} 不存在`)
         const nodes = card.bound_nodes ?? []
         if (json) return printJson(nodes)
@@ -86,17 +86,17 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       }
       if (!id || !nodeId) return errMsg(`用法: card bind ${op ?? ''} <cardId> <nodeId>`)
       if (op === 'add') {
-        if (succeed(api.addCardBoundNode(id, nodeId))) okMsg(`已绑定 ${id} → ${nodeId}`)
+        if (succeed(await api.addCardBoundNode(id, nodeId))) okMsg(`已绑定 ${id} → ${nodeId}`)
         return
       }
       if (op === 'remove') {
-        if (succeed(api.removeCardBoundNode(id, nodeId))) okMsg(`已解绑 ${id} → ${nodeId}`)
+        if (succeed(await api.removeCardBoundNode(id, nodeId))) okMsg(`已解绑 ${id} → ${nodeId}`)
         return
       }
       return errMsg(`未知子命令: bind ${op}`)
     }
     case 'children': {
-      const children = api.getChildCards(rest[0])
+      const children = await api.getChildCards(rest[0])
       if (json) return printJson(children)
       printLines(children.map((c) => `${c.id}  ${c.title}  [${c.type}]`), '（无子卡片）')
       return

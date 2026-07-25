@@ -38,7 +38,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       return
     }
     case 'select': {
-      if (succeed(api.selectMatchedCard(rest[0]))) okMsg(`已选中卡片 ${rest[0]}`)
+      if (succeed(await api.selectMatchedCard(rest[0]))) okMsg(`已选中卡片 ${rest[0]}`)
       return
     }
     case 'bind-nodes': {

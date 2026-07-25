@@ -1,0 +1,214 @@
+/* 后端设置对话框 */
+
+.mask {
+  position: fixed;
+  inset: 0;
+  background: var(--mask-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: 24px;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--label-primary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 13px;
+  color: var(--label-secondary);
+  line-height: 1.6;
+}
+
+.modeGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modeOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--fill-f1);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.modeOption:hover {
+  border-color: var(--separator-hover);
+}
+
+.modeOptionActive {
+  border-color: var(--status-kimiblue);
+  background: rgba(10, 132, 255, 0.08);
+}
+
+.modeOption input {
+  margin-top: 3px;
+  accent-color: var(--status-kimiblue);
+}
+
+.modeText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modeName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--label-primary);
+}
+
+.modeDesc {
+  font-size: 11px;
+  color: var(--label-tertiary);
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--label-primary);
+}
+
+.urlRow {
+  display: flex;
+  gap: 8px;
+}
+
+.urlInput {
+  flex: 1;
+  padding: 8px 10px;
+  background: var(--fill-f1);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-sm);
+  color: var(--label-primary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  outline: none;
+}
+
+.urlInput:focus {
+  border-color: var(--status-kimiblue);
+}
+
+.urlInput:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.testBtn {
+  padding: 8px 14px;
+  background: var(--fill-f1);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-sm);
+  color: var(--label-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  white-space: nowrap;
+}
+
+.testBtn:hover:not(:disabled) {
+  color: var(--label-primary);
+  border-color: var(--separator-hover);
+}
+
+.testBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.testResult {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.testOk {
+  color: var(--status-success, #30d158);
+}
+
+.testFail {
+  color: var(--status-danger);
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--label-quaternary);
+  line-height: 1.6;
+}
+
+.hint code {
+  padding: 1px 5px;
+  background: var(--fill-f1);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.cancelBtn {
+  padding: 8px 18px;
+  background: var(--fill-f1);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-sm);
+  color: var(--label-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+.cancelBtn:hover {
+  color: var(--label-primary);
+  border-color: var(--separator-hover);
+}
+
+.confirmBtn {
+  padding: 8px 18px;
+  background: var(--status-kimiblue);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+.confirmBtn:hover {
+  filter: brightness(1.1);
+}

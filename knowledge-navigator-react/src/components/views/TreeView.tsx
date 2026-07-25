@@ -8,6 +8,7 @@ import CardEditPanel from '../tree/CardEditPanel'
 import NodeManagementView from '../node-mgr/NodeManagementView'
 import ImportConfirmDialog from '../dialog/ImportConfirmDialog'
 import ImportErrorDialog from '../dialog/ImportErrorDialog'
+import BackendSettingsDialog from '../settings/BackendSettingsDialog'
 import { useTreeStore } from '../../store/treeStore'
 import { useCardStore, getEditingCard } from '../../store/cardStore'
 import { useNavNodeStore } from '../../store/navNodeStore'
@@ -35,6 +36,7 @@ const TreeView: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [pendingImport, setPendingImport] = useState<{ data: YamlData; preview: ImportPreview } | null>(null)
   const [importErrors, setImportErrors] = useState<ValidationError[] | null>(null)
+  const [showBackendSettings, setShowBackendSettings] = useState(false)
 
   const breadcrumbs = selectedId ? getFullPath(flatData, selectedId) : []
   const editingCard = getEditingCard(allCards, selectedId)
@@ -131,6 +133,14 @@ const TreeView: React.FC = () => {
           <button className={styles.ioBtn} onClick={handleExport}>
             导出
           </button>
+          <button
+            className={styles.ioBtn}
+            onClick={() => setShowBackendSettings(true)}
+            title="后端设置（本地 / 远程模式）"
+            aria-label="后端设置"
+          >
+            ⚙
+          </button>
           <input
             ref={fileInputRef}
             type="file"
@@ -189,6 +199,9 @@ const TreeView: React.FC = () => {
       )}
       {importErrors && (
         <ImportErrorDialog errors={importErrors} onClose={() => setImportErrors(null)} />
+      )}
+      {showBackendSettings && (
+        <BackendSettingsDialog onClose={() => setShowBackendSettings(false)} />
       )}
     </div>
   )

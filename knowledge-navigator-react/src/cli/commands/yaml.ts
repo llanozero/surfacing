@@ -10,12 +10,12 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
 
   switch (sub) {
     case 'export': {
-      const yaml = api.exportToYAML()
+      const yaml = await api.exportToYAML()
       const file = flagString(flags, 'file')
       if (file) {
         writeFileSync(file, yaml, 'utf-8')
-        const cards = api.getAllCards().length
-        const nodes = api.getAllNavNodes().length
+        const cards = (await api.getAllCards()).length
+        const nodes = (await api.getAllNavNodes()).length
         return okMsg(`已导出 ${cards} 张认知卡片和 ${nodes} 个导航节点 → ${file}`)
       }
       // 未指定文件：输出到 stdout
@@ -25,7 +25,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
     case 'preview': {
       const raw = readFile(rest[0])
       if (raw === null) return
-      const preview = unwrap(api.computeImportPreview(raw))
+      const preview = unwrap(await api.computeImportPreview(raw))
       if (!preview) return
       if (json) return printJson({ ok: true, data: preview })
       console.log('导入预览：')
@@ -36,7 +36,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
     case 'import': {
       const raw = readFile(rest[0])
       if (raw === null) return
-      const preview = unwrap(api.importYAML(raw))
+      const preview = unwrap(await api.importYAML(raw))
       if (!preview) return
       if (json) return printJson({ ok: true, data: preview })
       okMsg(`已导入 ${preview.cards.total} 张认知卡片和 ${preview.nodes.total} 个导航节点`)
@@ -47,7 +47,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
     case 'validate': {
       const raw = readFile(rest[0])
       if (raw === null) return
-      const result = api.parseYAML(raw)
+      const result = await api.parseYAML(raw)
       if (json) return printJson(result.ok ? { ok: true, data: { cards: result.data.cognitive_cards.length, nodes: result.data.navigation_nodes.length } } : result)
       if (!result.ok) return errMsg(`校验未通过：\n${result.error}`)
       okMsg(`YAML 合法：${result.data.cognitive_cards.length} 张卡片，${result.data.navigation_nodes.length} 个节点`)

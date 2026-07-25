@@ -11,14 +11,14 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
   switch (sub) {
     case 'list': {
       const query = flagString(flags, 'query')
-      const nodes = query ? api.searchNavNodes(query) : api.getAllNavNodes()
+      const nodes = query ? await api.searchNavNodes(query) : await api.getAllNavNodes()
       if (json) return printJson(nodes)
       console.log(`共 ${nodes.length} 个节点：`)
       printLines(nodes.map((n) => `${n.id}  ${n.label}  (${n.next_nodes.length} 出口)`))
       return
     }
     case 'get': {
-      const node = rest[0] ? api.getNavNode(rest[0]) : undefined
+      const node = rest[0] ? await api.getNavNode(rest[0]) : undefined
       if (!node) return errMsg(`节点 ${rest[0] ?? ''} 不存在`)
       if (json) return printJson(node)
       console.log(`${node.id}  ${node.label}`)
@@ -31,30 +31,30 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       return
     }
     case 'create': {
-      const result = unwrap(api.createNavNode())
+      const result = unwrap(await api.createNavNode())
       if (!result) return
       const label = flagString(flags, 'label')
-      if (label) api.updateNavNodeField(result.id, 'label', label)
-      const node = api.getNavNode(result.id)!
+      if (label) await api.updateNavNodeField(result.id, 'label', label)
+      const node = (await api.getNavNode(result.id))!
       if (json) return printJson({ ok: true, data: node })
       okMsg(`已创建节点 ${node.id}（${node.label}）`)
       return
     }
     case 'delete': {
-      if (succeed(api.deleteNavNode(rest[0]))) okMsg(`已删除节点 ${rest[0]}（引用已级联清理）`)
+      if (succeed(await api.deleteNavNode(rest[0]))) okMsg(`已删除节点 ${rest[0]}（引用已级联清理）`)
       return
     }
     case 'update': {
       const [id, field, ...valueParts] = rest
       const value = valueParts.join(' ')
       if (!id || !field || !value) return errMsg('用法: node update <id> <field> <value>')
-      if (succeed(api.updateNavNodeField(id, field, value))) okMsg(`已更新 ${id} 的 ${field}`)
+      if (succeed(await api.updateNavNodeField(id, field, value))) okMsg(`已更新 ${id} 的 ${field}`)
       return
     }
     case 'bind': {
       const [op, id, cardId] = rest
       if (op === 'list') {
-        const node = api.getNavNode(id)
+        const node = await api.getNavNode(id)
         if (!node) return errMsg(`节点 ${id} 不存在`)
         const cards = node.bound_cards ?? []
         if (json) return printJson(cards)
@@ -62,11 +62,11 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       }
       if (!id || !cardId) return errMsg(`用法: node bind ${op ?? ''} <nodeId> <cardId>`)
       if (op === 'add') {
-        if (succeed(api.addNavNodeBoundCard(id, cardId))) okMsg(`已绑定 ${id} → ${cardId}`)
+        if (succeed(await api.addNavNodeBoundCard(id, cardId))) okMsg(`已绑定 ${id} → ${cardId}`)
         return
       }
       if (op === 'remove') {
-        if (succeed(api.removeNavNodeBoundCard(id, cardId))) okMsg(`已解绑 ${id} → ${cardId}`)
+        if (succeed(await api.removeNavNodeBoundCard(id, cardId))) okMsg(`已解绑 ${id} → ${cardId}`)
         return
       }
       return errMsg(`未知子命令: bind ${op}`)
@@ -74,7 +74,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
     case 'next': {
       const [op, ...vals] = rest
       if (op === 'list') {
-        const items = api.getNextNodes(vals[0])
+        const items = await api.getNextNodes(vals[0])
         if (json) return printJson(items)
         return printLines(
           items.map((x) => `→ ${x.node.id}  ${x.node.label}  #${weightToPriority(x.ref.preset_weight)}  w=${x.ref.weight.toFixed(2)}`),
@@ -89,7 +89,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
           preset_priority: flagInt(flags, 'priority'),
           connection_type: flagString(flags, 'type') as 'preset' | 'browse_derived' | 'user_added' | undefined,
         })
-        if (succeed(result)) okMsg(`已添加连接 ${fromId} → ${toId}`)
+        if (succeed(await result)) okMsg(`已添加连接 ${fromId} → ${toId}`)
         return
       }
       if (op === 'update') {
@@ -101,15 +101,15 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
           field === 'connection_type'
             ? { connection_type: value as 'preset' | 'browse_derived' | 'user_added' }
             : { [field]: Number(value) }
-        if (succeed(api.updateNextNodeRef(fromId, toId, updates))) okMsg(`已更新连接 ${fromId} → ${toId} 的 ${field}`)
+        if (succeed(await api.updateNextNodeRef(fromId, toId, updates))) okMsg(`已更新连接 ${fromId} → ${toId} 的 ${field}`)
         return
       }
       if (op === 'remove') {
-        if (succeed(api.removeNextNodeRef(vals[0], vals[1]))) okMsg(`已删除连接 ${vals[0]} → ${vals[1]}`)
+        if (succeed(await api.removeNextNodeRef(vals[0], vals[1]))) okMsg(`已删除连接 ${vals[0]} → ${vals[1]}`)
         return
       }
       if (op === 'status') {
-        const result = api.getConnectionStatus(vals[0], vals[1])
+        const result = await api.getConnectionStatus(vals[0], vals[1])
         if (json) return printJson(result)
         if (result.status === 'connected' && result.ref) {
           console.log(`✓ 已连接 · 优先级 #${weightToPriority(result.ref.preset_weight)} · ${result.ref.connection_type}`)
@@ -123,7 +123,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       return errMsg(`未知子命令: next ${op ?? ''}（支持 list/add/update/remove/status）`)
     }
     case 'prev': {
-      const items = api.getPrevNodes(rest[0])
+      const items = await api.getPrevNodes(rest[0])
       if (json) return printJson(items.map((x) => x.node))
       printLines(items.map((x) => `${x.node.id}  ${x.node.label}`), '（无前驱节点）')
       return

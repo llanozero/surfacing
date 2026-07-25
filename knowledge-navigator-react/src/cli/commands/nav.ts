@@ -10,30 +10,30 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
   switch (group) {
     case 'graph': {
       if (op === 'nodes') {
-        const nodes = api.getAllNavNodes()
+        const nodes = await api.getAllNavNodes()
         if (json) return printJson(nodes)
         return printLines(nodes.map((n) => `${n.id}  ${n.label}`))
       }
       if (op === 'edges') {
-        const edges = api.getAllEdges()
+        const edges = await api.getAllEdges()
         if (json) return printJson(edges)
         console.log(`共 ${edges.length} 条有向边：`)
         return printLines(edges.map((e) => `${e.source} → ${e.target}  w=${e.weight}`))
       }
       if (op === 'sync') {
-        api.syncGraphFromSource()
+        await api.syncGraphFromSource()
         return okMsg('已从数据源重算图')
       }
       return errMsg(`未知子命令: graph ${op ?? ''}（支持 nodes/edges/sync）`)
     }
     case 'current': {
       if (op === 'get') {
-        const current = api.getNavNode(useNavStore.getState().currentNodeId)
+        const current = await api.getNavNode(useNavStore.getState().currentNodeId)
         if (json) return printJson(current ?? null)
         return console.log(current ? `${current.id}  ${current.label}` : '（未设置）')
       }
       if (op === 'set') {
-        if (!rest[0] || !api.getNavNode(rest[0])) return errMsg(`节点 ${rest[0] ?? ''} 不存在`)
+        if (!rest[0] || !(await api.getNavNode(rest[0]))) return errMsg(`节点 ${rest[0] ?? ''} 不存在`)
         api.setCurrentNode(rest[0])
         return okMsg(`当前中心节点已设置为 ${rest[0]}`)
       }
@@ -55,7 +55,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
         return printLines(wps.map((w, i) => `${i + 1}. ${w.id}  ${w.label}`), '（无途经点）')
       }
       if (op === 'add') {
-        if (succeed(api.addWaypoint(rest[0]))) okMsg(`已添加途经点 ${rest[0]}`)
+        if (succeed(await api.addWaypoint(rest[0]))) okMsg(`已添加途经点 ${rest[0]}`)
         return
       }
       if (op === 'remove') {
@@ -67,13 +67,13 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
         return okMsg('已清空途经点')
       }
       if (op === 'fill') {
-        const count = api.fillAllMissingConnections(api.getWaypoints().map((w) => w.id))
+        const count = await api.fillAllMissingConnections(api.getWaypoints().map((w) => w.id))
         return okMsg(count > 0 ? `已建立 ${count} 条跳转连接` : '所有相邻途经点均已连接')
       }
       return errMsg(`未知子命令: waypoint ${op ?? ''}（支持 list/add/remove/clear/fill）`)
     }
     case 'next': {
-      const items = api.getWeightedNextNodes(op)
+      const items = await api.getWeightedNextNodes(op)
       if (json) return printJson(items)
       return printLines(
         items.map((r) => `→ ${r.target_id}  seq=${r.seq}  w=${r.weight.toFixed(2)}  [${r.source}]`),
@@ -81,7 +81,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       )
     }
     case 'prev': {
-      const items = api.getPrevNodes(op)
+      const items = await api.getPrevNodes(op)
       if (json) return printJson(items.map((x) => x.node))
       return printLines(items.map((x) => `${x.node.id}  ${x.node.label}`), '（无前驱节点）')
     }

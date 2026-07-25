@@ -16,7 +16,7 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
   switch (sub) {
     case 'generate': {
       const ids = flagString(flags, 'ids')?.split(',').map((s) => s.trim()).filter(Boolean)
-      const plans = unwrap(api.generatePlans(ids))
+      const plans = unwrap(await api.generatePlans(ids))
       if (!plans) return
       if (json) return printJson({ ok: true, data: plans })
       okMsg(`已生成 ${plans.length} 个候选计划：`)
@@ -24,13 +24,13 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       return
     }
     case 'list': {
-      const plans = api.getAllPlans()
+      const plans = await api.getAllPlans()
       if (json) return printJson(plans)
       printLines(plans.map(planLine), '（尚无候选计划，请先 plan generate）')
       return
     }
     case 'get': {
-      const plan = api.getAllPlans().find((p) => p.id === rest[0])
+      const plan = (await api.getAllPlans()).find((p) => p.id === rest[0])
       if (!plan) return errMsg(`计划 ${rest[0] ?? ''} 不存在`)
       if (json) return printJson(plan)
       console.log(planLine(plan))
@@ -39,11 +39,11 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       return
     }
     case 'select': {
-      if (succeed(api.selectPlan(rest[0]))) okMsg(`已选中计划 ${rest[0]}`)
+      if (succeed(await api.selectPlan(rest[0]))) okMsg(`已选中计划 ${rest[0]}`)
       return
     }
     case 'recommend': {
-      const plan = api.getRecommendedPlan()
+      const plan = await api.getRecommendedPlan()
       if (json) return printJson(plan ?? null)
       if (!plan) return console.log('（无推荐计划）')
       console.log(planLine(plan))
@@ -72,8 +72,8 @@ export const run: CommandModule['run'] = async (api, args, flags) => {
       return errMsg(`未知子命令: mode ${kind ?? ''}（支持 get/waypoint/weight）`)
     }
     case 'replan': {
-      api.replan()
-      const plans = api.getAllPlans()
+      await api.replan()
+      const plans = await api.getAllPlans()
       if (json) return printJson({ ok: true, data: plans })
       okMsg(`已重新规划，共 ${plans.length} 个候选计划`)
       return

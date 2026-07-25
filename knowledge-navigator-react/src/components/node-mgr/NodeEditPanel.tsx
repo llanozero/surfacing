@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import { useNavNodeStore, getEditingNode } from '../../store/navNodeStore'
+import { useCardStore } from '../../store/cardStore'
+import { useNavStore } from '../../store/navStore'
 import { useToastStore } from '../shared/Toast'
+import { useAiGenerate } from '../../hooks/useAiGenerate'
 import BoundCardEditor from './BoundCardEditor'
 import NextNodeEditor from './NextNodeEditor'
 import BrowseHistoryViewer from './BrowseHistoryViewer'
@@ -10,7 +13,9 @@ import cardStyles from '../tree/CardEditPanel.module.css'
 /** 右侧编辑面板：基本字段 + 绑定卡片 + 指向节点 + 浏览记录 + 删除节点 */
 const NodeEditPanel: React.FC = () => {
   const { allNodes, selectedNodeId, updateField, deleteNavNode } = useNavNodeStore()
+  const allCards = useCardStore((s) => s.allCards)
   const toast = useToastStore((s) => s.show)
+  const { generating, generateNodeLabel, generateNodeDescription } = useAiGenerate()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const node = getEditingNode({ allNodes, selectedNodeId })
 
@@ -34,6 +39,44 @@ const NodeEditPanel: React.FC = () => {
     )
   }
 
+  /* ---- AI 生成依据 ---- */
+  const boundCards = (node.bound_cards ?? [])
+    .map((id) => allCards.find((c) => c.id === id))
+    .filter((c): c is NonNullable<typeof c> => Boolean(c))
+  const nav = useNavStore.getState()
+  const prevNodes = nav.getPrevNodes(node.id).map((x) => x.node)
+  const nextNodes = nav.getNextNodes(node.id).map((x) => x.node)
+
+  /** label 生成依据：至少绑定一张卡片 */
+  const hasLabelSource = boundCards.length >= 1
+  /** description 生成依据：绑定卡片语料/描述，或前驱/后继节点描述，任意其一 */
+  const hasDescSource =
+    boundCards.some((c) => c.corpus.length > 0 || c.description) ||
+    prevNodes.some((n) => n.description) ||
+    nextNodes.some((n) => n.description)
+  const labelDisabledHint = '缺少生成依据，请先绑定认知卡片'
+  const descDisabledHint = '缺少生成依据，请先绑定卡片或连接前驱/后继节点'
+
+  const handleGenLabel = async () => {
+    const result = await generateNodeLabel(node, boundCards)
+    if (!result) {
+      toast('生成失败，请重试')
+      return
+    }
+    updateField('label', result.text)
+    toast(`已生成标签${result.source === 'local' ? '（本地模式）' : ''}`)
+  }
+
+  const handleGenDescription = async () => {
+    const result = await generateNodeDescription(node, boundCards, prevNodes, nextNodes)
+    if (!result) {
+      toast('生成失败，请重试')
+      return
+    }
+    updateField('description', result.text)
+    toast(`已生成描述${result.source === 'local' ? '（本地模式）' : ''}`)
+  }
+
   return (
     <div className={styles.editPanel}>
       {/* 基本字段（NM-04 / NM-05，自动保存） */}
@@ -44,20 +87,42 @@ const NodeEditPanel: React.FC = () => {
         </div>
         <div className={styles.fieldRow}>
           <span className={styles.fieldLabel}>label</span>
-          <input
-            className={styles.input}
-            value={node.label}
-            onChange={(e) => updateField('label', e.target.value)}
-          />
+          <div className={styles.aiRow}>
+            <input
+              className={styles.input}
+              value={node.label}
+              onChange={(e) => updateField('label', e.target.value)}
+            />
+            <button
+              className={styles.aiButton}
+              onClick={handleGenLabel}
+              disabled={generating || !hasLabelSource}
+              title={hasLabelSource ? 'AI 生成标签' : labelDisabledHint}
+              aria-label="AI 生成标签"
+            >
+              {generating ? '⏳' : '✨'}
+            </button>
+          </div>
         </div>
         <div className={styles.fieldRow}>
           <span className={styles.fieldLabel}>description</span>
-          <textarea
-            className={styles.textarea}
-            rows={3}
-            value={node.description}
-            onChange={(e) => updateField('description', e.target.value)}
-          />
+          <div className={styles.aiRow}>
+            <textarea
+              className={styles.textarea}
+              rows={3}
+              value={node.description}
+              onChange={(e) => updateField('description', e.target.value)}
+            />
+            <button
+              className={styles.aiButton}
+              onClick={handleGenDescription}
+              disabled={generating || !hasDescSource}
+              title={hasDescSource ? 'AI 生成描述' : descDisabledHint}
+              aria-label="AI 生成描述"
+            >
+              {generating ? '⏳' : '✨'}
+            </button>
+          </div>
         </div>
       </section>
 

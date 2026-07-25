@@ -3,6 +3,8 @@ import type { CognitiveCard } from '../../data/types'
 import { allNavNodes } from '../../data/allNavNodes'
 import { useCardStore } from '../../store/cardStore'
 import { useToastStore } from '../shared/Toast'
+import { useAiGenerate } from '../../hooks/useAiGenerate'
+import { deriveParent } from '../../utils/treeUtils'
 import NodeSelector from '../node-mgr/NodeSelector'
 import mgrStyles from '../node-mgr/NodeMgr.module.css'
 import styles from './CardEditPanel.module.css'
@@ -21,10 +23,51 @@ const TAG_OPTIONS = [
 const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
   const { updateField, addCorpus, updateCorpus, removeCorpus, addBoundNode, removeBoundNode, deleteCard } =
     useCardStore()
+  const allCards = useCardStore((s) => s.allCards)
   const toast = useToastStore((s) => s.show)
+  const { generating, generateCardTitle, generateCardDescription } = useAiGenerate()
   const [selectorOpen, setSelectorOpen] = useState(false)
   const [newCorpus, setNewCorpus] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+
+  /** 子卡片（文件夹的生成依据之一） */
+  const children = allCards.filter((c) => {
+    if (c.id === card.id) return false
+    try {
+      return deriveParent(c.id) === card.id
+    } catch {
+      return false
+    }
+  })
+  /** 生成依据是否充足：有语料或有子卡片 */
+  const hasAiSource = card.corpus.length > 0 || children.length > 0
+  const aiDisabledHint = '缺少生成依据，请先添加语料或子卡片'
+
+  const handleGenTitle = async () => {
+    const result = await generateCardTitle(card, children)
+    if (!result) {
+      toast('生成失败，请重试')
+      return
+    }
+    let text = result.text
+    let truncated = false
+    if (text.length > 10) {
+      text = text.slice(0, 9) + '…'
+      truncated = true
+    }
+    updateField(card.id, 'title', text)
+    toast(`已生成标题${result.source === 'local' ? '（本地模式）' : ''}${truncated ? '（已截断）' : ''}`)
+  }
+
+  const handleGenDescription = async () => {
+    const result = await generateCardDescription(card, children)
+    if (!result) {
+      toast('生成失败，请重试')
+      return
+    }
+    updateField(card.id, 'description', result.text)
+    toast(`已生成描述${result.source === 'local' ? '（本地模式）' : ''}`)
+  }
 
   const boundNodes = (card.bound_nodes ?? [])
     .map((id) => ({ id, node: allNavNodes.find((n) => n.id === id) }))
@@ -62,11 +105,22 @@ const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
         </div>
         <div className={mgrStyles.fieldRow}>
           <span className={mgrStyles.fieldLabel}>标题</span>
-          <input
-            className={mgrStyles.input}
-            value={card.title}
-            onChange={(e) => updateField(card.id, 'title', e.target.value)}
-          />
+          <div className={styles.aiRow}>
+            <input
+              className={mgrStyles.input}
+              value={card.title}
+              onChange={(e) => updateField(card.id, 'title', e.target.value)}
+            />
+            <button
+              className={styles.aiButton}
+              onClick={handleGenTitle}
+              disabled={generating || !hasAiSource}
+              title={hasAiSource ? 'AI 生成标题' : aiDisabledHint}
+              aria-label="AI 生成标题"
+            >
+              {generating ? '⏳' : '✨'}
+            </button>
+          </div>
         </div>
         <div className={mgrStyles.fieldRow}>
           <span className={mgrStyles.fieldLabel}>类型 / 标签</span>
@@ -89,13 +143,24 @@ const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
         </div>
         <div className={mgrStyles.fieldRow}>
           <span className={mgrStyles.fieldLabel}>描述</span>
-          <textarea
-            className={mgrStyles.textarea}
-            rows={2}
-            placeholder="简短概述卡片内容（1-2 句话）"
-            value={card.description ?? ''}
-            onChange={(e) => updateField(card.id, 'description', e.target.value)}
-          />
+          <div className={styles.aiRow}>
+            <textarea
+              className={mgrStyles.textarea}
+              rows={2}
+              placeholder="简短概述卡片内容（1-2 句话）"
+              value={card.description ?? ''}
+              onChange={(e) => updateField(card.id, 'description', e.target.value)}
+            />
+            <button
+              className={styles.aiButton}
+              onClick={handleGenDescription}
+              disabled={generating || !hasAiSource}
+              title={hasAiSource ? 'AI 生成描述' : aiDisabledHint}
+              aria-label="AI 生成描述"
+            >
+              {generating ? '⏳' : '✨'}
+            </button>
+          </div>
         </div>
       </section>
 

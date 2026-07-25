@@ -1,0 +1,120 @@
+/* 连接编辑浮层 */
+
+.mask {
+  position: fixed;
+  inset: 0;
+  background: var(--mask-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: 24px;
+}
+
+.popover {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--label-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.arrow {
+  color: var(--label-quaternary);
+  margin: 0 4px;
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fieldLabel {
+  flex-shrink: 0;
+  width: 56px;
+  font-size: 12px;
+  color: var(--label-tertiary);
+}
+
+.priorityInput {
+  width: 72px;
+  padding: 6px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-xs);
+  color: var(--label-primary);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  outline: none;
+}
+.priorityInput:focus {
+  border-color: var(--status-kimiblue);
+}
+
+.hint {
+  font-size: 10px;
+  color: var(--label-quaternary);
+}
+
+.typeSelect {
+  flex: 1;
+  padding: 6px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-xs);
+  color: var(--label-secondary);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.deleteBtn {
+  padding: 7px 14px;
+  background: transparent;
+  border: 1px solid rgba(255, 71, 86, 0.4);
+  border-radius: var(--radius-sm);
+  color: var(--status-danger);
+  font-size: 12px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.deleteBtn:hover {
+  background: rgba(255, 71, 86, 0.1);
+}
+
+.saveBtn {
+  padding: 7px 18px;
+  background: var(--status-kimiblue);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.saveBtn:hover {
+  filter: brightness(1.1);
+}

@@ -1,0 +1,50 @@
+/* 连接状态指示器 */
+
+.indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+  margin: 0 1px;
+  font-family: var(--font-sans);
+}
+
+.connected {
+  background: rgba(52, 199, 89, 0.12);
+  color: #34c759;
+  border: 1px solid rgba(52, 199, 89, 0.4);
+}
+.connected:hover {
+  background: rgba(52, 199, 89, 0.22);
+}
+
+.priority {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  opacity: 0.85;
+}
+
+.missing {
+  background: rgba(26, 136, 255, 0.1);
+  color: var(--status-kimiblue);
+  border: 1px dashed rgba(26, 136, 255, 0.5);
+}
+.missing:hover {
+  background: rgba(26, 136, 255, 0.22);
+}
+
+.unavailable {
+  background: var(--fill-f1);
+  color: var(--label-quaternary);
+  border: 1px solid var(--separator);
+  cursor: not-allowed;
+}

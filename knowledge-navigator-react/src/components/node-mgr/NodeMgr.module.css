@@ -290,6 +290,40 @@
   color: var(--label-quaternary);
 }
 
+/* AI 生成按钮 */
+.aiRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.aiRow > input,
+.aiRow > textarea {
+  flex: 1;
+  min-width: 0;
+}
+.aiButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(26, 136, 255, 0.1);
+  border: 1px solid rgba(26, 136, 255, 0.4);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: background 0.15s, opacity 0.15s;
+}
+.aiButton:hover:not(:disabled) {
+  background: rgba(26, 136, 255, 0.25);
+}
+.aiButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ---------- 选择器弹窗 ---------- */
 .selectorMask {
   position: fixed;

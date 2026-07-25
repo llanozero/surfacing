@@ -1,10 +1,11 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import styles from './NavView.module.css'
 import Button from '../shared/Button'
 import NavCanvas from '../canvas/NavCanvas'
 import ZoomControls from '../canvas/ZoomControls'
 import NavModeToggle from '../nav/NavModeToggle'
 import WaypointsBar from '../nav/WaypointsBar'
+import ConnectionEditPopover from '../nav/ConnectionEditPopover'
 import DropDownPanel from '../panel/DropDownPanel'
 import { useNavStore, getCurrentNode } from '../../store/navStore'
 import { usePanelStore } from '../../store/panelStore'
@@ -12,6 +13,14 @@ import { usePlanStore } from '../../store/planStore'
 import { useViewStore } from '../../store/viewStore'
 import { useToastStore } from '../shared/Toast'
 import { useNavCanvas } from '../../hooks/useNavCanvas'
+import {
+  ensureQuickConnection,
+  updateQuickConnection,
+  removeQuickConnection,
+  fillAllMissingConnections,
+  getConnectionStatus,
+} from '../../utils/quickConnectUtils'
+import { getNavNode } from '../../data/allNavNodes'
 import type { NavNode } from '../../data/types'
 
 const NavView: React.FC = () => {
@@ -37,6 +46,21 @@ const NavView: React.FC = () => {
   const toast = useToastStore((s) => s.show)
 
   const currentNode = getCurrentNode({ currentNodeId })
+
+  /** 正在编辑的连接（✅ 指示器点击后弹出浮层） */
+  const [editingConn, setEditingConn] = useState<{ fromId: string; toId: string } | null>(null)
+
+  /** QC-02：一键新建连接（预设优先级 #1，类型 user_added） */
+  const handleQuickConnect = (fromId: string, toId: string) => {
+    const created = ensureQuickConnection(fromId, toId)
+    toast(created ? '已建立跳转连接' : '连接已存在')
+  }
+
+  /** QC-07：批量补齐所有缺失连接 */
+  const handleFillAll = () => {
+    const count = fillAllMissingConnections(waypoints)
+    toast(count > 0 ? `已建立 ${count} 条跳转连接` : '所有相邻途经点均已连接')
+  }
 
   // 点击分流（spec §4.2）：逐站模式切换中心节点；全览模式更新选中高亮
   const handleNodeClick = (node: NavNode) => {
@@ -97,11 +121,24 @@ const NavView: React.FC = () => {
         <DropDownPanel />
       </div>
 
-      <WaypointsBar waypoints={waypoints} onRemove={removeWaypoint} />
+      <WaypointsBar
+        waypoints={waypoints}
+        onRemove={removeWaypoint}
+        onQuickConnect={handleQuickConnect}
+        onEditConnection={(fromId, toId) => setEditingConn({ fromId, toId })}
+      />
 
       <div className={styles.actions}>
         <Button variant="outline" size="sm" onClick={handleClear} disabled={waypoints.length === 0}>
           清空途径点
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleFillAll}
+          disabled={waypoints.length < 2}
+        >
+          补齐连接
         </Button>
         <Button
           variant="primary"
@@ -112,6 +149,33 @@ const NavView: React.FC = () => {
           规划路线 ({waypoints.length} 站)
         </Button>
       </div>
+
+      {/* 连接编辑浮层（QC-03 / QC-04） */}
+      {editingConn &&
+        (() => {
+          const { status, ref } = getConnectionStatus(editingConn.fromId, editingConn.toId)
+          const fromNode = getNavNode(editingConn.fromId)
+          const toNode = getNavNode(editingConn.toId)
+          if (status !== 'connected' || !ref || !fromNode || !toNode) return null
+          return (
+            <ConnectionEditPopover
+              fromId={editingConn.fromId}
+              toId={editingConn.toId}
+              fromLabel={fromNode.label}
+              toLabel={toNode.label}
+              initialRef={ref}
+              onSave={(f, t, updates) => {
+                updateQuickConnection(f, t, updates)
+                toast('已更新跳转连接')
+              }}
+              onDelete={(f, t) => {
+                removeQuickConnection(f, t)
+                toast('已删除跳转连接')
+              }}
+              onClose={() => setEditingConn(null)}
+            />
+          )
+        })()}
     </div>
   )
 }

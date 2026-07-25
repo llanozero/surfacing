@@ -59,3 +59,110 @@
   font-family: var(--font-mono);
   text-align: right;
 }
+
+/* ---------- 连接编辑面板（QC-06） ---------- */
+.connPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--separator);
+}
+.connPanelTitle {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--label-quaternary);
+  letter-spacing: 0.02em;
+}
+.connRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--fill-f1);
+  border-radius: var(--radius-sm);
+}
+.connTitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--label-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.connFields {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.connField {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--label-tertiary);
+}
+.connInput {
+  width: 52px;
+  padding: 4px 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-xs);
+  color: var(--label-primary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  outline: none;
+}
+.connInput:focus {
+  border-color: var(--status-kimiblue);
+}
+.connSelect {
+  padding: 4px 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-xs);
+  color: var(--label-secondary);
+  font-size: 11px;
+  font-family: var(--font-sans);
+  outline: none;
+}
+.connSave {
+  margin-left: auto;
+  padding: 4px 12px;
+  background: var(--status-kimiblue);
+  border: none;
+  border-radius: var(--radius-xs);
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.connDelete {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid rgba(255, 71, 86, 0.4);
+  border-radius: var(--radius-xs);
+  color: var(--status-danger);
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.connDelete:hover {
+  background: rgba(255, 71, 86, 0.1);
+}
+.connCreate {
+  align-self: flex-start;
+  padding: 5px 12px;
+  background: rgba(26, 136, 255, 0.1);
+  border: 1px dashed rgba(26, 136, 255, 0.5);
+  border-radius: var(--radius-xs);
+  color: var(--status-kimiblue);
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.connCreate:hover {
+  background: rgba(26, 136, 255, 0.22);
+}

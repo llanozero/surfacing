@@ -25,6 +25,8 @@ interface NavStore {
   allNavNodes: NavNode[]
   allEdges: GraphEdge[]
   waypoints: NavNode[]
+  /** 自由分支浏览模式是否激活 */
+  freeBrowseActive: boolean
   init: (nodeId: string, mode?: NavMode) => void
   setMode: (m: NavMode) => void
   setCurrentNode: (nodeId: string) => void
@@ -32,6 +34,8 @@ interface NavStore {
   addWaypoint: (node: NavNode) => void
   removeWaypoint: (index: number) => void
   clearWaypoints: () => void
+  /** 切换自由分支浏览模式 */
+  setFreeBrowse: (active: boolean) => void
   /** 按合成权重排序的后继节点 */
   getNextNodes: (nodeId: string) => NextNodeItem[]
   /** 前驱节点（指向 nodeId 的节点） */
@@ -47,6 +51,7 @@ export const useNavStore = create<NavStore>((set, get) => ({
   allNavNodes,
   allEdges,
   waypoints: [],
+  freeBrowseActive: false,
 
   init: (nodeId, mode = 'overview') => {
     if (!getNavNode(nodeId)) return
@@ -71,6 +76,8 @@ export const useNavStore = create<NavStore>((set, get) => ({
   },
 
   clearWaypoints: () => set({ waypoints: [] }),
+
+  setFreeBrowse: (active) => set({ freeBrowseActive: active }),
 
   getNextNodes: (nodeId) => {
     const node = getNavNode(nodeId)

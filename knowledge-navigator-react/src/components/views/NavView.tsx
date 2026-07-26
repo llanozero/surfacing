@@ -8,6 +8,7 @@ import WaypointsBar from '../nav/WaypointsBar'
 import ConnectionEditPopover from '../nav/ConnectionEditPopover'
 import DropDownPanel from '../panel/DropDownPanel'
 import { useNavStore, getCurrentNode } from '../../store/navStore'
+import { useBrowseStore } from '../../store/browseStore'
 import { usePanelStore } from '../../store/panelStore'
 import { usePlanStore } from '../../store/planStore'
 import { useViewStore } from '../../store/viewStore'
@@ -44,6 +45,7 @@ const NavView: React.FC = () => {
   const generatePlans = usePlanStore((s) => s.generatePlans)
   const switchView = useViewStore((s) => s.switchView)
   const toast = useToastStore((s) => s.show)
+  const enterFreeBrowse = useBrowseStore((s) => s.enterFreeBrowse)
 
   const currentNode = getCurrentNode({ currentNodeId })
 
@@ -65,11 +67,9 @@ const NavView: React.FC = () => {
   // 点击分流（spec §4.2）：逐站模式切换中心节点；全览模式更新选中高亮
   const handleNodeClick = (node: NavNode) => {
     setPanelNode(node)
-    if (mode === 'station') {
-      setCurrentNode(node.id)
-    } else {
-      setSelectedNode(node.id)
-    }
+    // ★ 两字段同步：全览/逐站共享选中节点
+    setCurrentNode(node.id)
+    setSelectedNode(node.id)
   }
 
   const { zoomIn, zoomOut, zoomReset } = useNavCanvas(
@@ -90,6 +90,16 @@ const NavView: React.FC = () => {
   const handleClear = () => {
     clearWaypoints()
     toast('已清空途径点')
+  }
+
+  // 自由分支浏览：以第一个途经点为起始节点
+  const handleFreeBrowse = () => {
+    if (waypoints.length === 0) return
+    const startNode = waypoints[0]
+    setCurrentNode(startNode.id)
+    setSelectedNode(startNode.id)
+    enterFreeBrowse(startNode)
+    switchView('free-browse')
   }
 
   // NavView → PlanView（spec §4.4）：途经点 ≥ 2 时进入路线规划
@@ -140,6 +150,11 @@ const NavView: React.FC = () => {
         >
           补齐连接
         </Button>
+        {waypoints.length === 1 && (
+          <Button variant="primary" size="sm" onClick={handleFreeBrowse}>
+            自由分支浏览
+          </Button>
+        )}
         <Button
           variant="primary"
           size="sm"

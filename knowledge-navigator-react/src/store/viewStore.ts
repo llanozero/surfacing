@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { usePanelStore } from './panelStore'
 
-export type ViewName = 'search' | 'nav' | 'plan' | 'browse' | 'tree'
+export type ViewName = 'search' | 'nav' | 'plan' | 'browse' | 'tree' | 'free-browse'
 
 interface ViewStore {
   activeView: ViewName

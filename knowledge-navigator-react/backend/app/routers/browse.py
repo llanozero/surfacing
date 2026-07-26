@@ -141,3 +141,72 @@ def next_waypoint() -> dict[str, Any]:
     browse_state.waypoint_index = (browse_state.waypoint_index + 1) % len(browse_state.node_ids)
     browse_state.card_index = 0
     return {"ok": True, "waypointIndex": browse_state.waypoint_index}
+
+
+# ── 自由分支浏览 ──
+
+
+class FreeStartBody(BaseModel):
+    node_id: str
+
+
+def _branch_node_items(node_id: str, direction: str) -> list[dict[str, Any]]:
+    """获取节点的前驱/后继分支节点列表。
+    
+    direction: 'prev' | 'next'
+    """
+    items: list[dict[str, Any]] = []
+    all_nodes = store.nodes
+
+    if direction == "prev":
+        for n in all_nodes:
+            for e in n.get("next_nodes") or []:
+                if e.get("target_id") == node_id:
+                    node = store.get_node(n["id"])
+                    if node:
+                        items.append({
+                            "node_id": n["id"],
+                            "label": node.get("label", n["id"]),
+                            "weight": e.get("preset_weight", 0.5),
+                        })
+    else:
+        node = store.get_node(node_id)
+        if node:
+            for e in node.get("next_nodes") or []:
+                target = store.get_node(e.get("target_id", ""))
+                if target:
+                    items.append({
+                        "node_id": e["target_id"],
+                        "label": target.get("label", e["target_id"]),
+                        "weight": e.get("preset_weight", 0.5),
+                    })
+
+    items.sort(key=lambda x: x["weight"], reverse=True)
+    return items
+
+
+def _free_browse_response(node_id: str) -> dict[str, Any]:
+    """构造自由分支浏览的完整响应。"""
+    node = store.get_node(node_id)
+    if node is None:
+        raise HTTPException(status_code=404, detail=f"节点 {node_id} 不存在")
+    return {
+        "ok": True,
+        "current_node_id": node_id,
+        "current_node_label": node.get("label", node_id),
+        "cards": _cards_for_waypoint(node),
+        "prev_nodes": _branch_node_items(node_id, "prev"),
+        "next_nodes": _branch_node_items(node_id, "next"),
+    }
+
+
+@router.post("/free/start")
+def free_start(body: FreeStartBody) -> dict[str, Any]:
+    """以指定节点开始自由分支浏览。"""
+    return _free_browse_response(body.node_id)
+
+
+@router.post("/free/jump/{target_id}")
+def free_jump(target_id: str) -> dict[str, Any]:
+    """跳转到目标节点，返回新节点的上下文。"""
+    return _free_browse_response(target_id)

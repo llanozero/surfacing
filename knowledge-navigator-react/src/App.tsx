@@ -6,6 +6,7 @@ import StatusBar from './components/layout/StatusBar'
 import TabBar from './components/layout/TabBar'
 import SearchView from './components/views/SearchView'
 import NavView from './components/views/NavView'
+import FreeBrowseView from './components/views/FreeBrowseView'
 import PlanView from './components/plan/PlanView'
 import BrowseView from './components/views/BrowseView'
 import TreeView from './components/views/TreeView'
@@ -17,6 +18,7 @@ const viewMap: Record<ViewName, React.FC> = {
   plan: PlanView,
   browse: BrowseView,
   tree: TreeView,
+  'free-browse': FreeBrowseView,
 }
 
 function App() {

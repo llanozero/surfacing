@@ -1,16 +1,17 @@
 /**
  * 后端模式配置（backend-architecture.md §二）。
- * 本地模式：前端内存操作；远程模式：请求 Python FastAPI 后端。
+ * lite 模式（轻量）：纯前端操作，不依赖后端服务；
+ * pro 模式（完整）：通过 HTTP 请求调用 Python FastAPI 后端完成全部数据操作。
  * 优先级：URL 参数 > localStorage > 默认值。
- * Node（CLI）环境下无 localStorage / window，自动降级为默认本地模式。
+ * Node（CLI）环境下无 localStorage / window，自动降级为默认 pro 模式。
  */
 
-export type BackendMode = 'local' | 'remote'
+export type BackendMode = 'lite' | 'pro'
 
 export interface BackendConfig {
   /** 当前运行模式 */
   mode: BackendMode
-  /** 远程后端的基础 URL（仅 remote 模式需要） */
+  /** 后端的基础 URL（仅 pro 模式需要） */
   baseUrl: string
   /** 请求超时时间（毫秒） */
   timeout: number
@@ -19,8 +20,8 @@ export interface BackendConfig {
 }
 
 export const defaultBackendConfig: BackendConfig = {
-  mode: 'local',
-  baseUrl: 'http://localhost:8171', // Python 后端端口
+  mode: 'pro',
+  baseUrl: 'http://localhost:8171',
   timeout: 10000,
   retryCount: 1,
 }
@@ -47,8 +48,8 @@ export function setBackendConfig(partial: Partial<BackendConfig>): void {
   }
 }
 
-export function isRemoteMode(): boolean {
-  return _config.mode === 'remote'
+export function isProMode(): boolean {
+  return _config.mode === 'pro'
 }
 
 /** 初始化配置：localStorage 恢复 → URL 参数覆盖（最高优先级） */
@@ -58,7 +59,9 @@ export function initBackendConfig(): void {
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as Partial<BackendConfig>
-        _config = { ..._config, ...parsed }
+        if (parsed.mode === 'lite' || parsed.mode === 'pro') {
+          _config = { ..._config, ...parsed }
+        }
       } catch {
         /* 忽略损坏的存档 */
       }
@@ -68,7 +71,7 @@ export function initBackendConfig(): void {
   if (hasWindow) {
     const params = new URLSearchParams(window.location.search)
     const modeParam = params.get('backend_mode')
-    if (modeParam === 'local' || modeParam === 'remote') {
+    if (modeParam === 'lite' || modeParam === 'pro') {
       _config.mode = modeParam
     }
     const baseUrl = params.get('backend_url')
@@ -80,7 +83,7 @@ export function initBackendConfig(): void {
   // Node（CLI）环境：环境变量 KN_BACKEND_MODE / KN_BACKEND_URL（最高优先级）
   if (typeof process !== 'undefined' && process.env) {
     const envMode = process.env.KN_BACKEND_MODE
-    if (envMode === 'local' || envMode === 'remote') {
+    if (envMode === 'lite' || envMode === 'pro') {
       _config.mode = envMode
     }
     const envUrl = process.env.KN_BACKEND_URL

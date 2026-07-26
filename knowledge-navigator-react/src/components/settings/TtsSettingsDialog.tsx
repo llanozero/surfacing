@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import styles from './TtsSettingsDialog.module.css'
 import { getTtsConfig, setTtsConfig, getDefaultTtsConfig } from '../../config/tts'
 import { playTts, stopTts } from '../../utils/ttsPlayer'
-import { isRemoteMode } from '../../config/backend'
+import { isProMode, getBackendConfig } from '../../config/backend'
 
 interface VoiceItem {
   name: string
@@ -29,19 +29,16 @@ const TtsSettingsDialog: React.FC<TtsSettingsDialogProps> = ({ onClose }) => {
   const [testing, setTesting] = useState(false)
   const [error, setError] = useState('')
 
-  const remoteMode = isRemoteMode()
-
   useEffect(() => {
-    if (!remoteMode) {
-      setLoading(false)
-      return
-    }
-    fetch('/api/tts/voices')
+    const voicesUrl = isProMode()
+      ? `${getBackendConfig().baseUrl}/api/tts/voices`
+      : '/api/tts/voices'
+    fetch(voicesUrl)
       .then((r) => r.json())
       .then((data) => setVoices(data.voices || []))
       .catch(() => setVoices([]))
       .finally(() => setLoading(false))
-  }, [remoteMode])
+  }, [])
 
   const selectedVoice = voices.find((v) => v.name === voice)
 
@@ -82,10 +79,7 @@ const TtsSettingsDialog: React.FC<TtsSettingsDialogProps> = ({ onClose }) => {
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
-        {!remoteMode ? (
-          <p className={styles.hint}>TTS 需要后端支持，请先切换到远程模式。</p>
-        ) : (
-          <div className={styles.body}>
+        <div className={styles.body}>
             {/* 音色 */}
             <label className={styles.field}>
               <span className={styles.fieldLabel}>音色 (Voice)</span>
@@ -152,7 +146,6 @@ const TtsSettingsDialog: React.FC<TtsSettingsDialogProps> = ({ onClose }) => {
             </button>
             {error && <p className={styles.error}>{error}</p>}
           </div>
-        )}
 
         <div className={styles.footer}>
           <button className={styles.resetBtn} onClick={handleReset}>重置默认</button>

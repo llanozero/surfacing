@@ -31,8 +31,8 @@
 # 启动后端
 python backend/run.py
 
-# CLI 远程模式：校验 → 预览 → 导入
-set KN_BACKEND_MODE=remote
+# CLI 完整模式（pro）：校验 → 预览 → 导入
+set KN_BACKEND_MODE=pro
 kn-cli yaml validate imports/cognitive-cards-kits.yaml
 kn-cli yaml preview  imports/cognitive-cards-kits.yaml
 kn-cli yaml import   imports/cognitive-cards-kits.yaml
@@ -51,8 +51,8 @@ kn-cli yaml import   imports/cognitive-cards-kits.yaml
 
 `start-dev.bat`：同时启动 FastAPI 后端（8171）与 Vite 前端开发服务器。
 
-- 远程模式切换：管理界面 ⚙ → 远程模式 → `http://localhost:8171` → 保存
-- 或 URL 参数：`http://localhost:5173/?backend_mode=remote`
+- 完整模式（pro）切换：管理界面 ⚙ → 完整模式（pro）→ `http://localhost:8171` → 保存
+- 或 URL 参数：`http://localhost:5173/?backend_mode=pro`
 
 ## 六、后续可选
 

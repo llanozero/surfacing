@@ -61,12 +61,15 @@ async def speak(body: SpeakBody) -> StreamingResponse:
     if len(text) > 5000:
         raise HTTPException(status_code=400, detail="文本过长（最多 5000 字）")
 
-    communicate = edge_tts.Communicate(
-        text, body.voice, rate=body.rate, pitch=body.pitch
-    )
-    buf = BytesIO()
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            buf.write(chunk["data"])
-    buf.seek(0)
-    return StreamingResponse(buf, media_type="audio/mpeg")
+    try:
+        communicate = edge_tts.Communicate(
+            text, body.voice, rate=body.rate, pitch=body.pitch
+        )
+        buf = BytesIO()
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                buf.write(chunk["data"])
+        buf.seek(0)
+        return StreamingResponse(buf, media_type="audio/mpeg")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"TTS 合成失败: {e}")

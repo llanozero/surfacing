@@ -5,8 +5,8 @@
 
 ## 一、目标
 
-让前端「远程模式」真正可用：启动本地 FastAPI 服务（端口 8171）后，
-前端管理界面切换到远程模式即可通过 HTTP 完成全部数据操作，
+让前端「完整模式（pro）」真正可用：启动本地 FastAPI 服务（端口 8171）后，
+前端管理界面切换到完整模式（pro）即可通过 HTTP 完成全部数据操作，
 数据以 YAML 文件持久化在服务端，重启不丢失。
 
 ## 二、技术选型
@@ -62,7 +62,7 @@ backend/
 ### 4.3 会话态归属
 
 浏览进度（当前站点 / 卡片下标）与当前视图保存在**服务端内存**
-（与远程模式的语义一致：刷新前端不丢失浏览进度），不写入 YAML。
+（与完整模式（pro）的语义一致：刷新前端不丢失浏览进度），不写入 YAML。
 
 ### 4.4 AI 生成
 
@@ -79,14 +79,14 @@ python backend/run.py
 # 健康检查
 curl http://localhost:8171/api/health
 
-# 前端切换远程模式：管理界面 ⚙ → 远程模式 → 测试连接 → 保存
-# 或 URL 参数：?backend_mode=remote&backend_url=http://localhost:8171
+# 前端切换完整模式（pro）：管理界面 ⚙ → 完整模式（pro）→ 测试连接 → 保存
+# 或 URL 参数：?backend_mode=pro&backend_url=http://localhost:8171
 ```
 
-CLI 验证（远程模式）：
+CLI 验证（完整模式（pro））：
 
 ```bash
-set KN_BACKEND_MODE=remote
+set KN_BACKEND_MODE=pro
 kn-cli card list
 kn-cli plan generate --ids node-ml-foundation,node-supervised
 ```

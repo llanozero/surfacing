@@ -1,5 +1,5 @@
 import { getTtsConfig, type TtsConfig } from '../config/tts'
-import { isRemoteMode } from '../config/backend'
+import { isProMode, getBackendConfig } from '../config/backend'
 
 let currentAudio: HTMLAudioElement | null = null
 
@@ -14,16 +14,20 @@ export function isTtsPlaying(): boolean {
   return currentAudio !== null && !currentAudio.paused
 }
 
+function apiUrl(path: string): string {
+  if (isProMode()) {
+    return `${getBackendConfig().baseUrl}${path}`
+  }
+  return path
+}
+
 export async function playTts(text: string, overrides?: Partial<TtsConfig>): Promise<void> {
   if (!text) return
-  if (!isRemoteMode()) {
-    throw new Error('TTS 需要后端支持，请切换到远程模式')
-  }
 
   stopTts()
   const cfg = { ...getTtsConfig(), ...overrides }
 
-  const res = await fetch('/api/tts/speak', {
+  const res = await fetch(apiUrl('/api/tts/speak'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

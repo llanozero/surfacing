@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import styles from './TtsButton.module.css'
 import { playTts, stopTts, isTtsPlaying } from '../../utils/ttsPlayer'
+import { useToastStore } from './Toast'
 
 interface TtsButtonProps {
   text: string
@@ -9,6 +10,7 @@ interface TtsButtonProps {
 
 const TtsButton: React.FC<TtsButtonProps> = ({ text, size = 'sm' }) => {
   const [playing, setPlaying] = useState(false)
+  const toast = useToastStore((s) => s.show)
 
   const handleClick = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -23,12 +25,12 @@ const TtsButton: React.FC<TtsButtonProps> = ({ text, size = 'sm' }) => {
     setPlaying(true)
     try {
       await playTts(text)
-    } catch {
-      // toast 由调用方处理
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'TTS 播放失败')
     } finally {
       setPlaying(false)
     }
-  }, [text])
+  }, [text, toast])
 
   return (
     <button

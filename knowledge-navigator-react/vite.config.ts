@@ -13,6 +13,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/lm/, ''),
       },
+      // 后端 API（FastAPI 8171），包括 TTS 等所有 /api/* 请求
+      '/api': {
+        target: 'http://localhost:8171',
+        changeOrigin: true,
+      },
     },
   },
 })

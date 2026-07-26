@@ -2,7 +2,7 @@
 
 > 为 FastAPI 后端全部十组功能提供 Python 调用入口：
 > `backend/app/client.py`（API 客户端 SDK）+ `backend/cli.py`（命令行）。
-> 与 TS 版 kn-cli 并列：TS CLI 面向前端本地/远程双模式，本 CLI 直连后端 HTTP。
+> 与 TS 版 kn-cli 并列：TS CLI 面向前端轻量/完整双模式，本 CLI 直连后端 HTTP。
 
 ## 一、API 客户端（app/client.py）
 
@@ -65,7 +65,7 @@ plans = client.generate_plans(["node-kit-a", "node-kit-e", "node-kit-g"])
 | | TS kn-cli（`npm run kn-cli`） | Python CLI（`backend/cli.py`） |
 |--|------------------------------|-------------------------------|
 | 实现 | tsx + Zustand / BackendAdapter | requests → HTTP |
-| 本地模式 | ✓（内存数据源，无需后端） | ✗（必须启动后端） |
-| 远程模式 | ✓（KN_BACKEND_MODE=remote） | ✓（默认即远程） |
+| 轻量模式（lite） | ✓（内存数据源，无需后端） | ✗（必须启动后端） |
+| 完整模式（pro） | ✓（KN_BACKEND_MODE=pro） | ✓（默认即完整） |
 | 会话态 | 每次进程独立 | 浏览进度保存在服务端，跨调用连续 |
 | 适用 | 前端开发调试、无后端快速验证 | 后端联调、脚本自动化、运维 |

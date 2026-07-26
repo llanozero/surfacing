@@ -21,11 +21,11 @@ npm run dev                    # 前端 http://localhost:7100（Vite）
 
 打开方式：
 
-- 本地模式（默认）：`http://localhost:7100/` —— 全部数据在前端内存，刷新还原
-- 远程模式：`http://localhost:7100/?backend_mode=remote` —— 数据来自后端，编辑写回 YAML
+- 轻量模式（lite）（默认）：`http://localhost:7100/` —— 全部数据在前端内存，刷新还原
+- 完整模式（pro）：`http://localhost:7100/?backend_mode=pro` —— 数据来自后端，编辑写回 YAML
 - 也可在「管理 → ⚙ 后端设置」中切换并保存（URL 参数优先级最高）
 
-模式判定优先级：**URL 参数 > localStorage > 默认 local**（CLI 环境再叠加 `KN_BACKEND_MODE` / `KN_BACKEND_URL` 环境变量）。
+模式判定优先级：**URL 参数 > localStorage > 默认 lite**（CLI 环境再叠加 `KN_BACKEND_MODE` / `KN_BACKEND_URL` 环境变量）。
 
 ## 架构
 
@@ -35,9 +35,9 @@ npm run dev                    # 前端 http://localhost:7100（Vite）
 │  store/          Zustand 状态（card / navNode / tree / nav / plan / browse / search）    │
 │  data/           共享数据源（cognitiveCards / allNavNodes，const 数组原地变更）          │
 │  api/            BackendAdapter（超时+重试）· syncFromBackend（水合）· writeThrough     │
-│  config/backend  模式配置（local / remote）                                              │
+│  config/backend  模式配置（lite / pro）                                              │
 └──────────────────────────────┬─────────────────────────────────────────────────────────┘
-                               │ HTTP（仅远程模式）
+│                               │ HTTP（仅完整模式（pro））
 ┌──────────────────────────────┴─────────────────────────────────────────────────────────┐
 │  后端（FastAPI，端口 8171）                                                            │
 │  routers/  cards · nodes · connections · plan · browse · search · ai · graph · yaml   │
@@ -50,23 +50,23 @@ npm run dev                    # 前端 http://localhost:7100（Vite）
 
 ## 双模式设计
 
-每条链路都同时具备**本地计算**与**后端计算**两条路径，远程链路失败时自动回退本地，界面永远可用：
+每条链路都同时具备**轻量计算**与**后端计算**两条路径，完整链路失败时自动回退轻量，界面永远可用：
 
-| 链路 | 本地模式 | 远程模式 | 远程失败回退 |
+| 链路 | 轻量模式（lite） | 完整模式（pro） | 完整模式（pro）失败回退 |
 |---|---|---|---|
 | 启动数据读取 | 内置静态数据（18 卡 / 17 节点） | `GET /api/cards` + `GET /api/nodes` 水合全部 store | 保留静态数据 |
 | 卡片 / 节点增删改 | 内存变更 | 写透传 `POST/PUT/DELETE /api/cards|nodes`（火忘） | `console.warn`，下次水合对齐 |
-| 路线规划 | `routePlanner.ts`（排列/贪心/衔接/子路径拼接） | `/api/plan/generate` · `/replan`（Python 镜像算法） | 本地算法重算 |
-| 浏览会话 | `bound_cards` 本地派生，翻页钳位 | `/api/browse/start|next|prev|waypoint`，到底循环 | 本地派生 |
-| 关键词搜索 | 本地加权子串评分 | 同左（卡片已水合，同一份数据） | — |
-| 向量语义搜索 | 本地词袋重叠率近似 | `/api/search/vector-match`：LM Studio 嵌入余弦 Top-8 | 本地词袋 |
-| AI 辅助生成 | —（仅远程可用） | `/api/ai/generate/*`：LM Studio qwen，失败模板降级 | 模板文案 |
+| 路线规划 | `routePlanner.ts`（排列/贪心/衔接/子路径拼接） | `/api/plan/generate` · `/replan`（Python 镜像算法） | 轻量算法重算 |
+| 浏览会话 | `bound_cards` 轻量派生，翻页钳位 | `/api/browse/start|next|prev|waypoint`，到底循环 | 轻量派生 |
+| 关键词搜索 | 轻量加权子串评分 | 同左（卡片已水合，同一份数据） | — |
+| 向量语义搜索 | 轻量词袋重叠率近似 | `/api/search/vector-match`：LM Studio 嵌入余弦 Top-8 | 轻量词袋 |
+| AI 辅助生成 | —（仅完整模式（pro）可用） | `/api/ai/generate/*`：LM Studio qwen，失败模板降级 | 模板文案 |
 
 已知语义差异（如实记录）：
 
-- 浏览翻页 / 切站：远程到底**循环**，本地**钳位**停住
-- 浏览卡片 weight：远程为连接权重求和，本地为递减启发式
-- 本地词袋对无空格中文长句匹配能力弱（近似算法的固有局限）
+- 浏览翻页 / 切站：完整**循环**，轻量**钳位**停住
+- 浏览卡片 weight：完整为连接权重求和，轻量为递减启发式
+- 轻量词袋对无空格中文长句匹配能力弱（近似算法的固有局限）
 
 ## 后端 API 一览
 

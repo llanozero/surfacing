@@ -1,5 +1,5 @@
 import { BackendAdapter } from './BackendAdapter'
-import { isRemoteMode } from '../config/backend'
+import { isProMode } from '../config/backend'
 import { cognitiveCards } from '../data/cards'
 import { allEdges, allNavNodes, navNodeMap } from '../data/allNavNodes'
 import type { CognitiveCard, NavNode, TreeNodeData } from '../data/types'
@@ -9,12 +9,12 @@ import { useTreeStore } from '../store/treeStore'
 import { useNavStore } from '../store/navStore'
 
 /**
- * 远程模式数据水合：启动时（或切换后端配置后）从 FastAPI 后端拉取
+ * pro 模式（完整模式）数据水合：启动时（或切换后端配置后）从 FastAPI 后端拉取
  * 卡片与导航节点，原地替换共享数据源并刷新各 Zustand store。
- * 本地模式或后端不可达时静默回退到内置静态数据。
+ * lite 模式（轻量模式）或后端不可达时静默回退到内置静态数据。
  */
 export async function hydrateFromBackend(): Promise<boolean> {
-  if (!isRemoteMode()) return false
+  if (!isProMode()) return false
 
   const api = BackendAdapter.getInstance()
   try {

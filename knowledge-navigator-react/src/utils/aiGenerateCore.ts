@@ -12,7 +12,7 @@ import {
  * 不可用 / 超时时降级为本地规则算法。
  */
 
-/** 生成结果：text 为生成文本，source 标注来源（用于区分本地模式） */
+/** 生成结果：text 为生成文本，source 标注来源（用于区分 lite 模式（轻量模式）） */
 export interface AiResult {
   text: string
   source: 'ai' | 'local'

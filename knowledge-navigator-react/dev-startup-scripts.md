@@ -11,8 +11,8 @@
 
 启动后访问：
 
-- 本地模式：`http://localhost:7100/`
-- 远程模式：`http://localhost:7100/?backend_mode=remote`（或管理界面 ⚙ 切换）
+- 轻量模式（lite）：`http://localhost:7100/`
+- 完整模式（pro）：`http://localhost:7100/?backend_mode=pro`（或管理界面 ⚙ 切换）
 
 ## 二、编码问题排查记录（2026-07-26）
 

@@ -25,7 +25,7 @@ function App() {
   const activeView = useViewStore((s) => s.activeView)
   const CurrentView = viewMap[activeView]
 
-  // 远程模式：启动时从后端拉取卡片/节点，水合全部视图数据
+  // pro 模式（完整模式）：启动时从后端拉取卡片/节点，水合全部视图数据
   useEffect(() => {
     void hydrateFromBackend()
   }, [])

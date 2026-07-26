@@ -51,7 +51,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     return
   }
 
-  // 读取 KN_BACKEND_MODE / KN_BACKEND_URL 环境变量（远程模式走 HTTP 后端）
+  // 读取 KN_BACKEND_MODE / KN_BACKEND_URL 环境变量（pro 模式（完整模式）走 HTTP 后端）
   initBackendConfig()
 
   const api = new KnowledgeNavigatorAPI()

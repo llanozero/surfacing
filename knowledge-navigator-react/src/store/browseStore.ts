@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import type { BrowseCard, NavNode, NextNodeRef } from '../data/types'
 import { cognitiveCards } from '../data/cards'
 import { getNavNode, allNavNodes } from '../data/allNavNodes'
-import { isRemoteMode } from '../config/backend'
+import { isProMode } from '../config/backend'
 import { BackendAdapter } from '../api/BackendAdapter'
 
 /**
@@ -81,14 +81,14 @@ interface BrowseStore {
   exitFreeBrowse: () => void
 }
 
-/** 远程模式：POST /api/browse/start 并按序列拉取首站卡片 */
+/** pro 模式：POST /api/browse/start 并按序列拉取首站卡片 */
 async function remoteStart(sequence: NavNode[]): Promise<BrowseCard[]> {
   const api = BackendAdapter.getInstance()
   await api.post('/api/browse/start', { sequence: sequence.map((n) => n.id) })
   return api.get<BrowseCard[]>('/api/browse/cards')
 }
 
-/** 远程模式：后端自由分支浏览的 API 响应类型 */
+/** pro 模式：后端自由分支浏览的 API 响应类型 */
 interface FreeBrowseRemoteResponse {
   ok: boolean
   current_node_id: string
@@ -105,7 +105,7 @@ function convertBranchNodes(items: { node_id: string; weight: number }[]): Branc
     .filter((x): x is BranchNodeItem => Boolean(x.node))
 }
 
-/** 远程模式：发起自由分支浏览请求 */
+/** pro 模式：发起自由分支浏览请求 */
 async function remoteFreeStart(nodeId: string): Promise<FreeBrowseRemoteResponse> {
   return BackendAdapter.getInstance().post<FreeBrowseRemoteResponse>(
     '/api/browse/free/start',
@@ -113,7 +113,7 @@ async function remoteFreeStart(nodeId: string): Promise<FreeBrowseRemoteResponse
   )
 }
 
-/** 远程模式：自由分支跳转请求 */
+/** pro 模式：自由分支跳转请求 */
 async function remoteFreeJump(targetId: string): Promise<FreeBrowseRemoteResponse> {
   return BackendAdapter.getInstance().post<FreeBrowseRemoteResponse>(
     `/api/browse/free/jump/${targetId}`,
@@ -136,8 +136,8 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
   initFromWaypoints: (waypoints) => {
     if (waypoints.length === 0) return
 
-    // 远程模式：会话态保存在服务端，卡片由后端派生
-    if (isRemoteMode()) {
+    // pro 模式：会话态保存在服务端，卡片由后端派生
+    if (isProMode()) {
       set({ waypoints: [...waypoints], wpIndex: 0, cards: [], currentIndex: 0 })
       void remoteStart(waypoints)
         .then((cards) => set({ cards, currentIndex: 0 }))
@@ -160,8 +160,8 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
   initFromSequence: (sequence) => {
     if (sequence.length === 0) return
 
-    // 远程模式：以节点序列启动服务端浏览会话
-    if (isRemoteMode()) {
+    // pro 模式：以节点序列启动服务端浏览会话
+    if (isProMode()) {
       set({ waypoints: [...sequence], wpIndex: 0, cards: [], currentIndex: 0 })
       void remoteStart(sequence)
         .then((cards) => set({ cards, currentIndex: 0 }))
@@ -181,8 +181,8 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
   },
 
   nextCard: () => {
-    // 远程模式：服务端推进（到底循环）
-    if (isRemoteMode()) {
+    // pro 模式：服务端推进（到底循环）
+    if (isProMode()) {
       void BackendAdapter.getInstance()
         .post<{ cardIndex: number }>('/api/browse/next')
         .then((r) => set({ currentIndex: r.cardIndex }))
@@ -194,8 +194,8 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
   },
 
   prevCard: () => {
-    // 远程模式：服务端回退（到顶循环）
-    if (isRemoteMode()) {
+    // pro 模式：服务端回退（到顶循环）
+    if (isProMode()) {
       void BackendAdapter.getInstance()
         .post<{ cardIndex: number }>('/api/browse/prev')
         .then((r) => set({ currentIndex: r.cardIndex }))
@@ -207,8 +207,8 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
   },
 
   nextWaypoint: () => {
-    // 远程模式：服务端切换站点并拉取新站卡片
-    if (isRemoteMode()) {
+    // pro 模式：服务端切换站点并拉取新站卡片
+    if (isProMode()) {
       const api = BackendAdapter.getInstance()
       void api
         .post<{ waypointIndex: number }>('/api/browse/waypoint')
@@ -228,8 +228,8 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
   },
 
   enterFreeBrowse: (startNode) => {
-    // 远程模式：调用后端 /api/browse/free/start
-    if (isRemoteMode()) {
+    // pro 模式：调用后端 /api/browse/free/start
+    if (isProMode()) {
       set({ browseMode: 'free', freeNodeId: startNode.id, freeCards: [], freePrevNodes: [], freeNextNodes: [] })
       void remoteFreeStart(startNode.id)
         .then((res) =>
@@ -260,8 +260,8 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
   },
 
   jumpToNode: (targetId) => {
-    // 远程模式：调用后端 /api/browse/free/jump/{target_id}
-    if (isRemoteMode()) {
+    // pro 模式：调用后端 /api/browse/free/jump/{target_id}
+    if (isProMode()) {
       set({ freeNodeId: targetId, freeCards: [], freePrevNodes: [], freeNextNodes: [] })
       void remoteFreeJump(targetId)
         .then((res) =>

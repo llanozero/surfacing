@@ -329,10 +329,112 @@ const TtsButton: React.FC<TtsButtonProps> = ({ text, size = 'sm' }) => {
 | 文本为空 | 按钮 disabled，后端返回 400 |
 | 文本过长（>5000 字） | 后端返回 400，前端可截断处理 |
 | 网络错误 | toast 提示"TTS 播放失败" |
-| 后端未启动（本地模式） | 本地模式下隐藏 TTS 按钮，或 toast 提示 |
+| 后端未启动（轻量模式（lite）） | 轻量模式（lite）下隐藏 TTS 按钮，或 toast 提示 |
 | 音频正在播放时再次点击 | 停止当前音频，开始新播放 |
 | 音色列表加载失败 | 下拉显示默认音色，前端内置备选列表 |
 
 ---
 
-*本文档定义了基于 edge-tts 的语音朗读功能，涵盖后端 API、前端播放、设置配置三部分。*
+## 八、TTS 功能异常排查与修复
+
+### 8.1 版本
+
+| 版本 | 日期 | 作者 | 变更说明 |
+|------|------|------|----------|
+| 1.1 | 2026-07-26 | — | TTS 功能异常排查与修复 |
+
+### 8.2 问题总览
+
+TTS 功能在轻量模式（lite）下完全不可用，用户点击设置齿轮后仅看到"TTS 需要后端支持，请先切换到完整模式（pro）"提示，无法配置音色、试听或使用 TTS 朗读功能。
+
+### 8.3 根因分析
+
+**问题 1：TtsSettingsDialog 错误地阻止轻量模式（lite）下的 TTS 使用**
+
+| 项目 | 说明 |
+|------|------|
+| 位置 | `src/components/settings/TtsSettingsDialog.tsx` |
+| 根因 | `useEffect` 中检查 `!proMode` 时提前 `return`，不加载音色列表；模板中检查 `!proMode` 时直接渲染阻断提示文字 |
+| 影响 | 轻量模式（lite）下用户完全无法使用 TTS 设置和朗读功能 |
+
+虽然 `vite.config.ts` 已配置 `/api` 代理到 `localhost:8171`，前端 `ttsPlayer.ts` 也正确使用相对路径 `/api/tts/speak`，TTS 在轻量模式（lite）下理论上可以正常工作。但 `TtsSettingsDialog` 的设计假设 TTS 仅在完整模式（pro）下可用，硬编码了模式检查。
+
+**问题 2：音色列表 API URL 逻辑冗余且错误**
+
+| 项目 | 说明 |
+|------|------|
+| 位置 | `src/components/settings/TtsSettingsDialog.tsx` 第 39-41 行 |
+| 根因 | 由于 `!proMode` 时已提前返回，到 line 39 时 `isProMode()` 必定为 `true`，三元表达式永走真分支，`/api/tts/voices` 分支永不可达 |
+| 影响 | 代码逻辑冗余，且与 `ttsPlayer.ts` 的 `apiUrl()` 模式不一致 |
+
+### 8.4 修复方案
+
+#### 修复文件：`src/components/settings/TtsSettingsDialog.tsx`
+
+**变更 1：移除轻量模式（lite）阻断，改为始终加载音色列表**
+
+移除 `useEffect` 中的 `if (!proMode) return` 提前返回逻辑，改为使用与 `ttsPlayer.ts` 一致的 URL 拼接模式：
+
+```tsx
+// 修复前（问题代码）
+useEffect(() => {
+    if (!proMode) {
+      setLoading(false)
+      return
+    }
+    const voicesUrl = isProMode()
+      ? `${getBackendConfig().baseUrl}/api/tts/voices`
+      : '/api/tts/voices'
+    fetch(voicesUrl)
+      ...
+}, [proMode])
+
+// 修复后
+useEffect(() => {
+    const voicesUrl = isProMode()
+      ? `${getBackendConfig().baseUrl}/api/tts/voices`
+      : '/api/tts/voices'
+    fetch(voicesUrl)
+      ...
+}, [])
+```
+
+> 轻量模式（lite）下 `isProMode()` 返回 false，`voicesUrl` = `'/api/tts/voices'`，通过 Vite 代理转发到后端，正常工作。
+
+**变更 2：移除模板中的模式阻断**
+
+```tsx
+// 修复前（问题代码）
+{!proMode ? (
+  <p className={styles.hint}>TTS 需要后端支持，请先切换到完整模式（pro）。</p>
+) : (
+  <div className={styles.body}>
+    {/* 音色、语速、音调、试听等设置项 */}
+  </div>
+)}
+
+// 修复后
+<div className={styles.body}>
+  {/* 音色、语速、音调、试听等设置项 */}
+</div>
+```
+
+**变更 3：移除不再使用的 `proMode` 变量**
+
+### 8.5 边界情况更新
+
+| 场景 | 行为（修订后） |
+|------|------|
+| 后端未启动（轻量模式（lite）） | 音色列表加载失败时下拉为空，TtsButton 点击后 toast 提示错误（不再阻止整个 TTS 功能入口） |
+| 轻量模式（lite） | 通过 Vite 代理正常访问后端 TTS API，功能与完整模式（pro）一致 |
+
+### 8.6 验证结果
+
+- TypeScript 编译：零错误
+- 轻量模式（lite）下 TtsSettingsDialog 正常展示并加载音色列表
+- 轻量模式（lite）下 TTS 试听功能正常
+- 完整模式（pro）下功能不受影响
+
+---
+
+*本文档定义了基于 edge-tts 的语音朗读功能，涵盖后端 API、前端播放、设置配置三部分，以及功能异常的排查与修复。*

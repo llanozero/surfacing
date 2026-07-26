@@ -4,7 +4,7 @@
 
 | 版本 | 日期 | 作者 | 变更说明 |
 |------|------|------|----------|
-| 1.0 | 2026-07-25 | — | 初始规范：定义前端本地/后端远程切换机制、多项目后端服务分配 |
+| 1.0 | 2026-07-25 | — | 初始规范：定义前端轻量/后端完整切换机制、多项目后端服务分配 |
 
 ---
 
@@ -60,21 +60,21 @@
 
 `knowledge-navigator-react` 作为纯前端子项目，所有功能当前均在前端内存中完成（Zustand Store + Utils 层）。引入后端后，需要一个**全局开关**，让前端可以自由切换：
 
-- **本地模式（local）**：沿用当前的前端实现，所有操作在浏览器内存中完成
-- **远程模式（remote）**：通过 HTTP 请求调用 Python 后端 API 完成操作
+- **轻量模式（lite）**：沿用当前的前端实现，所有操作在浏览器内存中完成
+- **完整模式（pro）**：通过 HTTP 请求调用 Python 后端 API 完成操作
 
 ### 2.2 配置定义
 
 ```typescript
 // src/config/backend.ts
 
-export type BackendMode = 'local' | 'remote'
+export type BackendMode = 'lite' | 'pro'
 
 export interface BackendConfig {
   /** 当前运行模式 */
   mode: BackendMode
 
-  /** 远程后端的基础 URL（仅 remote 模式需要） */
+  /** 完整后端的基础 URL（仅 pro 模式需要） */
   baseUrl: string
 
   /** 请求超时时间（毫秒，默认 10000） */
@@ -85,7 +85,7 @@ export interface BackendConfig {
 }
 
 export const defaultBackendConfig: BackendConfig = {
-  mode: 'local',
+  mode: 'lite',
   baseUrl: 'http://localhost:8171',  // Python 后端端口
   timeout: 10000,
   retryCount: 1,
@@ -111,8 +111,8 @@ export function setBackendConfig(partial: Partial<BackendConfig>): void {
   localStorage.setItem('kn_backend_config', JSON.stringify(_config))
 }
 
-export function isRemoteMode(): boolean {
-  return _config.mode === 'remote'
+export function isProMode(): boolean {
+  return _config.mode === 'pro'
 }
 
 /**
@@ -131,7 +131,7 @@ export function initBackendConfig(): void {
   // 2. URL 参数覆盖（最高优先级）
   const params = new URLSearchParams(window.location.search)
   const modeParam = params.get('backend_mode')
-  if (modeParam === 'local' || modeParam === 'remote') {
+  if (modeParam === 'lite' || modeParam === 'pro') {
     _config.mode = modeParam
   }
   const baseUrl = params.get('backend_url')
@@ -149,7 +149,7 @@ export function initBackendConfig(): void {
 ┌─────────────────────────────────────────────┐
 │  后端模式                                    │
 │                                             │
-│  ○ 本地模式（当前）   ● 远程模式             │
+│  ○ 轻量模式（lite）（当前）   ● 完整模式（pro）             │
 │    前端内存操作         请求 Python 后端       │
 │                                             │
 │  [后端地址] http://localhost:8171 ────────── │
@@ -160,8 +160,8 @@ export function initBackendConfig(): void {
 
 | 控件 | 说明 |
 |------|------|
-| 模式切换 Radio | `local` / `remote` 二选一 |
-| 后端地址输入框 | 仅 remote 模式可用，默认 `http://localhost:8171` |
+| 模式切换 Radio | `lite` / `pro` 二选一 |
+| 后端地址输入框 | 仅 pro 模式可用，默认 `http://localhost:8171` |
 | 测试连接按钮 | 发送 `GET /api/health` 验证连通性 |
 | 保存设置按钮 | 写入 localStorage，下次启动自动恢复 |
 
@@ -177,9 +177,9 @@ UI 组件 (React)
     ▼
 Store (Zustand)
     │
-    ├── 本地模式 → 直接操作 Utils / 共享数据源
+    ├── 轻量模式（lite）→ 直接操作 Utils / 共享数据源
     │
-    └── 远程模式 → 通过 BackendAdapter 调用 REST API
+    └── 完整模式（pro）→ 通过 BackendAdapter 调用 REST API
                        │
                        ▼
                 Python Backend (FastAPI)
@@ -193,7 +193,7 @@ Store (Zustand)
 ```typescript
 // src/api/BackendAdapter.ts
 
-import { getBackendConfig, isRemoteMode } from '../config/backend'
+import { getBackendConfig, isProMode } from '../config/backend'
 
 export class BackendAdapter {
   private static instance: BackendAdapter
@@ -280,7 +280,7 @@ export class ApiError extends Error {
 // src/api/index.ts（增强）
 
 import { BackendAdapter } from './BackendAdapter'
-import { isRemoteMode } from '../config/backend'
+import { isProMode } from '../config/backend'
 
 export class KnowledgeNavigatorAPI {
   private adapter = BackendAdapter.getInstance()
@@ -288,17 +288,17 @@ export class KnowledgeNavigatorAPI {
   // ── 示例：获取全部卡片 ──
 
   async getAllCards(): Promise<CognitiveCard[]> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return this.adapter.get<CognitiveCard[]>('/api/cards')
     }
-    // 本地模式：直接操作 Store
+    // 轻量模式（lite）：直接操作 Store
     return useCardStore.getState().allCards
   }
 
   // ── 示例：创建卡片 ──
 
   async createCard(parentId?: string): Promise<ApiResult<CognitiveCard>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       try {
         const card = await this.adapter.post<CognitiveCard>('/api/cards', { parent_id: parentId })
         return { ok: true, data: card }
@@ -314,13 +314,13 @@ export class KnowledgeNavigatorAPI {
     }
   }
 
-  // ── 示例：搜索（异步操作，远程模式自然适用） ──
+  // ── 示例：搜索（异步操作，完整模式（pro）自然适用） ──
 
   async search(query: string, mode?: MatchMode): Promise<MatchedCard[]> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return this.adapter.post<MatchedCard[]>('/api/search', { query, mode })
     }
-    // 本地模式：调用 searchStore
+    // 轻量模式（lite）：调用 searchStore
     useSearchStore.getState().setQuery(query)
     if (mode) useSearchStore.getState().setMatchMode(mode)
     return useSearchStore.getState().matchedCards
@@ -328,7 +328,7 @@ export class KnowledgeNavigatorAPI {
 }
 ```
 
-> **注意**：API 方法签名从同步改为 `async` 以兼容远程模式的异步请求。本地模式下的同步操作包装为 `Promise.resolve()` 以统一调用方。
+> **注意**：API 方法签名从同步改为 `async` 以兼容完整模式（pro）的异步请求。轻量模式（lite）下的同步操作包装为 `Promise.resolve()` 以统一调用方。
 
 ---
 
@@ -431,7 +431,7 @@ Python Backend (FastAPI, port 8171)
 
 ### 5.1 功能覆盖矩阵
 
-| 功能域 | 本地模式 | 远程模式 |
+| 功能域 | 轻量模式（lite） | 完整模式（pro） |
 |--------|----------|----------|
 | 认知卡片 CRUD | Zustand Store → data/cards.ts | `GET/POST/PUT/DELETE /api/cards` |
 | 导航节点 CRUD | Zustand Store → data/allNavNodes.ts | `GET/POST/PUT/DELETE /api/nodes` |
@@ -440,16 +440,16 @@ Python Backend (FastAPI, port 8171)
 | 路线规划 | routePlanner.ts | `POST /api/plan/generate` |
 | 浏览 | browseStore | `POST /api/browse/start` |
 | 搜索（关键词） | searchStore（前端过滤） | `POST /api/search/query` |
-| 搜索（向量） | vectorMatchUtils.ts（本地降级） | `POST /api/search/vector-match` |
+| 搜索（向量） | vectorMatchUtils.ts（轻量降级） | `POST /api/search/vector-match` |
 | YAML 导入导出 | yamlIO.ts（浏览器文件操作） | `GET /api/yaml/export` + `POST /api/yaml/import` |
-| AI 辅助生成 | aiFallback.ts（本地降级） | `POST /api/ai/generate/*` |
+| AI 辅助生成 | aiFallback.ts（轻量降级） | `POST /api/ai/generate/*` |
 | 树形管理 | treeStore + treeUtils.ts | 组合 `GET /api/cards` + `GET /api/nodes` |
 | 视图切换 | viewStore | `POST /api/view/switch` |
-| 面板控制 | panelStore | 本地处理（纯 UI 状态） |
+| 面板控制 | panelStore | 轻量处理（纯 UI 状态） |
 
-### 5.2 仅本地模式保留的功能
+### 5.2 仅轻量模式（lite）保留的功能
 
-以下功能**始终在本地处理**，不依赖后端：
+以下功能**始终在轻量处理**，不依赖后端：
 
 | 功能 | 原因 |
 |------|------|
@@ -480,19 +480,19 @@ src/
 
 ## 七、验收标准
 
-- [ ] `BackendConfig` 支持 `local` / `remote` 两种模式
+- [ ] `BackendConfig` 支持 `lite` / `pro` 两种模式
 - [ ] 模式设置有三级优先级：URL 参数 > localStorage > 默认值
 - [ ] 树形管理视图中可直观切换后端模式并配置后端地址
 - [ ] 测试连接按钮可验证后端连通性
-- [ ] 本地模式下所有功能表现与当前一致
-- [ ] 远程模式下认知卡片 CRUD 请求正确的 REST API
-- [ ] 远程模式下导航节点 CRUD 请求正确的 REST API
-- [ ] 远程模式下路线规划调用后端生成
-- [ ] 远程模式下搜索（关键词+向量）调用后端
-- [ ] 远程模式下 AI 辅助生成调用后端
-- [ ] 远程模式下 YAML 导入导出调用后端
+- [ ] 轻量模式（lite）下所有功能表现与当前一致
+- [ ] 完整模式（pro）下认知卡片 CRUD 请求正确的 REST API
+- [ ] 完整模式（pro）下导航节点 CRUD 请求正确的 REST API
+- [ ] 完整模式（pro）下路线规划调用后端生成
+- [ ] 完整模式（pro）下搜索（关键词+向量）调用后端
+- [ ] 完整模式（pro）下 AI 辅助生成调用后端
+- [ ] 完整模式（pro）下 YAML 导入导出调用后端
 - [ ] 切换模式时 UI 即时响应，无需刷新页面
-- [ ] 后端不可用时远程模式有友好的错误提示
+- [ ] 后端不可用时完整模式（pro）有友好的错误提示
 - [ ] API 错误通过 Toast 组件显示给用户
 - [ ] TypeScript 编译零错误
 - [ ] Python 后端 API 路由与前端预期一致
@@ -503,11 +503,11 @@ src/
 
 | 场景 | 行为 |
 |------|------|
-| 远程模式下后端不可用 | API 请求超时（10 秒）→ Toast "后端服务不可用，请检查连接" |
-| 远程模式切换回本地模式 | 数据从后端拉取后合并到本地，继续以本地方式运行 |
-| 本地模式下操作的数据未同步到后端 | 切换为远程模式时提示"本地数据尚未同步到后端" |
-| 远程模式下某 API 返回 404 | 前端显示 "该功能后端暂未实现" |
+| 完整模式（pro）下后端不可用 | API 请求超时（10 秒）→ Toast "后端服务不可用，请检查连接" |
+| 完整模式（pro）切换回轻量模式（lite） | 数据从后端拉取后合并到本地，继续以轻量方式运行 |
+| 轻量模式（lite）下操作的数据未同步到后端 | 切换为完整模式（pro）时提示"本地数据尚未同步到后端" |
+| 完整模式（pro）下某 API 返回 404 | 前端显示 "该功能后端暂未实现" |
 | URL 参数指定了无效的后端地址 | 测试连接失败时红色提示，禁止保存 |
 | 后端请求返回网络错误 | 自动重试 1 次后仍失败则显示错误 Toast |
-| 浏览器不支持 `fetch` 或 `AbortController` | 降级为本地模式，Console 警告 |
+| 浏览器不支持 `fetch` 或 `AbortController` | 降级为轻量模式（lite），Console 警告 |
 | 同时存在 localStorage 保存的配置和 URL 参数 | URL 参数优先 |

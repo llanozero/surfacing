@@ -36,7 +36,7 @@ import {
   aiNodeDescription,
 } from '../utils/aiGenerateCore'
 import type { RoutePlan, WaypointMode, WeightMode } from '../utils/routePlanner'
-import { isRemoteMode } from '../config/backend'
+import { isProMode } from '../config/backend'
 import { BackendAdapter, ApiError } from './BackendAdapter'
 
 // ============================================================
@@ -61,7 +61,7 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
 const enc = encodeURIComponent
 
-/** 远程错误 → 中文提示（404 视为"后端暂未实现"，网络/超时视为连接问题） */
+/** pro 错误 → 中文提示（404 视为"后端暂未实现"，网络/超时视为连接问题） */
 function remoteErrorMessage(e: unknown): string {
   if (e instanceof ApiError) {
     if (e.status === 404) return '该功能后端暂未实现'
@@ -70,7 +70,7 @@ function remoteErrorMessage(e: unknown): string {
   return '后端服务不可用，请检查连接'
 }
 
-/** 包装远程调用为 ApiResult */
+/** 包装 pro 调用为 ApiResult */
 async function remoteResult<T>(fn: () => Promise<T>): Promise<ApiResult<T>> {
   try {
     return ok(await fn())
@@ -87,8 +87,8 @@ function syncAfterConnectionMutation(): void {
 
 /**
  * Knowledge Navigator 程序化 API（async 全异步签名）。
- * 本地模式：操作 Zustand Store 与共享数据源；
- * 远程模式：通过 BackendAdapter 调用 Python FastAPI 后端（backend-architecture.md §4.2）。
+ * lite 模式（轻量模式）：操作 Zustand Store 与共享数据源；
+ * pro 模式（完整模式）：通过 BackendAdapter 调用 Python FastAPI 后端（backend-architecture.md §4.2）。
  */
 export class KnowledgeNavigatorAPI {
   private adapter = BackendAdapter.getInstance()
@@ -101,12 +101,12 @@ export class KnowledgeNavigatorAPI {
   // ============================================================
 
   async getAllCards(): Promise<CognitiveCard[]> {
-    if (isRemoteMode()) return this.adapter.get<CognitiveCard[]>('/api/cards')
+    if (isProMode()) return this.adapter.get<CognitiveCard[]>('/api/cards')
     return useCardStore.getState().allCards
   }
 
   async getCard(id: string): Promise<CognitiveCard | undefined> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       try {
         return await this.adapter.get<CognitiveCard>(`/api/cards/${enc(id)}`)
       } catch {
@@ -117,7 +117,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async getChildCards(parentId: string): Promise<CognitiveCard[]> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return this.adapter.get<CognitiveCard[]>(`/api/cards/${enc(parentId)}/children`)
     }
     const all = await this.getAllCards()
@@ -132,7 +132,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async createCard(parentId?: string): Promise<ApiResult<CognitiveCard>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(() => this.adapter.post<CognitiveCard>('/api/cards', { parent_id: parentId }))
     }
     try {
@@ -144,7 +144,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async deleteCard(id: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.delete(`/api/cards/${enc(id)}`)
         return undefined
@@ -157,7 +157,7 @@ export class KnowledgeNavigatorAPI {
 
   async updateCardField(id: string, field: string, value: unknown): Promise<ApiResult<void>> {
     if (field === 'id') return err('id 字段只读')
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.put(`/api/cards/${enc(id)}`, { [field]: value })
         return undefined
@@ -170,7 +170,7 @@ export class KnowledgeNavigatorAPI {
 
   async updateCardFields(id: string, updates: Partial<CognitiveCard>): Promise<ApiResult<void>> {
     const { id: _ignored, ...rest } = updates
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.put(`/api/cards/${enc(id)}`, rest)
         return undefined
@@ -185,7 +185,7 @@ export class KnowledgeNavigatorAPI {
 
   async addCardCorpus(id: string, text: string): Promise<ApiResult<void>> {
     if (!text.trim()) return err('语料内容不能为空')
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.post(`/api/cards/${enc(id)}/corpus`, { text })
         return undefined
@@ -197,7 +197,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async updateCardCorpus(id: string, index: number, text: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.put(`/api/cards/${enc(id)}/corpus/${index}`, { text })
         return undefined
@@ -211,7 +211,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async removeCardCorpus(id: string, index: number): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.delete(`/api/cards/${enc(id)}/corpus/${index}`)
         return undefined
@@ -224,9 +224,9 @@ export class KnowledgeNavigatorAPI {
     return ok(undefined)
   }
 
-  /** 卡片绑定节点：远程模式经整卡字段更新（后端 cards 路由无独立 bind 端点） */
+  /** 卡片绑定节点：pro 模式（完整模式）经整卡字段更新（后端 cards 路由无独立 bind 端点） */
   async addCardBoundNode(cardId: string, nodeId: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         const card = await this.adapter.get<CognitiveCard>(`/api/cards/${enc(cardId)}`)
         const bound = card.bound_nodes ?? []
@@ -243,7 +243,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async removeCardBoundNode(cardId: string, nodeId: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         const card = await this.adapter.get<CognitiveCard>(`/api/cards/${enc(cardId)}`)
         await this.adapter.put(`/api/cards/${enc(cardId)}`, {
@@ -262,12 +262,12 @@ export class KnowledgeNavigatorAPI {
   // ============================================================
 
   async getAllNavNodes(): Promise<NavNode[]> {
-    if (isRemoteMode()) return this.adapter.get<NavNode[]>('/api/nodes')
+    if (isProMode()) return this.adapter.get<NavNode[]>('/api/nodes')
     return useNavNodeStore.getState().allNodes
   }
 
   async getNavNode(id: string): Promise<NavNode | undefined> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       try {
         return await this.adapter.get<NavNode>(`/api/nodes/${enc(id)}`)
       } catch {
@@ -278,12 +278,12 @@ export class KnowledgeNavigatorAPI {
   }
 
   async searchNavNodes(query: string): Promise<NavNode[]> {
-    if (isRemoteMode()) return this.adapter.get<NavNode[]>(`/api/nodes?q=${enc(query)}`)
+    if (isProMode()) return this.adapter.get<NavNode[]>(`/api/nodes?q=${enc(query)}`)
     return filterNodes(useNavNodeStore.getState().allNodes, query)
   }
 
   async createNavNode(): Promise<ApiResult<NavNode>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(() => this.adapter.post<NavNode>('/api/nodes', {}))
     }
     try {
@@ -294,7 +294,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async deleteNavNode(id: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.delete(`/api/nodes/${enc(id)}`)
         return undefined
@@ -308,7 +308,7 @@ export class KnowledgeNavigatorAPI {
 
   async updateNavNodeField(id: string, field: string, value: unknown): Promise<ApiResult<void>> {
     if (field === 'id') return err('id 字段只读')
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.put(`/api/nodes/${enc(id)}`, { [field]: value })
         return undefined
@@ -321,7 +321,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async addNavNodeBoundCard(nodeId: string, cardId: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.post(`/api/nodes/${enc(nodeId)}/bind-card`, { card_id: cardId })
         return undefined
@@ -335,7 +335,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async removeNavNodeBoundCard(nodeId: string, cardId: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.delete(`/api/nodes/${enc(nodeId)}/bind-card/${enc(cardId)}`)
         return undefined
@@ -352,17 +352,17 @@ export class KnowledgeNavigatorAPI {
   // ============================================================
 
   async getNextNodes(nodeId: string): Promise<NextNodeItem[]> {
-    if (isRemoteMode()) return this.adapter.get<NextNodeItem[]>(`/api/nodes/${enc(nodeId)}/next`)
+    if (isProMode()) return this.adapter.get<NextNodeItem[]>(`/api/nodes/${enc(nodeId)}/next`)
     return useNavStore.getState().getNextNodes(nodeId)
   }
 
   async getPrevNodes(nodeId: string): Promise<NextNodeItem[]> {
-    if (isRemoteMode()) return this.adapter.get<NextNodeItem[]>(`/api/nodes/${enc(nodeId)}/prev`)
+    if (isProMode()) return this.adapter.get<NextNodeItem[]>(`/api/nodes/${enc(nodeId)}/prev`)
     return useNavStore.getState().getPrevNodes(nodeId)
   }
 
   async addNextNodeRef(fromId: string, ref: NextNodeRefInput): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.post(`/api/nodes/${enc(fromId)}/next`, ref)
         return undefined
@@ -390,7 +390,7 @@ export class KnowledgeNavigatorAPI {
     targetId: string,
     updates: Partial<NextNodeRefInput>,
   ): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.put(`/api/nodes/${enc(fromId)}/next/${enc(targetId)}`, updates)
         return undefined
@@ -418,7 +418,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async removeNextNodeRef(fromId: string, targetId: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.delete(`/api/nodes/${enc(fromId)}/next/${enc(targetId)}`)
         return undefined
@@ -430,7 +430,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async getConnectionStatus(fromId: string, toId: string): Promise<ConnectionStatusResult> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return this.adapter.get<ConnectionStatusResult>(
         `/api/connections/status/${enc(fromId)}/${enc(toId)}`,
       )
@@ -439,7 +439,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async ensureQuickConnection(fromId: string, toId: string): Promise<boolean> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       try {
         await this.adapter.post('/api/connections/ensure', { from_id: fromId, to_id: toId })
         return true
@@ -451,7 +451,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async fillAllMissingConnections(waypointIds: string[]): Promise<number> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       const result = await this.adapter.post<{ count: number }>('/api/connections/fill-all', {
         waypoint_ids: waypointIds,
       })
@@ -466,7 +466,7 @@ export class KnowledgeNavigatorAPI {
   // ============================================================
 
   async getAllEdges(): Promise<GraphEdge[]> {
-    if (isRemoteMode()) return this.adapter.get<GraphEdge[]>('/api/graph/edges')
+    if (isProMode()) return this.adapter.get<GraphEdge[]>('/api/graph/edges')
     return useNavStore.getState().allEdges
   }
 
@@ -499,13 +499,13 @@ export class KnowledgeNavigatorAPI {
   }
 
   async getWeightedNextNodes(nodeId: string): Promise<WeightedRef[]> {
-    if (isRemoteMode()) return this.adapter.get<WeightedRef[]>(`/api/nodes/${enc(nodeId)}/next`)
+    if (isProMode()) return this.adapter.get<WeightedRef[]>(`/api/nodes/${enc(nodeId)}/next`)
     const node = getNavNode(nodeId)
     return node ? composeWeights(node) : []
   }
 
   async syncGraphFromSource(): Promise<void> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       await this.adapter.post('/api/graph/sync')
       return
     }
@@ -526,7 +526,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async generatePlans(waypointIds?: string[]): Promise<ApiResult<RoutePlan[]>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         const plans = await this.adapter.post<RoutePlan[]>('/api/plan/generate', {
           waypoint_ids: waypointIds,
@@ -552,7 +552,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async selectPlan(planId: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.post(`/api/plan/plans/${enc(planId)}/select`)
         usePlanStore.setState({ selectedPlanId: planId })
@@ -567,13 +567,13 @@ export class KnowledgeNavigatorAPI {
   }
 
   async getAllPlans(): Promise<RoutePlan[]> {
-    if (isRemoteMode()) return this.adapter.get<RoutePlan[]>('/api/plan/plans')
+    if (isProMode()) return this.adapter.get<RoutePlan[]>('/api/plan/plans')
     return usePlanStore.getState().plans
   }
 
   async getSelectedPlan(): Promise<RoutePlan | undefined> {
     const { plans, selectedPlanId } = usePlanStore.getState()
-    if (isRemoteMode()) {
+    if (isProMode()) {
       const remotePlans = await this.getAllPlans()
       return remotePlans.find((p) => p.id === selectedPlanId)
     }
@@ -586,7 +586,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async replan(): Promise<void> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       const plans = await this.adapter.post<RoutePlan[]>('/api/plan/replan')
       usePlanStore.setState({ plans })
       return
@@ -599,7 +599,7 @@ export class KnowledgeNavigatorAPI {
   // ============================================================
 
   async initBrowseFromPlan(planId: string): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.post('/api/browse/start', { plan_id: planId })
         return undefined
@@ -613,7 +613,7 @@ export class KnowledgeNavigatorAPI {
 
   async initBrowseFromSequence(nodeIds: string[]): Promise<ApiResult<void>> {
     if (nodeIds.length === 0) return err('节点序列不能为空')
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.post('/api/browse/start', { sequence: nodeIds })
         return undefined
@@ -626,7 +626,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async getCurrentBrowseCards(): Promise<BrowseCard[]> {
-    if (isRemoteMode()) return this.adapter.get<BrowseCard[]>('/api/browse/cards')
+    if (isProMode()) return this.adapter.get<BrowseCard[]>('/api/browse/cards')
     return useBrowseStore.getState().cards
   }
 
@@ -636,13 +636,13 @@ export class KnowledgeNavigatorAPI {
     cardIndex: number
     totalCards: number
   }> {
-    if (isRemoteMode()) return this.adapter.get('/api/browse/status')
+    if (isProMode()) return this.adapter.get('/api/browse/status')
     const { wpIndex, waypoints, currentIndex, cards } = useBrowseStore.getState()
     return { waypointIndex: wpIndex, totalWaypoints: waypoints.length, cardIndex: currentIndex, totalCards: cards.length }
   }
 
   async nextCard(): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.post('/api/browse/next')
         return undefined
@@ -655,7 +655,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async prevCard(): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.post('/api/browse/prev')
         return undefined
@@ -668,7 +668,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async nextWaypoint(): Promise<ApiResult<void>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(async () => {
         await this.adapter.post('/api/browse/waypoint')
         return undefined
@@ -692,9 +692,9 @@ export class KnowledgeNavigatorAPI {
     useSearchStore.getState().setMatchMode(mode)
   }
 
-  /** 执行搜索：本地走防抖+异步匹配；远程调用 /api/search/query 并镜像结果到本地 store */
+  /** 执行搜索：本地走防抖+异步匹配；pro 调用 /api/search/query 并镜像结果到本地 store */
   async search(query: string, mode?: MatchMode): Promise<MatchedCard[]> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       const results = await this.adapter.post<MatchedCard[]>('/api/search/query', { query, mode })
       useSearchStore.setState({ query, matchedCards: results, ...(mode ? { matchMode: mode } : {}) })
       return results
@@ -728,7 +728,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async retryVectorMatch(): Promise<void> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       const query = useSearchStore.getState().query
       const results = await this.adapter.post<MatchedCard[]>('/api/search/vector-match', { query })
       useSearchStore.setState({ matchedCards: results })
@@ -746,7 +746,7 @@ export class KnowledgeNavigatorAPI {
   // ============================================================
 
   async getTreeFlatData(): Promise<TreeNodeData[]> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       const cards = await this.adapter.get<CognitiveCard[]>('/api/cards')
       return cards.map((c) => ({ id: c.id, title: c.title, type: c.type, tag: c.tag }))
     }
@@ -787,7 +787,7 @@ export class KnowledgeNavigatorAPI {
   // ============================================================
 
   async exportToYAML(): Promise<string> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       const result = await this.adapter.get<{ yaml: string } | string>('/api/yaml/export')
       return typeof result === 'string' ? result : result.yaml
     }
@@ -803,7 +803,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async parseYAML(raw: string): Promise<ApiResult<YamlData>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(() => this.adapter.post<YamlData>('/api/yaml/validate', { raw }))
     }
     const result = parseAndValidateYAML(raw, useCardStore.getState().allCards, useNavNodeStore.getState().allNodes)
@@ -814,7 +814,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async computeImportPreview(raw: string): Promise<ApiResult<ImportPreview>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(() => this.adapter.post<ImportPreview>('/api/yaml/preview', { raw }))
     }
     const parsed = await this.parseYAML(raw)
@@ -824,9 +824,9 @@ export class KnowledgeNavigatorAPI {
     )
   }
 
-  /** 执行导入合并（upsert）；本地模式同步所有 Store */
+  /** 执行导入合并（upsert）；lite 模式（轻量模式）同步所有 Store */
   async importYAML(raw: string): Promise<ApiResult<ImportPreview>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return remoteResult(() => this.adapter.post<ImportPreview>('/api/yaml/import', { raw }))
     }
     const parsed = await this.parseYAML(raw)
@@ -865,7 +865,7 @@ export class KnowledgeNavigatorAPI {
     }
   }
 
-  /** 远程 AI 生成统一入口 */
+  /** pro AI 生成统一入口 */
   private async remoteAiGenerate(endpoint: string, id: string): Promise<ApiResult<string>> {
     return remoteResult(async () => {
       const result = await this.adapter.post<{ result: string }>(`/api/ai/generate/${endpoint}`, { id })
@@ -874,7 +874,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async generateCardTitle(cardId: string): Promise<ApiResult<string>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return this.trackGeneration(() => this.remoteAiGenerate('card-title', cardId))
     }
     const card = getCard(cardId)
@@ -888,7 +888,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async generateCardDescription(cardId: string): Promise<ApiResult<string>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return this.trackGeneration(() => this.remoteAiGenerate('card-desc', cardId))
     }
     const card = getCard(cardId)
@@ -902,7 +902,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async generateNodeLabel(nodeId: string): Promise<ApiResult<string>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return this.trackGeneration(() => this.remoteAiGenerate('node-label', nodeId))
     }
     const node = getNavNode(nodeId)
@@ -916,7 +916,7 @@ export class KnowledgeNavigatorAPI {
   }
 
   async generateNodeDescription(nodeId: string): Promise<ApiResult<string>> {
-    if (isRemoteMode()) {
+    if (isProMode()) {
       return this.trackGeneration(() => this.remoteAiGenerate('node-desc', nodeId))
     }
     const node = getNavNode(nodeId)
@@ -946,10 +946,10 @@ export class KnowledgeNavigatorAPI {
   // 视图与面板
   // ============================================================
 
-  /** 切换视图：本地即时生效；远程模式同时通知后端（失败不阻塞） */
+  /** 切换视图：本地即时生效；pro 模式（完整模式）同时通知后端（失败不阻塞） */
   switchView(viewName: ViewName): void {
     useViewStore.getState().switchView(viewName)
-    if (isRemoteMode()) {
+    if (isProMode()) {
       this.adapter.post('/api/view/switch', { view: viewName }).catch(() => {
         /* 后端视图同步失败不阻塞本地切换 */
       })

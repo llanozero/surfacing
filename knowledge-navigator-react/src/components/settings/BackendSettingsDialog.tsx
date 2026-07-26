@@ -13,7 +13,8 @@ type TestState = 'idle' | 'testing' | 'ok' | 'fail'
 
 /**
  * 后端设置对话框（backend-architecture.md §二）。
- * 本地模式：前端内存操作；远程模式：请求 Python FastAPI 后端。
+ * lite 模式（轻量）：纯前端操作，不依赖后端服务；
+ * pro 模式（完整）：通过 HTTP 请求调用 Python FastAPI 后端完成全部数据操作。
  * 保存后写入 localStorage（优先级低于 URL 参数）。
  */
 const BackendSettingsDialog: React.FC<BackendSettingsDialogProps> = ({ onClose }) => {
@@ -55,10 +56,10 @@ const BackendSettingsDialog: React.FC<BackendSettingsDialogProps> = ({ onClose }
   const handleSave = () => {
     const url = baseUrl.trim().replace(/\/+$/, '')
     setBackendConfig({ mode, baseUrl: url || initial.baseUrl })
-    toast(mode === 'remote' ? `已切换为远程模式（${url || initial.baseUrl}）` : '已切换为本地模式')
+    toast(mode === 'pro' ? `已切换为完整模式（${url || initial.baseUrl}）` : '已切换为轻量模式')
     onClose()
-    // 切换到远程模式后立即从后端水合数据，无需刷新页面
-    if (mode === 'remote') void hydrateFromBackend()
+    // 切换到 pro 模式后立即从后端水合数据，无需刷新页面
+    if (mode === 'pro') void hydrateFromBackend()
   }
 
   return createPortal(
@@ -68,27 +69,27 @@ const BackendSettingsDialog: React.FC<BackendSettingsDialogProps> = ({ onClose }
 
         <div className={styles.body}>
           <div className={styles.modeGroup}>
-            <label className={`${styles.modeOption} ${mode === 'local' ? styles.modeOptionActive : ''}`}>
+            <label className={`${styles.modeOption} ${mode === 'lite' ? styles.modeOptionActive : ''}`}>
               <input
                 type="radio"
                 name="backend-mode"
-                checked={mode === 'local'}
-                onChange={() => setMode('local')}
+                checked={mode === 'lite'}
+                onChange={() => setMode('lite')}
               />
               <span className={styles.modeText}>
-                <span className={styles.modeName}>本地模式（默认）</span>
+                <span className={styles.modeName}>轻量模式（lite，默认）</span>
                 <span className={styles.modeDesc}>数据保存在浏览器内存中，刷新后恢复为内置数据</span>
               </span>
             </label>
-            <label className={`${styles.modeOption} ${mode === 'remote' ? styles.modeOptionActive : ''}`}>
+            <label className={`${styles.modeOption} ${mode === 'pro' ? styles.modeOptionActive : ''}`}>
               <input
                 type="radio"
                 name="backend-mode"
-                checked={mode === 'remote'}
-                onChange={() => setMode('remote')}
+                checked={mode === 'pro'}
+                onChange={() => setMode('pro')}
               />
               <span className={styles.modeText}>
-                <span className={styles.modeName}>远程模式</span>
+                <span className={styles.modeName}>完整模式（pro）</span>
                 <span className={styles.modeDesc}>连接 Python FastAPI 后端，数据持久化在服务端</span>
               </span>
             </label>
@@ -101,7 +102,7 @@ const BackendSettingsDialog: React.FC<BackendSettingsDialogProps> = ({ onClose }
                 className={styles.urlInput}
                 type="text"
                 value={baseUrl}
-                disabled={mode === 'local'}
+                disabled={mode === 'lite'}
                 placeholder="http://localhost:8171"
                 onChange={(e) => {
                   setBaseUrl(e.target.value)
@@ -111,7 +112,7 @@ const BackendSettingsDialog: React.FC<BackendSettingsDialogProps> = ({ onClose }
               />
               <button
                 className={styles.testBtn}
-                disabled={mode === 'local' || testState === 'testing'}
+                disabled={mode === 'lite' || testState === 'testing'}
                 onClick={handleTest}
               >
                 {testState === 'testing' ? '测试中…' : '测试连接'}
@@ -122,7 +123,7 @@ const BackendSettingsDialog: React.FC<BackendSettingsDialogProps> = ({ onClose }
           </div>
 
           <p className={styles.hint}>
-            也可以通过 URL 参数临时切换：<code>?backend_mode=remote&backend_url=http://localhost:8171</code>
+            也可以通过 URL 参数临时切换：<code>?backend_mode=pro&backend_url=http://localhost:8171</code>
             （URL 参数优先级高于此处保存的设置）
           </p>
         </div>

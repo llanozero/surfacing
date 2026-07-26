@@ -1,6 +1,6 @@
 import type { CognitiveCard } from '../data/types'
 import type { MatchedCard } from '../store/searchStore'
-import { isRemoteMode } from '../config/backend'
+import { isProMode } from '../config/backend'
 import { BackendAdapter } from '../api/BackendAdapter'
 
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
@@ -32,13 +32,13 @@ function localFallback(query: string, cards: CognitiveCard[]): MatchedCard[] {
 
 /**
  * 向量模型匹配（spec §4.1）双模式：
- * - 远程模式：POST /api/search/vector-match，由后端调 LM Studio
+ * - pro 模式（完整模式）：POST /api/search/vector-match，由后端调 LM Studio
  *   qwen3-embedding 做余弦相似度语义匹配（后端不可用时自身降级关键词）；
- * - 本地模式：本地词袋重叠率近似，零网络请求；
- * - 远程调用失败时同样回退本地词袋，保证界面可用。
+ * - lite 模式（轻量模式）：本地词袋重叠率近似，零网络请求；
+ * - pro 模式下调用失败时同样回退本地词袋，保证界面可用。
  */
 export async function vectorMatch(query: string, cards: CognitiveCard[]): Promise<MatchedCard[]> {
-  if (isRemoteMode()) {
+  if (isProMode()) {
     try {
       const data = await BackendAdapter.getInstance().post<
         { card: CognitiveCard; score: number }[]

@@ -5,6 +5,7 @@ import { allNavNodes } from '../data/allNavNodes'
 import { deriveParent } from '../utils/treeUtils'
 import { useTreeStore } from './treeStore'
 import { useNavNodeStore } from './navNodeStore'
+import { wtCreateCard, wtDeleteCard, wtUpdateCard } from '../api/writeThrough'
 
 interface CardStore {
   /** 全部认知卡片（与 data/cards 共享数据源，编辑即时同步） */
@@ -37,6 +38,9 @@ interface CardStore {
 function commitToSource(updated: CognitiveCard, allCards: CognitiveCard[]) {
   const idx = cognitiveCards.findIndex((c) => c.id === updated.id)
   if (idx >= 0) cognitiveCards[idx] = updated
+
+  // 远程模式：同步到后端（火忘，失败仅告警）
+  wtUpdateCard(updated)
 
   const treeStore = useTreeStore.getState()
   useTreeStore.setState({
@@ -81,6 +85,8 @@ export const useCardStore = create<CardStore>((set, get) => {
       // 写回共享数据源
       cognitiveCards.push(newCard)
       set({ allCards: [...allCards, newCard] })
+      // 远程模式：同步到后端
+      wtCreateCard(newCard)
       // 同步树形视图扁平数据
       const treeStore = useTreeStore.getState()
       useTreeStore.setState({
@@ -104,6 +110,8 @@ export const useCardStore = create<CardStore>((set, get) => {
       const idx = cognitiveCards.findIndex((c) => c.id === id)
       if (idx >= 0) cognitiveCards.splice(idx, 1)
       set({ allCards: allCards.filter((c) => c.id !== id) })
+      // 远程模式：同步到后端（后端级联清理节点 bound_cards）
+      wtDeleteCard(id)
 
       // 清理导航节点 bound_cards 中的引用（原地过滤，所有读取方即时一致）
       allNavNodes.forEach((n) => {

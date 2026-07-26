@@ -5,6 +5,7 @@ import { cognitiveCards } from '../data/cards'
 import { useNavStore } from './navStore'
 import { usePanelStore } from './panelStore'
 import { useCardStore } from './cardStore'
+import { wtCreateNode, wtDeleteNode, wtUpdateNode } from '../api/writeThrough'
 
 export type SubTab = 'cards' | 'nodes'
 
@@ -43,6 +44,8 @@ function commitToSource(updated: NavNode) {
   const idx = allNavNodes.findIndex((n) => n.id === updated.id)
   if (idx >= 0) allNavNodes[idx] = updated
   navNodeMap.set(updated.id, updated)
+  // 远程模式：同步到后端（火忘，失败仅告警）
+  wtUpdateNode(updated)
 }
 
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
@@ -95,6 +98,8 @@ export const useNavNodeStore = create<NavNodeStore>((set, get) => {
       allNavNodes.push(newNode)
       navNodeMap.set(newNode.id, newNode)
       set({ allNodes: [...allNavNodes], selectedNodeId: newNode.id })
+      // 远程模式：同步到后端
+      wtCreateNode(newNode)
       // 导航画布数据源同步（边集不变，但节点列表更新）
       useNavStore.getState().syncFromSource()
       return newNode
@@ -109,6 +114,8 @@ export const useNavNodeStore = create<NavNodeStore>((set, get) => {
       // 共享数据源移除
       allNavNodes.splice(idx, 1)
       navNodeMap.delete(selectedNodeId)
+      // 远程模式：同步到后端（后端级联清理连接与卡片绑定）
+      wtDeleteNode(selectedNodeId)
 
       // 级联清理：其他节点的出向连接与浏览记录
       allNavNodes.forEach((n) => {

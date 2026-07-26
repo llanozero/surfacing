@@ -1,15 +1,12 @@
 import type { CognitiveCard } from '../data/types'
 import type { MatchedCard } from '../store/searchStore'
-
-export interface VectorMatchResult {
-  index: number
-  similarity: number
-}
+import { isRemoteMode } from '../config/backend'
+import { BackendAdapter } from '../api/BackendAdapter'
 
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
 
 /**
- * 降级策略（spec §3.3）：后端向量模型不可用时的词袋重叠率近似。
+ * 降级策略（spec §3.3）：向量模型不可用时的词袋重叠率近似。
  * 仅为开发/演示占位，生产环境应替换为真实向量模型 API。
  */
 export function fallbackVectorMatch(query: string, card: CognitiveCard): number {
@@ -25,36 +22,34 @@ export function fallbackVectorMatch(query: string, card: CognitiveCard): number 
   return intersection.length / Math.max(qWords.size, 1)
 }
 
+/** 本地词袋降级结果（按相似度降序） */
+function localFallback(query: string, cards: CognitiveCard[]): MatchedCard[] {
+  return cards
+    .map((card) => ({ card, score: fallbackVectorMatch(query, card) }))
+    .filter((m) => m.score > 0)
+    .sort((a, b) => b.score - a.score)
+}
+
 /**
- * 向量模型匹配（spec §4.1）：
- * 1. 优先调用后端 POST /api/vector-match
- * 2. 失败（后端未部署 / 超时）时降级为 fallbackVectorMatch
- * 返回按相似度降序的 MatchedCard[]
+ * 向量模型匹配（spec §4.1）双模式：
+ * - 远程模式：POST /api/search/vector-match，由后端调 LM Studio
+ *   qwen3-embedding 做余弦相似度语义匹配（后端不可用时自身降级关键词）；
+ * - 本地模式：本地词袋重叠率近似，零网络请求；
+ * - 远程调用失败时同样回退本地词袋，保证界面可用。
  */
 export async function vectorMatch(query: string, cards: CognitiveCard[]): Promise<MatchedCard[]> {
-  const corpora = cards.map((c) => [c.title, c.description ?? '', ...c.corpus].join('\n'))
-
-  try {
-    const ctrl = new AbortController()
-    const timer = setTimeout(() => ctrl.abort(), 5000)
-    const res = await fetch('/api/vector-match', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, corpora }),
-      signal: ctrl.signal,
-    })
-    clearTimeout(timer)
-    if (!res.ok) throw new Error(`vector-match API ${res.status}`)
-    const data = (await res.json()) as { scores: VectorMatchResult[] }
-    return data.scores
-      .filter((s) => s.index >= 0 && s.index < cards.length && s.similarity > 0)
-      .map((s) => ({ card: cards[s.index], score: clamp01(s.similarity) }))
-      .sort((a, b) => b.score - a.score)
-  } catch {
-    // 降级：本地词袋重叠近似
-    return cards
-      .map((card) => ({ card, score: fallbackVectorMatch(query, card) }))
-      .filter((m) => m.score > 0)
-      .sort((a, b) => b.score - a.score)
+  if (isRemoteMode()) {
+    try {
+      const data = await BackendAdapter.getInstance().post<
+        { card: CognitiveCard; score: number }[]
+      >('/api/search/vector-match', { query })
+      return data
+        .filter((m) => m.score > 0)
+        .map((m) => ({ card: m.card, score: clamp01(m.score) }))
+        .sort((a, b) => b.score - a.score)
+    } catch (e) {
+      console.warn('[search] 后端向量匹配失败，回退本地词袋近似：', e)
+    }
   }
+  return localFallback(query, cards)
 }

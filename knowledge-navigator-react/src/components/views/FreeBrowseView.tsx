@@ -19,7 +19,6 @@ const FreeBrowseView: React.FC = () => {
     exitFreeBrowse,
   } = useBrowseStore()
   const setCurrentNode = useNavStore((s) => s.setCurrentNode)
-  const setSelectedNode = useNavStore((s) => s.setSelectedNode)
   const addWaypoint = useNavStore((s) => s.addWaypoint)
   const switchView = useViewStore((s) => s.switchView)
   const toast = useToastStore((s) => s.show)
@@ -36,10 +35,9 @@ const FreeBrowseView: React.FC = () => {
     (targetId: string) => {
       jumpToNode(targetId)
       setCurrentNode(targetId)
-      setSelectedNode(targetId)
       setCardIndex(0)
     },
-    [jumpToNode, setCurrentNode, setSelectedNode],
+    [jumpToNode, setCurrentNode],
   )
 
   const handleAddWaypoint = useCallback(() => {
@@ -51,9 +49,8 @@ const FreeBrowseView: React.FC = () => {
   const handleSetCurrentNode = useCallback(() => {
     if (!currentNode) return
     setCurrentNode(currentNode.id)
-    setSelectedNode(currentNode.id)
     toast(`当前节点已设为「${currentNode.label}」`)
-  }, [currentNode, setCurrentNode, setSelectedNode, toast])
+  }, [currentNode, setCurrentNode, toast])
 
   if (!currentNode) {
     return (

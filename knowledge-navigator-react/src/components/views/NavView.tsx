@@ -29,13 +29,11 @@ const NavView: React.FC = () => {
 
   const mode = useNavStore((s) => s.mode)
   const currentNodeId = useNavStore((s) => s.currentNodeId)
-  const selectedNodeId = useNavStore((s) => s.selectedNodeId)
   const allNavNodes = useNavStore((s) => s.allNavNodes)
   const allEdges = useNavStore((s) => s.allEdges)
   const waypoints = useNavStore((s) => s.waypoints)
   const setMode = useNavStore((s) => s.setMode)
   const setCurrentNode = useNavStore((s) => s.setCurrentNode)
-  const setSelectedNode = useNavStore((s) => s.setSelectedNode)
   const getNextNodes = useNavStore((s) => s.getNextNodes)
   const getPrevNodes = useNavStore((s) => s.getPrevNodes)
   const removeWaypoint = useNavStore((s) => s.removeWaypoint)
@@ -64,12 +62,10 @@ const NavView: React.FC = () => {
     toast(count > 0 ? `已建立 ${count} 条跳转连接` : '所有相邻途经点均已连接')
   }
 
-  // 点击分流（spec §4.2）：逐站模式切换中心节点；全览模式更新选中高亮
+  // 点击节点：全览/逐站统一更新同一个 currentNodeId
   const handleNodeClick = (node: NavNode) => {
     setPanelNode(node)
-    // ★ 两字段同步：全览/逐站共享选中节点
     setCurrentNode(node.id)
-    setSelectedNode(node.id)
   }
 
   const { zoomIn, zoomOut, zoomReset } = useNavCanvas(
@@ -82,7 +78,7 @@ const NavView: React.FC = () => {
       prevNodes: currentNode ? getPrevNodes(currentNode.id) : [],
       nextNodes: currentNode ? getNextNodes(currentNode.id) : [],
       waypointIds: new Set(waypoints.map((w) => w.id)),
-      selectedNodeId,
+      selectedNodeId: currentNodeId,
     },
     { onNodeClick: handleNodeClick },
   )
@@ -97,7 +93,6 @@ const NavView: React.FC = () => {
     if (waypoints.length === 0) return
     const startNode = waypoints[0]
     setCurrentNode(startNode.id)
-    setSelectedNode(startNode.id)
     enterFreeBrowse(startNode)
     switchView('free-browse')
   }

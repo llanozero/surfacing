@@ -19,9 +19,8 @@ export interface NextNodeItem {
 
 interface NavStore {
   mode: NavMode
+  /** 当前选中/中心的导航节点（全览高亮 + 逐站锚点合一） */
   currentNodeId: string
-  /** 全览视图中当前点击选中的节点 id（三态样式：普通/途经点/选中） */
-  selectedNodeId: string | null
   allNavNodes: NavNode[]
   allEdges: GraphEdge[]
   waypoints: NavNode[]
@@ -30,7 +29,6 @@ interface NavStore {
   init: (nodeId: string, mode?: NavMode) => void
   setMode: (m: NavMode) => void
   setCurrentNode: (nodeId: string) => void
-  setSelectedNode: (nodeId: string | null) => void
   addWaypoint: (node: NavNode) => void
   removeWaypoint: (index: number) => void
   clearWaypoints: () => void
@@ -47,7 +45,6 @@ interface NavStore {
 export const useNavStore = create<NavStore>((set, get) => ({
   mode: 'overview',
   currentNodeId: 'node-ml-foundation',
-  selectedNodeId: null,
   allNavNodes,
   allEdges,
   waypoints: [],
@@ -63,8 +60,6 @@ export const useNavStore = create<NavStore>((set, get) => ({
   setCurrentNode: (nodeId) => {
     if (getNavNode(nodeId)) set({ currentNodeId: nodeId })
   },
-
-  setSelectedNode: (nodeId) => set({ selectedNodeId: nodeId }),
 
   addWaypoint: (node) => {
     // 允许重复（同一节点可多次经过）

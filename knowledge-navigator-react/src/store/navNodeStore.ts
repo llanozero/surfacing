@@ -137,7 +137,6 @@ export const useNavNodeStore = create<NavNodeStore>((set, get) => {
       const nav = useNavStore.getState()
       useNavStore.setState({
         waypoints: nav.waypoints.filter((w) => w.id !== selectedNodeId),
-        ...(nav.selectedNodeId === selectedNodeId ? { selectedNodeId: null } : {}),
         ...(nav.currentNodeId === selectedNodeId
           ? { currentNodeId: allNavNodes[0]?.id ?? '' }
           : {}),

@@ -59,10 +59,16 @@
   flex-direction: column;
   gap: 6px;
 }
+.headRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .nodeLabel {
   font-size: 17px;
   font-weight: 600;
   color: var(--label-primary);
+  margin: 0;
 }
 .nodeDesc {
   font-size: 13px;

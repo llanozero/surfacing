@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from './DropDownPanel.module.css'
 import Button from '../shared/Button'
+import TtsButton from '../shared/TtsButton'
 import { usePanelStore } from '../../store/panelStore'
 import { useNavStore } from '../../store/navStore'
 import { useNavNodeStore } from '../../store/navNodeStore'
@@ -71,7 +72,10 @@ const DropDownPanel: React.FC = () => {
       ) : (
         <div className={styles.content}>
           <div className={styles.head}>
-            <h3 className={styles.nodeLabel}>{node.label}</h3>
+            <div className={styles.headRow}>
+              <h3 className={styles.nodeLabel}>{node.label}</h3>
+              {node.description && <TtsButton text={node.description} size="sm" />}
+            </div>
             <p className={styles.nodeDesc}>{node.description}</p>
             <div className={styles.stats}>
               <span className={styles.stat}>绑定卡片 {boundCards.length}</span>

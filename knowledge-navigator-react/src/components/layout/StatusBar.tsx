@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styles from './StatusBar.module.css'
+import TtsSettingsDialog from '../settings/TtsSettingsDialog'
 
 const StatusBar: React.FC = () => {
   const [time, setTime] = React.useState('')
+  const [ttsOpen, setTtsOpen] = useState(false)
 
   React.useEffect(() => {
     const update = () => {
@@ -19,6 +21,14 @@ const StatusBar: React.FC = () => {
       <span className={styles.time}>{time}</span>
       <span className={styles.title}>认知导航</span>
       <span className={styles.spacer} />
+      <button
+        className={styles.ttsBtn}
+        onClick={() => setTtsOpen(true)}
+        title="TTS 语音设置"
+      >
+        ⚙
+      </button>
+      {ttsOpen && <TtsSettingsDialog onClose={() => setTtsOpen(false)} />}
     </header>
   )
 }

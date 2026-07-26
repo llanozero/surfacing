@@ -1,0 +1,43 @@
+.btn {
+  background: none;
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: 6px;
+  cursor: pointer;
+  color: #06b6d4;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: var(--font-sans);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.btn:hover {
+  background: rgba(6, 182, 212, 0.12);
+  border-color: rgba(6, 182, 212, 0.4);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.sm {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+}
+
+.md {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 14px;
+}
+
+.active {
+  background: rgba(6, 182, 212, 0.18);
+  border-color: rgba(6, 182, 212, 0.5);
+}

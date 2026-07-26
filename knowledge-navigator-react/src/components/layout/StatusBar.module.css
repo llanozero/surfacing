@@ -29,3 +29,18 @@
 .spacer {
   min-width: 48px;
 }
+
+.ttsBtn {
+  background: none;
+  border: none;
+  color: var(--label-tertiary);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  line-height: 1;
+}
+.ttsBtn:hover {
+  color: var(--label-primary);
+  background: rgba(255, 255, 255, 0.06);
+}

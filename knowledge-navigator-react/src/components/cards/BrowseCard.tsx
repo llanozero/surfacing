@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import type { BrowseCard as BrowseCardData } from '../../data/types'
+import TtsButton from '../shared/TtsButton'
 import styles from './BrowseCard.module.css'
 
 interface BrowseCardProps {
@@ -39,7 +40,10 @@ const BrowseCard: React.FC<BrowseCardProps> = ({ data, layer }) => {
     <div className={`${styles.card} ${styles.layer0}`}>
       <div className={styles.bar} />
       <div className={styles.bodyScroll}>
-        <h2 className={styles.title}>{data.title}</h2>
+        <div className={styles.titleRow}>
+          <h2 className={styles.title}>{data.title}</h2>
+          <TtsButton text={`${data.title}。${data.desc}`} size="sm" />
+        </div>
         <p className={styles.desc}>{data.desc}</p>
 
         <div className={styles.chips}>

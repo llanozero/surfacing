@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import styles from './FreeBrowseView.module.css'
 import Button from '../shared/Button'
+import TtsButton from '../shared/TtsButton'
 import CardStack from '../cards/CardStack'
 import SwipeHint from '../cards/SwipeHint'
 import { useBrowseStore, type BranchNodeItem } from '../../store/browseStore'
@@ -80,7 +81,15 @@ const FreeBrowseView: React.FC = () => {
 
       {/* 节点标题与描述 */}
       <div className={styles.nodeHeader}>
-        <h2 className={styles.nodeTitle}>{currentNode.label}</h2>
+        <div className={styles.nodeTitleRow}>
+          <h2 className={styles.nodeTitle}>{currentNode.label}</h2>
+          <TtsButton
+            text={(currentNode.description
+              ? `${currentNode.label}。${currentNode.description}`
+              : currentNode.label)}
+            size="md"
+          />
+        </div>
         {currentNode.description && (
           <p className={styles.nodeDesc}>{currentNode.description}</p>
         )}

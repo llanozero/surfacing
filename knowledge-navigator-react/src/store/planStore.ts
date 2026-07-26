@@ -6,6 +6,8 @@ import {
   type WaypointMode,
   type WeightMode,
 } from '../utils/routePlanner'
+import { isRemoteMode } from '../config/backend'
+import { BackendAdapter } from '../api/BackendAdapter'
 
 interface PlanStore {
   sourceWaypoints: NavNode[]
@@ -32,6 +34,22 @@ function defaultSelection(plans: RoutePlan[]): string | null {
   return plans.find((p) => p.isRecommended)?.id ?? plans[0]?.id ?? null
 }
 
+/**
+ * 远程模式：调用后端 /api/plan/*（Python 镜像算法，结果形状与 RoutePlan 一致）。
+ * 失败时回退本地算法，保证界面可用。
+ */
+async function remoteGenerate(
+  waypointIds: string[],
+  waypointMode: WaypointMode,
+  weightMode: WeightMode,
+): Promise<RoutePlan[]> {
+  return BackendAdapter.getInstance().post<RoutePlan[]>('/api/plan/generate', {
+    waypoint_ids: waypointIds,
+    waypoint_mode: waypointMode,
+    weight_mode: weightMode,
+  })
+}
+
 export const usePlanStore = create<PlanStore>((set, get) => ({
   sourceWaypoints: [],
   waypointMode: 'unordered',
@@ -43,6 +61,27 @@ export const usePlanStore = create<PlanStore>((set, get) => ({
     if (get().waypointMode === mode) return
     const { sourceWaypoints, weightMode, plans, selectedPlanId } = get()
     const prevSeq = plans.find((p) => p.id === selectedPlanId)?.sequence.map((n) => n.id).join('>')
+
+    // 远程模式：后端重算（generate 会覆盖服务端会话的模式状态）
+    if (isRemoteMode() && sourceWaypoints.length > 0) {
+      const ids = sourceWaypoints.map((n) => n.id)
+      void remoteGenerate(ids, mode, weightMode)
+        .then((remotePlans) => {
+          let selected = defaultSelection(remotePlans)
+          if (prevSeq) {
+            const same = remotePlans.find((p) => p.sequence.map((n) => n.id).join('>') === prevSeq)
+            if (same) selected = same.id
+          }
+          set({ waypointMode: mode, plans: remotePlans, selectedPlanId: selected })
+        })
+        .catch((e) => {
+          console.warn('[plan] 后端规划失败，回退本地算法：', e)
+          const output = generateRoutePlans(sourceWaypoints, weightMode, mode)
+          set({ waypointMode: mode, plans: output.plans, selectedPlanId: defaultSelection(output.plans) })
+        })
+      return
+    }
+
     const output = generateRoutePlans(sourceWaypoints, weightMode, mode)
     // 选中保持：相同序列在新列表中仍存在则保持选中（spec §2.3）
     let selected = defaultSelection(output.plans)
@@ -62,6 +101,21 @@ export const usePlanStore = create<PlanStore>((set, get) => ({
 
   generatePlans: (waypoints, weightMode) => {
     // 每次重新进入：重置为默认无序模式（spec §九 边界情况）
+    // 远程模式：途经点先落库（界面立即有上下文），计划由后端异步生成
+    if (isRemoteMode() && waypoints.length > 0) {
+      set({ sourceWaypoints: [...waypoints], weightMode, waypointMode: 'unordered' })
+      void remoteGenerate(waypoints.map((n) => n.id), 'unordered', weightMode)
+        .then((remotePlans) => {
+          set({ plans: remotePlans, selectedPlanId: defaultSelection(remotePlans) })
+        })
+        .catch((e) => {
+          console.warn('[plan] 后端规划失败，回退本地算法：', e)
+          const output = generateRoutePlans(waypoints, weightMode, 'unordered')
+          set({ plans: output.plans, selectedPlanId: defaultSelection(output.plans) })
+        })
+      return
+    }
+
     const output = generateRoutePlans(waypoints, weightMode, 'unordered')
     set({
       sourceWaypoints: [...waypoints],
@@ -72,10 +126,34 @@ export const usePlanStore = create<PlanStore>((set, get) => ({
     })
   },
 
-  selectPlan: (id) => set({ selectedPlanId: id }),
+  selectPlan: (id) => {
+    set({ selectedPlanId: id })
+    // 远程模式：同步服务端会话选中态（火忘，浏览以 sequence 启动不依赖它）
+    if (isRemoteMode()) {
+      void BackendAdapter.getInstance()
+        .post(`/api/plan/plans/${id}/select`)
+        .catch((e) => console.warn('[plan] 选中计划同步后端失败：', e))
+    }
+  },
 
   replan: () => {
     const { sourceWaypoints, weightMode, waypointMode } = get()
+
+    // 远程模式：服务端按会话态（途经点 + 两种模式）重算
+    if (isRemoteMode() && sourceWaypoints.length > 0) {
+      void BackendAdapter.getInstance()
+        .post<RoutePlan[]>('/api/plan/replan')
+        .then((remotePlans) => {
+          set({ plans: remotePlans, selectedPlanId: defaultSelection(remotePlans) })
+        })
+        .catch((e) => {
+          console.warn('[plan] 后端重规划失败，回退本地算法：', e)
+          const output = generateRoutePlans(sourceWaypoints, weightMode, waypointMode)
+          set({ plans: output.plans, selectedPlanId: defaultSelection(output.plans) })
+        })
+      return
+    }
+
     const output = generateRoutePlans(sourceWaypoints, weightMode, waypointMode)
     set({ plans: output.plans, selectedPlanId: defaultSelection(output.plans) })
   },

@@ -2,6 +2,8 @@ import { create } from 'zustand'
 import type { BrowseCard, NavNode } from '../data/types'
 import { cognitiveCards } from '../data/cards'
 import { getNavNode } from '../data/allNavNodes'
+import { isRemoteMode } from '../config/backend'
+import { BackendAdapter } from '../api/BackendAdapter'
 
 /**
  * 由途径点的 bound_cards 派生浏览卡片：
@@ -39,6 +41,13 @@ interface BrowseStore {
   nextWaypoint: () => void
 }
 
+/** 远程模式：POST /api/browse/start 并按序列拉取首站卡片 */
+async function remoteStart(sequence: NavNode[]): Promise<BrowseCard[]> {
+  const api = BackendAdapter.getInstance()
+  await api.post('/api/browse/start', { sequence: sequence.map((n) => n.id) })
+  return api.get<BrowseCard[]>('/api/browse/cards')
+}
+
 export const useBrowseStore = create<BrowseStore>((set, get) => ({
   waypoints: [],
   wpIndex: 0,
@@ -47,6 +56,19 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
 
   initFromWaypoints: (waypoints) => {
     if (waypoints.length === 0) return
+
+    // 远程模式：会话态保存在服务端，卡片由后端派生
+    if (isRemoteMode()) {
+      set({ waypoints: [...waypoints], wpIndex: 0, cards: [], currentIndex: 0 })
+      void remoteStart(waypoints)
+        .then((cards) => set({ cards, currentIndex: 0 }))
+        .catch((e) => {
+          console.warn('[browse] 后端浏览启动失败，回退本地派生：', e)
+          set({ cards: cardsForWaypoint(waypoints[0]), currentIndex: 0 })
+        })
+      return
+    }
+
     set({
       waypoints: [...waypoints],
       wpIndex: 0,
@@ -58,6 +80,19 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
   // 按规划后的节点序列初始化（spec §4.6，逻辑与 initFromWaypoints 一致）
   initFromSequence: (sequence) => {
     if (sequence.length === 0) return
+
+    // 远程模式：以节点序列启动服务端浏览会话
+    if (isRemoteMode()) {
+      set({ waypoints: [...sequence], wpIndex: 0, cards: [], currentIndex: 0 })
+      void remoteStart(sequence)
+        .then((cards) => set({ cards, currentIndex: 0 }))
+        .catch((e) => {
+          console.warn('[browse] 后端浏览启动失败，回退本地派生：', e)
+          set({ cards: cardsForWaypoint(sequence[0]), currentIndex: 0 })
+        })
+      return
+    }
+
     set({
       waypoints: [...sequence],
       wpIndex: 0,
@@ -67,16 +102,45 @@ export const useBrowseStore = create<BrowseStore>((set, get) => ({
   },
 
   nextCard: () => {
+    // 远程模式：服务端推进（到底循环）
+    if (isRemoteMode()) {
+      void BackendAdapter.getInstance()
+        .post<{ cardIndex: number }>('/api/browse/next')
+        .then((r) => set({ currentIndex: r.cardIndex }))
+        .catch((e) => console.warn('[browse] next 同步失败：', e))
+      return
+    }
     const { currentIndex, cards } = get()
     if (currentIndex < cards.length - 1) set({ currentIndex: currentIndex + 1 })
   },
 
   prevCard: () => {
+    // 远程模式：服务端回退（到顶循环）
+    if (isRemoteMode()) {
+      void BackendAdapter.getInstance()
+        .post<{ cardIndex: number }>('/api/browse/prev')
+        .then((r) => set({ currentIndex: r.cardIndex }))
+        .catch((e) => console.warn('[browse] prev 同步失败：', e))
+      return
+    }
     const { currentIndex } = get()
     if (currentIndex > 0) set({ currentIndex: currentIndex - 1 })
   },
 
   nextWaypoint: () => {
+    // 远程模式：服务端切换站点并拉取新站卡片
+    if (isRemoteMode()) {
+      const api = BackendAdapter.getInstance()
+      void api
+        .post<{ waypointIndex: number }>('/api/browse/waypoint')
+        .then((r) =>
+          api.get<BrowseCard[]>('/api/browse/cards').then((cards) => {
+            set({ wpIndex: r.waypointIndex, cards, currentIndex: 0 })
+          }),
+        )
+        .catch((e) => console.warn('[browse] 切换站点失败：', e))
+      return
+    }
     const { wpIndex, waypoints } = get()
     if (wpIndex < waypoints.length - 1) {
       const next = wpIndex + 1

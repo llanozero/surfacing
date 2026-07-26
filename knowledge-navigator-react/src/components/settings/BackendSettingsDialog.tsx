@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { getBackendConfig, setBackendConfig, type BackendMode } from '../../config/backend'
+import { hydrateFromBackend } from '../../api/syncFromBackend'
 import { useToastStore } from '../shared/Toast'
 import styles from './BackendSettingsDialog.module.css'
 
@@ -56,6 +57,8 @@ const BackendSettingsDialog: React.FC<BackendSettingsDialogProps> = ({ onClose }
     setBackendConfig({ mode, baseUrl: url || initial.baseUrl })
     toast(mode === 'remote' ? `已切换为远程模式（${url || initial.baseUrl}）` : '已切换为本地模式')
     onClose()
+    // 切换到远程模式后立即从后端水合数据，无需刷新页面
+    if (mode === 'remote') void hydrateFromBackend()
   }
 
   return createPortal(

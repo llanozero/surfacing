@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useViewStore, type ViewName } from './store/viewStore'
 import { useBrowseStore } from './store/browseStore'
+import { hydrateFromBackend } from './api/syncFromBackend'
 import StatusBar from './components/layout/StatusBar'
 import TabBar from './components/layout/TabBar'
 import SearchView from './components/views/SearchView'
@@ -21,6 +22,11 @@ const viewMap: Record<ViewName, React.FC> = {
 function App() {
   const activeView = useViewStore((s) => s.activeView)
   const CurrentView = viewMap[activeView]
+
+  // 远程模式：启动时从后端拉取卡片/节点，水合全部视图数据
+  useEffect(() => {
+    void hydrateFromBackend()
+  }, [])
 
   // 键盘快捷键：1-5 切换视图；浏览视图中 ↑↓ 切换卡片
   useEffect(() => {

@@ -1,0 +1,231 @@
+graph_id: g3
+graph_label: 认知心理学
+graph_description: 人类认知过程：注意力、记忆、思维与心智模型
+
+cognitive_cards:
+- id: root/psy/1
+  title: 认知心理学基础
+  type: folder
+  tag: 层级分类
+  description: 研究人类心智过程的科学分支
+  corpus:
+  - 认知心理学研究人类的知觉、注意、记忆、语言、推理和决策等高级心理过程。
+  - 兴起于20世纪50年代的"认知革命"，以信息加工模型为核心范式。
+  bound_nodes:
+  - node-cog-psy-foundation
+- id: root/psy/1/1
+  title: 信息加工模型
+  type: leaf
+  tag: 决策分支
+  description: 将人脑类比为信息处理系统的经典框架
+  corpus:
+  - 信息加工模型将认知过程分为输入、存储、加工和输出四个阶段。
+  - Atkinson-Shiffrin 三阶段模型：感觉记忆 → 短时记忆 → 长时记忆。
+  bound_nodes:
+  - node-cog-psy-foundation
+- id: root/psy/2
+  title: 注意力与工作记忆
+  type: folder
+  tag: 层级分类
+  description: 有限认知资源的分配与临时存储机制
+  corpus:
+  - 注意力是从大量信息中选择有限信息进行加工的能力，具有选择性和有限性。
+  - 工作记忆是信息暂时存储和操作的系统，Baddeley模型包括中央执行系统、语音环路和视空间画板。
+  bound_nodes:
+  - node-attention
+  - node-working-memory
+- id: root/psy/2/1
+  title: 注意力理论
+  type: leaf
+  tag: 决策分支
+  description: 选择性注意与分配性注意的主要理论
+  corpus:
+  - Broadbent的过滤器模型：基于物理特征的前期选择。
+  - Treisman的衰减模型：信息不是被完全阻断而是被衰减。
+  - 注意的资源理论认为注意力是有限的认知资源，需要在任务间合理分配。
+  bound_nodes:
+  - node-attention
+- id: root/psy/2/2
+  title: 工作记忆模型
+  type: leaf
+  tag: 决策分支
+  description: Baddeley 工作记忆的多成分模型
+  corpus:
+  - 工作记忆容量约为7±2个组块（Chunking），Cowan认为实际容量约为4个组块。
+  - 工作记忆是流体智力的核心预测指标，与学习能力和问题解决能力高度相关。
+  bound_nodes:
+  - node-working-memory
+- id: root/psy/3
+  title: 长时记忆
+  type: folder
+  tag: 层级分类
+  description: 知识的永久存储与提取系统
+  corpus:
+  - 长时记忆容量近乎无限，信息可存储数十年。
+  - 分为外显记忆（情景记忆、语义记忆）和内隐记忆（程序性记忆、启动效应）。
+  bound_nodes:
+  - node-ltm
+- id: root/psy/3/1
+  title: 记忆提取与遗忘
+  type: leaf
+  tag: 决策分支
+  description: 记忆的提取线索与遗忘曲线
+  corpus:
+  - Ebbinghaus遗忘曲线：遗忘先快后慢，及时复习可显著减缓遗忘速度。
+  - 提取失败理论认为遗忘并非记忆消失，而是提取线索不足导致无法访问。
+  - 编码特异性原则：提取时的线索与编码时的情境越匹配，提取效果越好。
+  bound_nodes:
+  - node-ltm
+- id: root/psy/4
+  title: 决策与推理
+  type: folder
+  tag: 层级分类
+  description: 人类判断与决策的认知过程
+  corpus:
+  - 决策理论分为规范性理论（理性决策）和描述性理论（真实决策行为）。
+  - Kahneman和Tversky的前景理论解释了风险条件下的非理性决策行为。
+  bound_nodes:
+  - node-decision
+- id: root/psy/4/1
+  title: 启发式与偏误
+  type: leaf
+  tag: 决策分支
+  description: 认知捷径导致的系统性判断偏误
+  corpus:
+  - 代表性启发式：根据典型性判断概率，忽略基础概率。
+  - 可得性启发式：根据易想起程度判断事件频率。
+  - 锚定效应：初始信息对后续判断产生不成比例的影响。
+  bound_nodes:
+  - node-decision
+- id: root/psy/5
+  title: 认知负荷与心智模型
+  type: folder
+  tag: 层级分类
+  description: 学习与问题解决中的认知限制与内部表征
+  corpus:
+  - 认知负荷理论（Sweller）认为教学设计应考虑工作记忆的容量限制。
+  - 内在负荷由学习材料本身的复杂度决定，外在负荷由教学呈现方式决定。
+  - 心智模型是人们对外部世界的内部表征，用于理解、推理和预测。
+  bound_nodes:
+  - node-cog-load
+  - node-mental-model
+- id: root/psy/5/1
+  title: 认知负荷设计原则
+  type: leaf
+  tag: 决策分支
+  description: 基于认知负荷理论的教学设计原则
+  corpus:
+  - 样例效应：通过分析已解决的示例比自己解决问题更有效。
+  - 分散注意效应：将相关的信息源整合在一起呈现降低外在负荷。
+  - 模态效应：图文结合（听觉+视觉）比纯视觉呈现更优。
+  bound_nodes:
+  - node-cog-load
+- id: root/psy/5/2
+  title: 心智模型与学习
+  type: leaf
+  tag: 决策分支
+  description: 心智模型的构建、修正与迁移
+  corpus:
+  - 心智模型具有不完整性、不稳定性和边界模糊性等特征。
+  - 概念转变理论描述了学习者如何修正错误的心智模型。
+  - 类比推理是将已有心智模型迁移到新领域的核心机制。
+  bound_nodes:
+  - node-mental-model
+
+navigation_nodes:
+- id: node-cog-psy-foundation
+  label: 认知心理学基础
+  description: 认知革命、信息加工模型与认知科学的核心范式
+  bound_cards:
+  - root/psy/1
+  - root/psy/1/1
+  next_nodes:
+  - target_id: node-attention
+    preset_weight: 0.78
+    browse_weight: 0.55
+    connection_type: preset
+  - target_id: node-ltm
+    preset_weight: 0.6
+    browse_weight: 0.42
+    connection_type: preset
+  - target_id: node-decision
+    preset_weight: 0.4
+    browse_weight: 0.3
+    connection_type: browse_derived
+- id: node-attention
+  label: 注意力机制
+  description: 选择性注意、分配性注意与认知资源理论
+  bound_cards:
+  - root/psy/2
+  - root/psy/2/1
+  next_nodes:
+  - target_id: node-working-memory
+    preset_weight: 0.82
+    browse_weight: 0.6
+    connection_type: preset
+  - target_id: node-cog-load
+    preset_weight: 0.5
+    browse_weight: 0.38
+    connection_type: browse_derived
+- id: node-working-memory
+  label: 工作记忆
+  description: Baddeley模型、容量限制与中央执行系统
+  bound_cards:
+  - root/psy/2/2
+  next_nodes:
+  - target_id: node-ltm
+    preset_weight: 0.75
+    browse_weight: 0.58
+    connection_type: preset
+- id: node-ltm
+  label: 长时记忆
+  description: 外显记忆、内隐记忆与记忆提取理论
+  bound_cards:
+  - root/psy/3
+  - root/psy/3/1
+  next_nodes:
+  - target_id: node-mental-model
+    preset_weight: 0.6
+    browse_weight: 0.45
+    connection_type: preset
+  - target_id: node-decision
+    preset_weight: 0.55
+    browse_weight: 0.4
+    connection_type: browse_derived
+- id: node-decision
+  label: 决策与推理
+  description: 前景理论、启发式与认知偏误
+  bound_cards:
+  - root/psy/4
+  - root/psy/4/1
+  next_nodes:
+  - target_id: node-cog-load
+    preset_weight: 0.5
+    browse_weight: 0.38
+    connection_type: browse_derived
+  - target_id: node-mental-model
+    preset_weight: 0.45
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-cog-load
+  label: 认知负荷理论
+  description: 内在负荷、外在负荷与相关负荷的教学设计
+  bound_cards:
+  - root/psy/5
+  - root/psy/5/1
+  next_nodes:
+  - target_id: node-working-memory
+    preset_weight: 0.55
+    browse_weight: 0.4
+    connection_type: browse_derived
+  - target_id: node-mental-model
+    preset_weight: 0.4
+    browse_weight: 0.3
+    connection_type: browse_derived
+- id: node-mental-model
+  label: 心智模型
+  description: 内部表征、概念转变与类比推理
+  bound_cards:
+  - root/psy/5
+  - root/psy/5/2
+  next_nodes: []

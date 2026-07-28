@@ -12,6 +12,8 @@ export interface NavCanvasData {
   waypointIds?: Set<string>
   /** 全览视图中当前选中节点的 id */
   selectedNodeId?: string | null
+  /** 子图节点 id 集合（在全览中显示特殊样式） */
+  subGraphNodeIds?: Set<string>
 }
 
 export interface NavCanvasOptions {
@@ -327,6 +329,7 @@ export function useNavCanvas(
     if (!nodeSel) return
     const ids = dataRef.current.waypointIds ?? new Set<string>()
     const selectedId = dataRef.current.selectedNodeId ?? null
+    const subIds = dataRef.current.subGraphNodeIds ?? new Set<string>()
 
     // body 圆圈：选中 > 途经点 > 普通
     nodeSel.select<SVGCircleElement>('circle.nc-body')
@@ -336,7 +339,11 @@ export function useNavCanvas(
         if (ids.has(n.id)) return WAYPOINT
         return ACCENT2
       })
-      .attr('stroke-width', (n) => (n.id === selectedId || ids.has(n.id) ? 4 : 2.5))
+      .attr('stroke-width', (n) => {
+        if (n.id === selectedId || ids.has(n.id)) return 4
+        return 2.5
+      })
+      .attr('stroke-dasharray', (n) => subIds.has(n.id) ? '4 3' : null)
 
     // halo 光晕
     nodeSel.select<SVGCircleElement>('circle.nc-halo')
@@ -351,6 +358,20 @@ export function useNavCanvas(
         if (ids.has(n.id)) return 0.4
         return 0.25
       })
+
+    // 子图节点标识：小文件夹图标（文本）
+    nodeSel.select<SVGTextElement>('text.nc-subgraph-icon').remove()
+    nodeSel.each(function (n) {
+      if (!subIds.has(n.id)) return
+      const g = d3.select(this)
+      g.append('text')
+        .attr('class', 'nc-subgraph-icon')
+        .attr('text-anchor', 'middle')
+        .attr('dy', -26)
+        .attr('fill', '#ffd230')
+        .attr('font-size', '10px')
+        .text('📂')
+    })
 
     // 脉冲环：选中节点添加（CSS 动画驱动），非选中移除
     nodeSel.each(function (n) {
@@ -381,7 +402,7 @@ export function useNavCanvas(
 
   useEffect(() => {
     applyNodeStyles()
-  }, [data.selectedNodeId, data.waypointIds, applyNodeStyles])
+  }, [data.selectedNodeId, data.waypointIds, data.subGraphNodeIds, applyNodeStyles])
 
   /* ---------- 缩放控制 ---------- */
   const zoomBy = useCallback((factor: number) => {

@@ -20,10 +20,17 @@ export interface NextNodeRef {
   connection_type: 'preset' | 'browse_derived' | 'user_added'
 }
 
+export interface SubgraphConfig {
+  target_graph_id: string
+  target_entry_node: string
+}
+
 export interface NavNode {
   id: string
   label: string
   description: string
+  /** 节点类型：normal | subgraph */
+  type?: 'normal' | 'subgraph'
   bound_cards?: string[]
   browse_history?: { from: string; count: number; last_at: string }[]
   next_nodes: NextNodeRef[]
@@ -33,6 +40,18 @@ export interface NavNode {
     browse_priority: number
     user_overrides: { target_id: string; override_weight: number }[]
   }
+  /** 子图节点配置（type='subgraph' 时使用） */
+  subgraph_config?: SubgraphConfig
+  /** @deprecated 使用 subgraph_config.target_graph_id */
+  sub_graph_id?: string
+  /** @deprecated 使用 subgraph_config.target_entry_node */
+  entry_node_id?: string
+}
+
+export interface NamespacedNode extends NavNode {
+  _nsId: string
+  _sourceGraphId: string
+  _sourceGraphLabel: string
 }
 
 export interface GraphEdge {

@@ -17,12 +17,15 @@ export const allNavNodes: NavNode[] = [
   },
   {
     id: 'node-math-foundation',
-    label: '数学基础',
+    label: '数学基础导航图',
     description: '概率论、线性代数与微积分——机器学习算法的数学语言。',
+    type: 'subgraph',
     bound_cards: ['root/6'],
+    subgraph_config: {
+      target_graph_id: 'g2',
+      target_entry_node: 'node-probability',
+    },
     next_nodes: [
-      { target_id: 'node-probability', preset_weight: 0.78, browse_weight: 0.55, connection_type: 'preset' },
-      { target_id: 'node-linear-algebra', preset_weight: 0.82, browse_weight: 0.48, connection_type: 'preset' },
       { target_id: 'node-ml-foundation', preset_weight: 0.5, browse_weight: 0.6, connection_type: 'browse_derived' },
     ],
   },

@@ -1,0 +1,163 @@
+graph_id: g2
+graph_label: 数学基础
+graph_description: 概率论、线性代数与微积分——机器学习与数据科学的数学基础
+
+cognitive_cards:
+- id: root/math/1
+  title: 概率论基础
+  type: folder
+  tag: 层级分类
+  description: 随机现象建模与不确定性量化的数学框架
+  corpus:
+  - 概率论研究随机现象和不确定性的数学规律，是统计学和机器学习的理论基础。
+  - 核心概念包括样本空间、事件、概率测度、条件概率和独立性。
+  bound_nodes:
+  - node-probability-theory
+- id: root/math/1/1
+  title: 随机变量与分布
+  type: leaf
+  tag: 决策分支
+  description: 离散与连续随机变量的概率分布
+  corpus:
+  - 随机变量是将样本空间映射到实数的函数，分为离散型（伯努利、二项、泊松）和连续型（正态、指数、均匀）。
+  - 概率质量函数（PMF）和概率密度函数（PDF）完整描述随机变量的分布特征。
+  bound_nodes:
+  - node-probability-theory
+  - node-bayes-theorem
+- id: root/math/1/2
+  title: 贝叶斯定理
+  type: leaf
+  tag: 决策分支
+  description: 基于先验知识和观测数据更新概率的数学公式
+  corpus:
+  - 贝叶斯定理：P(A|B) = P(B|A)P(A) / P(B)，描述了如何根据新证据更新先验信念。
+  - 在机器学习中广泛应用于朴素贝叶斯分类器、贝叶斯网络和概率图模型。
+  bound_nodes:
+  - node-bayes-theorem
+- id: root/math/2
+  title: 线性代数
+  type: folder
+  tag: 层级分类
+  description: 向量空间与线性变换的数学语言
+  corpus:
+  - 线性代数是处理高维数据的数学基础，几乎贯穿所有机器学习算法。
+  - 核心操作包括向量运算、矩阵乘法、线性变换和特征分解。
+  bound_nodes:
+  - node-la-foundation
+- id: root/math/2/1
+  title: 矩阵理论
+  type: leaf
+  tag: 决策分支
+  description: 矩阵运算、秩、逆与线性方程组
+  corpus:
+  - 矩阵是线性变换的代数表示，矩阵乘法对应变换的复合。
+  - 矩阵的秩描述了列空间的维度，逆矩阵用于求解线性方程组。
+  bound_nodes:
+  - node-matrix
+- id: root/math/2/2
+  title: 特征值与特征向量
+  type: leaf
+  tag: 决策分支
+  description: 矩阵对角化、PCA与谱聚类的核心概念
+  corpus:
+  - 特征向量是线性变换下方向不变的向量，特征值描述变换的伸缩幅度。
+  - 特征分解在PCA降维、谱聚类和PageRank中有重要应用。
+  bound_nodes:
+  - node-eigen
+- id: root/math/3
+  title: 微积分基础
+  type: folder
+  tag: 层级分类
+  description: 连续变化与优化的数学工具
+  corpus:
+  - 微积分研究连续量的变化率与累积效应，是优化理论的数学基础。
+  - 导数描述了函数在某点的瞬时变化率，是梯度下降法的理论核心。
+  bound_nodes:
+  - node-calc-foundation
+- id: root/math/3/1
+  title: 导数与梯度
+  type: leaf
+  tag: 决策分支
+  description: 多元函数的偏导数与梯度向量
+  corpus:
+  - 梯度是多元函数对所有自变量的偏导数组成的向量，指向函数值增长最快的方向。
+  - 梯度下降法沿着负梯度方向迭代更新参数，是最小化损失函数的核心算法。
+  bound_nodes:
+  - node-derivative
+
+navigation_nodes:
+- id: node-probability-theory
+  label: 概率论基础
+  description: 随机变量、概率分布与贝叶斯推断——不确定性建模的数学框架
+  bound_cards:
+  - root/math/1
+  - root/math/1/1
+  next_nodes:
+  - target_id: node-bayes-theorem
+    preset_weight: 0.85
+    browse_weight: 0.62
+    connection_type: preset
+  - target_id: node-la-foundation
+    preset_weight: 0.5
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-bayes-theorem
+  label: 贝叶斯定理
+  description: 基于先验知识和观测数据更新信念的概率公式
+  bound_cards:
+  - root/math/1/2
+  next_nodes: []
+- id: node-la-foundation
+  label: 线性代数基础
+  description: 向量空间、线性变换与矩阵运算
+  bound_cards:
+  - root/math/2
+  next_nodes:
+  - target_id: node-matrix
+    preset_weight: 0.8
+    browse_weight: 0.58
+    connection_type: preset
+  - target_id: node-eigen
+    preset_weight: 0.6
+    browse_weight: 0.52
+    connection_type: browse_derived
+  - target_id: node-calc-foundation
+    preset_weight: 0.4
+    browse_weight: 0.3
+    connection_type: browse_derived
+- id: node-matrix
+  label: 矩阵理论
+  description: 矩阵运算、秩与线性方程组求解
+  bound_cards:
+  - root/math/2/1
+  next_nodes:
+  - target_id: node-eigen
+    preset_weight: 0.75
+    browse_weight: 0.55
+    connection_type: preset
+- id: node-eigen
+  label: 特征值与分解
+  description: 特征分解、SVD与降维理论
+  bound_cards:
+  - root/math/2/2
+  next_nodes: []
+- id: node-calc-foundation
+  label: 微积分基础
+  description: 极限、导数与积分——优化理论的数学根基
+  bound_cards:
+  - root/math/3
+  next_nodes:
+  - target_id: node-derivative
+    preset_weight: 0.88
+    browse_weight: 0.65
+    connection_type: preset
+- id: node-derivative
+  label: 导数与梯度
+  description: 梯度、链式法则与梯度下降优化
+  bound_cards:
+  - root/math/3/1
+  next_nodes:
+  - target_id: node-probability-theory
+    preset_weight: 0.35
+    browse_weight: 0.25
+    connection_type: browse_derived

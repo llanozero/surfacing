@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useMemo } from 'react'
 import styles from './NavView.module.css'
 import Button from '../shared/Button'
 import NavCanvas from '../canvas/NavCanvas'
@@ -6,6 +6,7 @@ import ZoomControls from '../canvas/ZoomControls'
 import NavModeToggle from '../nav/NavModeToggle'
 import WaypointsBar from '../nav/WaypointsBar'
 import ConnectionEditPopover from '../nav/ConnectionEditPopover'
+import GraphMultiSelect from '../nav/GraphMultiSelect'
 import DropDownPanel from '../panel/DropDownPanel'
 import { useNavStore, getCurrentNode } from '../../store/navStore'
 import { useBrowseStore } from '../../store/browseStore'
@@ -13,6 +14,8 @@ import { usePanelStore } from '../../store/panelStore'
 import { usePlanStore } from '../../store/planStore'
 import { useViewStore } from '../../store/viewStore'
 import { useToastStore } from '../shared/Toast'
+import { useGraphStore } from '../../store/graphStore'
+import { useDrillStore } from '../../store/drillStore'
 import { useNavCanvas } from '../../hooks/useNavCanvas'
 import {
   ensureQuickConnection,
@@ -45,7 +48,19 @@ const NavView: React.FC = () => {
   const toast = useToastStore((s) => s.show)
   const enterFreeBrowse = useBrowseStore((s) => s.enterFreeBrowse)
 
+  const drillIn = useGraphStore((s) => s.drillIn)
+  const isInDrill = useDrillStore((s) => s.isInDrill)
+
   const currentNode = getCurrentNode({ currentNodeId })
+
+  /** 从 allNavNodes 中提取所有子图节点 id */
+  const subGraphNodeIds = useMemo(() => {
+    const ids = new Set<string>()
+    for (const n of allNavNodes) {
+      if (n.subgraph_config?.target_graph_id || n.sub_graph_id) ids.add(n.id)
+    }
+    return ids
+  }, [allNavNodes])
 
   /** 正在编辑的连接（✅ 指示器点击后弹出浮层） */
   const [editingConn, setEditingConn] = useState<{ fromId: string; toId: string } | null>(null)
@@ -79,6 +94,7 @@ const NavView: React.FC = () => {
       nextNodes: currentNode ? getNextNodes(currentNode.id) : [],
       waypointIds: new Set(waypoints.map((w) => w.id)),
       selectedNodeId: currentNodeId,
+      subGraphNodeIds,
     },
     { onNodeClick: handleNodeClick },
   )
@@ -95,6 +111,42 @@ const NavView: React.FC = () => {
     setCurrentNode(startNode.id)
     enterFreeBrowse(startNode)
     switchView('free-browse')
+  }
+
+  // 钻入子图：当前选中节点是子图节点时可用
+  const handleDrillIn = () => {
+    if (!currentNode) return
+    const config = currentNode.subgraph_config
+    const targetId = config?.target_graph_id || currentNode.sub_graph_id
+    const entryId = config?.target_entry_node || currentNode.entry_node_id
+    if (!targetId || !entryId) return
+
+    // 快照当前选中的图列表
+    const currentSelected = useNavStore.getState().selectedGraphIds
+    if (currentSelected.length > 0) {
+      useDrillStore.getState().setSnapshot(currentSelected)
+    }
+
+    drillIn(targetId, entryId, currentNode.id, currentNode.label)
+    setCurrentNode(entryId)
+    toast(`已钻入「${currentNode.label}」`)
+  }
+
+  // 钻出子图
+  const handleDrillOut = () => {
+    const popped = useGraphStore.getState().drillOut()
+    if (popped) {
+      setCurrentNode(popped.parentNodeId)
+
+      // 恢复钻入前的选中图列表
+      const snapshot = useDrillStore.getState().snapshotSelectedGraphIds
+      if (snapshot.length > 0) {
+        useNavStore.getState().setSelectedGraphs(snapshot)
+        useDrillStore.getState().setSnapshot([])
+      }
+
+      toast(`已钻出，回到「${popped.parentNodeLabel}」`)
+    }
   }
 
   // NavView → PlanView（spec §4.4）：途经点 ≥ 2 时进入路线规划
@@ -119,6 +171,8 @@ const NavView: React.FC = () => {
       </div>
 
       <NavModeToggle mode={mode} onChange={setMode} />
+
+      <GraphMultiSelect />
 
       <div className={styles.canvasWrap}>
         <NavCanvas ref={canvasRef} />
@@ -145,6 +199,16 @@ const NavView: React.FC = () => {
         >
           补齐连接
         </Button>
+        {(currentNode?.subgraph_config?.target_graph_id || currentNode?.sub_graph_id) && (
+          <Button variant="primary" size="sm" onClick={handleDrillIn}>
+            钻入「{currentNode.label}」
+          </Button>
+        )}
+        {isInDrill() && (
+          <Button variant="outline" size="sm" onClick={handleDrillOut}>
+            钻出
+          </Button>
+        )}
         {waypoints.length === 1 && (
           <Button variant="primary" size="sm" onClick={handleFreeBrowse}>
             自由分支浏览

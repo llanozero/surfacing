@@ -1,0 +1,23 @@
+graphs:
+  - graph_id: g1
+    file: g1-ml.yaml
+    label: 机器学习
+    description: 机器学习核心概念与算法导航图
+    created_at: '2026-07-20T00:00:00Z'
+    node_count: 18
+    card_count: 35
+  - graph_id: g2
+    file: g2-math.yaml
+    label: 数学基础
+    description: 概率论、线性代数与微积分——机器学习与数据科学的数学基础
+    created_at: '2026-07-26T00:00:00Z'
+    node_count: 7
+    card_count: 8
+  - graph_id: g3
+    file: g3-psychology.yaml
+    label: 认知心理学
+    description: 人类认知过程：注意力、记忆、思维与心智模型
+    created_at: '2026-07-26T00:00:00Z'
+    node_count: 7
+    card_count: 12
+next_graph_number: 4

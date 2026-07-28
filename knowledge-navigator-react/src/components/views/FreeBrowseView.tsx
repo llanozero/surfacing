@@ -8,6 +8,8 @@ import { useBrowseStore, type BranchNodeItem } from '../../store/browseStore'
 import { useNavStore } from '../../store/navStore'
 import { useViewStore } from '../../store/viewStore'
 import { useToastStore } from '../shared/Toast'
+import { useGraphStore } from '../../store/graphStore'
+import { useDrillStore } from '../../store/drillStore'
 import { getNavNode } from '../../data/allNavNodes'
 
 const FreeBrowseView: React.FC = () => {
@@ -23,6 +25,9 @@ const FreeBrowseView: React.FC = () => {
   const addWaypoint = useNavStore((s) => s.addWaypoint)
   const switchView = useViewStore((s) => s.switchView)
   const toast = useToastStore((s) => s.show)
+
+  const drillIn = useGraphStore((s) => s.drillIn)
+  const isInDrill = useDrillStore((s) => s.isInDrill)
 
   const [cardIndex, setCardIndex] = useState(0)
   const currentNode = freeNodeId ? getNavNode(freeNodeId) : null
@@ -52,6 +57,48 @@ const FreeBrowseView: React.FC = () => {
     setCurrentNode(currentNode.id)
     toast(`当前节点已设为「${currentNode.label}」`)
   }, [currentNode, setCurrentNode, toast])
+
+  // 钻入子图
+  const handleDrillIn = useCallback(() => {
+    if (!currentNode) return
+    const config = currentNode.subgraph_config
+    const targetId = config?.target_graph_id || currentNode.sub_graph_id
+    const entryId = config?.target_entry_node || currentNode.entry_node_id
+    if (!targetId || !entryId) return
+
+    // 快照
+    const currentSelected = useNavStore.getState().selectedGraphIds
+    if (currentSelected.length > 0) {
+      useDrillStore.getState().setSnapshot(currentSelected)
+    }
+
+    drillIn(targetId, entryId, currentNode.id, currentNode.label)
+    setTimeout(() => {
+      jumpToNode(entryId!)
+      setCurrentNode(entryId!)
+    }, 0)
+    toast(`已钻入「${currentNode.label}」`)
+  }, [currentNode, drillIn, jumpToNode, setCurrentNode, toast])
+
+  // 钻出子图
+  const handleDrillOut = useCallback(() => {
+    const popped = useGraphStore.getState().drillOut()
+    if (popped) {
+      jumpToNode(popped.parentNodeId)
+      setCurrentNode(popped.parentNodeId)
+
+      const snapshot = useDrillStore.getState().snapshotSelectedGraphIds
+      if (snapshot.length > 0) {
+        useNavStore.getState().setSelectedGraphs(snapshot)
+        useDrillStore.getState().setSnapshot([])
+      }
+
+      toast(`已钻出，回到「${popped.parentNodeLabel}」`)
+    }
+  }, [jumpToNode, setCurrentNode, toast])
+
+  // 无后继节点且处于钻入状态 → 自动钻出提示
+  const needsDrillOut = isInDrill() && freeNextNodes.length === 0
 
   if (!currentNode) {
     return (
@@ -135,12 +182,30 @@ const FreeBrowseView: React.FC = () => {
 
       {/* 底部操作栏 */}
       <div className={styles.bottomBar}>
-        <Button variant="outline" size="sm" onClick={handleAddWaypoint}>
-          添加为途经点
-        </Button>
-        <Button variant="outline" size="sm" onClick={handleSetCurrentNode}>
-          设为当前节点
-        </Button>
+        {needsDrillOut ? (
+          <Button variant="primary" size="sm" onClick={handleDrillOut}>
+            无后继节点，钻出子图
+          </Button>
+        ) : (
+          <>
+            {(currentNode.subgraph_config?.target_graph_id || currentNode.sub_graph_id) && (
+              <Button variant="primary" size="sm" onClick={handleDrillIn}>
+                钻入「{currentNode.label}」
+              </Button>
+            )}
+            {isInDrill() && (
+              <Button variant="outline" size="sm" onClick={handleDrillOut}>
+                钻出
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={handleAddWaypoint}>
+              添加为途经点
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleSetCurrentNode}>
+              设为当前节点
+            </Button>
+          </>
+        )}
       </div>
     </div>
   )

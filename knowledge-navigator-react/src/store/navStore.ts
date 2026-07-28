@@ -1,9 +1,10 @@
 import { create } from 'zustand'
-import type { GraphEdge, NavNode } from '../data/types'
+import type { GraphEdge, NavNode, NamespacedNode } from '../data/types'
 import { allNavNodes, allEdges, getNavNode } from '../data/allNavNodes'
 import { composeWeights, type WeightedRef } from '../utils/weightUtils'
+import { nsId } from '../config/graphs'
+import { useGraphStore } from './graphStore'
 
-/** 由共享 allNavNodes 重新推导全量有向边 */
 function deriveEdges(): GraphEdge[] {
   return allNavNodes.flatMap((n) =>
     n.next_nodes.map((e) => ({ source: n.id, target: e.target_id, weight: e.preset_weight })),
@@ -19,27 +20,43 @@ export interface NextNodeItem {
 
 interface NavStore {
   mode: NavMode
-  /** 当前选中/中心的导航节点（全览高亮 + 逐站锚点合一） */
   currentNodeId: string
   allNavNodes: NavNode[]
   allEdges: GraphEdge[]
   waypoints: NavNode[]
-  /** 自由分支浏览模式是否激活 */
   freeBrowseActive: boolean
+
+  /** 画布多选框选中的图 ID 列表 */
+  selectedGraphIds: string[]
+
   init: (nodeId: string, mode?: NavMode) => void
   setMode: (m: NavMode) => void
   setCurrentNode: (nodeId: string) => void
   addWaypoint: (node: NavNode) => void
   removeWaypoint: (index: number) => void
   clearWaypoints: () => void
-  /** 切换自由分支浏览模式 */
   setFreeBrowse: (active: boolean) => void
-  /** 按合成权重排序的后继节点 */
   getNextNodes: (nodeId: string) => NextNodeItem[]
-  /** 前驱节点（指向 nodeId 的节点） */
   getPrevNodes: (nodeId: string) => NextNodeItem[]
-  /** 节点增删改后，从共享数据源重算节点列表与边集 */
   syncFromSource: () => void
+
+  /** 设置画布选中的图列表 */
+  setSelectedGraphs: (ids: string[]) => void
+  /** 当前是否为多图模式 */
+  isMultiGraphMode: () => boolean
+  /** 获取画布应渲染的命名空间化节点列表 */
+  getCanvasNodes: () => NamespacedNode[]
+  /** 获取画布应渲染的命名空间化边列表 */
+  getCanvasEdges: () => GraphEdge[]
+}
+
+function namespaceNodes(nodes: NavNode[], graphId: string, graphLabel: string): NamespacedNode[] {
+  return nodes.map((n) => ({
+    ...n,
+    _nsId: nsId(graphId, n.id),
+    _sourceGraphId: graphId,
+    _sourceGraphLabel: graphLabel,
+  }))
 }
 
 export const useNavStore = create<NavStore>((set, get) => ({
@@ -49,6 +66,7 @@ export const useNavStore = create<NavStore>((set, get) => ({
   allEdges,
   waypoints: [],
   freeBrowseActive: false,
+  selectedGraphIds: [],
 
   init: (nodeId, mode = 'overview') => {
     if (!getNavNode(nodeId)) return
@@ -62,7 +80,6 @@ export const useNavStore = create<NavStore>((set, get) => ({
   },
 
   addWaypoint: (node) => {
-    // 允许重复（同一节点可多次经过）
     set({ waypoints: [...get().waypoints, node] })
   },
 
@@ -98,6 +115,40 @@ export const useNavStore = create<NavStore>((set, get) => ({
 
   syncFromSource: () => {
     set({ allNavNodes: [...allNavNodes], allEdges: deriveEdges() })
+  },
+
+  setSelectedGraphs: (ids) => {
+    set({ selectedGraphIds: ids })
+  },
+
+  isMultiGraphMode: () => {
+    return get().selectedGraphIds.length > 1
+  },
+
+  getCanvasNodes: () => {
+    const { selectedGraphIds, allNavNodes: nodes } = get()
+    const { graphs } = useGraphStore.getState()
+
+    const selected = graphs.filter((g) => selectedGraphIds.includes(g.graph_id))
+    if (selected.length > 0) {
+      return selected.flatMap((g) => namespaceNodes(nodes, g.graph_id, g.label))
+    }
+
+    const activeId = useGraphStore.getState().activeGraphId
+    const activeMeta = graphs.find((g) => g.graph_id === activeId)
+    return namespaceNodes(nodes, activeId, activeMeta?.label ?? activeId)
+  },
+
+  getCanvasEdges: () => {
+    const { allEdges: edges, selectedGraphIds } = get()
+    if (selectedGraphIds.length > 1) {
+      return edges.map((e) => ({
+        ...e,
+        source: nsId(selectedGraphIds[0], e.source),
+        target: nsId(selectedGraphIds[0], e.target),
+      }))
+    }
+    return edges
   },
 }))
 

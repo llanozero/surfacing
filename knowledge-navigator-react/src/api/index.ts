@@ -37,6 +37,7 @@ import {
 } from '../utils/aiGenerateCore'
 import type { RoutePlan, WaypointMode, WeightMode } from '../utils/routePlanner'
 import { isProMode } from '../config/backend'
+import { getActiveGraphId } from '../config/graphs'
 import { BackendAdapter, ApiError } from './BackendAdapter'
 
 // ============================================================
@@ -96,12 +97,17 @@ export class KnowledgeNavigatorAPI {
   /** AI 生成中的请求计数（isGenerating 用） */
   private generatingCount = 0
 
+  /** 构建带图参数的 URL */
+  private g(path: string): string {
+    return `${path}?graph=${getActiveGraphId()}`
+  }
+
   // ============================================================
   // 认知卡片
   // ============================================================
 
   async getAllCards(): Promise<CognitiveCard[]> {
-    if (isProMode()) return this.adapter.get<CognitiveCard[]>('/api/cards')
+    if (isProMode()) return this.adapter.get<CognitiveCard[]>(this.g('/api/cards'))
     return useCardStore.getState().allCards
   }
 
@@ -262,7 +268,7 @@ export class KnowledgeNavigatorAPI {
   // ============================================================
 
   async getAllNavNodes(): Promise<NavNode[]> {
-    if (isProMode()) return this.adapter.get<NavNode[]>('/api/nodes')
+    if (isProMode()) return this.adapter.get<NavNode[]>(this.g('/api/nodes'))
     return useNavNodeStore.getState().allNodes
   }
 
@@ -466,7 +472,7 @@ export class KnowledgeNavigatorAPI {
   // ============================================================
 
   async getAllEdges(): Promise<GraphEdge[]> {
-    if (isProMode()) return this.adapter.get<GraphEdge[]>('/api/graph/edges')
+    if (isProMode()) return this.adapter.get<GraphEdge[]>(this.g('/api/graph/edges'))
     return useNavStore.getState().allEdges
   }
 
@@ -977,5 +983,36 @@ export class KnowledgeNavigatorAPI {
 
   setPanelPosition(position: PanelPosition): void {
     usePanelStore.getState().setPosition(position)
+  }
+
+  // ============================================================
+  // 跨图资源解析
+  // ============================================================
+
+  /** 解析单个跨图引用，返回完整资源数据 */
+  async resolveCrossGraphNode(ref: string): Promise<NavNode | null> {
+    if (!ref.includes('::')) return null
+    if (!isProMode()) return null
+    try {
+      const res = await this.adapter.get<{ type: string; data: NavNode; graph_id: string; graph_label: string }>(
+        `/api/graphs/resolve?ref=${enc(ref)}`,
+      )
+      if (res.type === 'node') return res.data
+      return null
+    } catch {
+      return null
+    }
+  }
+
+  /** 批量解析跨图引用 */
+  async resolveCrossGraphBatch(refs: string[]): Promise<Array<{
+    ref: string; type?: string; data?: NavNode; graph_id?: string; graph_label?: string; error?: string
+  }>> {
+    if (!isProMode()) return refs.map((ref) => ({ ref, error: '非 pro 模式' }))
+    try {
+      return await this.adapter.post('/api/graphs/resolve-batch', { refs })
+    } catch {
+      return refs.map((ref) => ({ ref, error: '批量解析失败' }))
+    }
   }
 }

@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .store import store
-from .routers import ai, browse, cards, connections, graph, nodes, plan, search, tts, view, yaml_io
+from .routers import ai, browse, cards, connections, graph, graphs, nodes, plan, search, tts, view, yaml_io
 
 app = FastAPI(title="Knowledge Navigator Backend", version="0.1.0")
 
@@ -24,10 +24,11 @@ def health() -> dict:
         "status": "ok",
         "service": "knowledge-navigator-backend",
         "version": "0.1.0",
-        "cards": len(store.cards),
-        "nodes": len(store.nodes),
+        "cards": len(store.all_cards()),
+        "nodes": len(store.all_nodes()),
+        "graphs": len(store.graphs),
     }
 
 
-for r in (cards, nodes, graph, plan, browse, search, yaml_io, ai, connections, tts, view):
+for r in (cards, nodes, graph, plan, browse, search, yaml_io, ai, connections, tts, view, graphs):
     app.include_router(r.router)

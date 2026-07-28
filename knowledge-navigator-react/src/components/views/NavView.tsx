@@ -69,7 +69,6 @@ const NavView: React.FC = () => {
 
   /** 当 selectedGraphIds 变化时，从后端获取聚合画布数据 */
   useEffect(() => {
-    if (inDrill) return // 钻入模式下使用单一图数据
     if (selectedGraphIds.length === 0) {
       setCanvasNodes([])
       setCanvasEdges([])
@@ -82,14 +81,13 @@ const NavView: React.FC = () => {
         setCanvasNodes(res.data.nodes)
         setCanvasEdges(res.data.edges)
       } else {
-        // 降级到本地数据
         setCanvasNodes([])
         setCanvasEdges([])
         toast('获取画布数据失败: ' + res.error)
       }
     })
     return () => { cancelled = true }
-  }, [selectedGraphIds.join(','), inDrill]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedGraphIds.join(',')]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasCanvasData = inDrill || canvasNodes.length > 0
 
@@ -219,6 +217,9 @@ const NavView: React.FC = () => {
     if (currentSelected.length > 0) {
       useDrillStore.getState().setSnapshot(currentSelected)
     }
+
+    // 切换到子图的画布数据
+    useNavStore.getState().setSelectedGraphs([targetId])
 
     drillIn(targetId, entryId, currentNode.id, currentNode.label)
     setCurrentNode(entryId)

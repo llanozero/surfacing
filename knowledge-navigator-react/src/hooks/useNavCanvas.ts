@@ -54,6 +54,7 @@ export function useNavCanvas(
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null)
   const simRef = useRef<d3.Simulation<SimNode, SimLink> | null>(null)
   const overviewBuiltRef = useRef(false)
+  const overviewDataVersionRef = useRef('')
   const nodeSelRef = useRef<d3.Selection<SVGGElement, SimNode, SVGGElement, unknown> | null>(null)
 
   const dataRef = useRef(data)
@@ -415,6 +416,22 @@ export function useNavCanvas(
   }, [])
 
   /* ---------- 模式切换：可见性 + 按需构建/重绘 ---------- */
+
+  /* 画布核心数据变化时，重置全览重建标志，触发 D3 重建 */
+  useEffect(() => {
+    if (mode !== 'overview') return
+    const d = dataRef.current
+    const key = `${d.allNodes?.length ?? 0}:${d.allEdges?.length ?? 0}`
+    if (overviewDataVersionRef.current && overviewDataVersionRef.current !== key) {
+      // 清除旧 D3 元素 + 停止旧仿真
+      overviewGRef.current?.selectAll('*').remove()
+      simRef.current?.stop()
+      simRef.current = null
+      overviewBuiltRef.current = false
+    }
+    overviewDataVersionRef.current = key
+  }, [mode, data.allNodes?.length, data.allEdges?.length])
+
   useEffect(() => {
     overviewGRef.current?.style('display', mode === 'overview' ? 'inline' : 'none')
     stationGRef.current?.style('display', mode === 'station' ? 'inline' : 'none')

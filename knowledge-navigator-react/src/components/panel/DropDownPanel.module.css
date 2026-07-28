@@ -16,6 +16,8 @@
 }
 .dragging {
   transition: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .handleZone {
   flex-shrink: 0;
@@ -45,6 +47,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
 }
 .content {
   flex: 1;
@@ -69,6 +72,7 @@
   font-weight: 600;
   color: var(--label-primary);
   margin: 0;
+  flex: 1;
 }
 .nodeDesc {
   font-size: 13px;
@@ -134,4 +138,35 @@
   padding-top: 8px;
   display: flex;
   gap: 8px;
+}
+
+/* ── 面板尺寸快捷控件 ── */
+.sizeBar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.sizeBtn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--label-tertiary);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.sizeBtn:hover {
+  background: var(--fill-f1);
+  color: var(--label-primary);
+}
+.sizeBtnActive {
+  composes: sizeBtn;
+  background: var(--fill-f2);
+  color: var(--accent);
 }

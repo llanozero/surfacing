@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './DropDownPanel.module.css'
 import Button from '../shared/Button'
 import TtsButton from '../shared/TtsButton'
-import { usePanelStore } from '../../store/panelStore'
+import { usePanelStore, type PanelPosition } from '../../store/panelStore'
 import { useNavStore } from '../../store/navStore'
 import { useNavNodeStore } from '../../store/navNodeStore'
 import { useGraphStore } from '../../store/graphStore'
@@ -11,6 +11,13 @@ import { useToastStore } from '../shared/Toast'
 import { useDragPanel } from '../../hooks/useDragPanel'
 import { getCard } from '../../data/cards'
 import { getNavNode } from '../../data/allNavNodes'
+
+/** 尺寸按钮配置 */
+const SIZE_BTNS: { pos: PanelPosition; label: string; title: string }[] = [
+  { pos: 'collapsed', label: '📄', title: '隐藏' },
+  { pos: 'half', label: '⊞', title: '半屏' },
+  { pos: 'full', label: '⛶', title: '全屏' },
+]
 
 /**
  * 下拉面板（仅 NavView 内嵌）。
@@ -81,6 +88,18 @@ const DropDownPanel: React.FC = () => {
 
       {position === 'collapsed' ? (
         <div className={styles.collapsed}>
+          <div className={styles.sizeBar}>
+            {SIZE_BTNS.map((b) => (
+              <button
+                key={b.pos}
+                className={position === b.pos ? styles.sizeBtnActive : styles.sizeBtn}
+                title={b.title}
+                onClick={() => setPosition(b.pos)}
+              >
+                {b.label}
+              </button>
+            ))}
+          </div>
           <span className={styles.collapsedLabel}>
             {isRef && '↻ '}
             {isSubgraph && '📂 '}
@@ -99,6 +118,18 @@ const DropDownPanel: React.FC = () => {
                 {isSubgraph && <span className={styles.subIcon} title="子图节点">📂 </span>}
                 {node.label}
               </h3>
+              <div className={styles.sizeBar}>
+                {SIZE_BTNS.map((b) => (
+                  <button
+                    key={b.pos}
+                    className={position === b.pos ? styles.sizeBtnActive : styles.sizeBtn}
+                    title={b.title}
+                    onClick={() => setPosition(b.pos)}
+                  >
+                    {b.label}
+                  </button>
+                ))}
+              </div>
               {node.description && <TtsButton text={node.description} size="sm" />}
             </div>
             {isRef && sourceGraphLabel && (

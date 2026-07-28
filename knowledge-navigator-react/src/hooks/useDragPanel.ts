@@ -45,8 +45,8 @@ export function useDragPanel(
       if (!st || !panel) return
       const dy = getY(e) - st.startY
       const h = panel.offsetHeight || 1
-      // 位移 /3 映射为面板位移（百分比）
-      const pct = st.startPct + (dy / 3 / h) * 100
+      // 位移映射为面板位移百分比（1:1 跟随鼠标）
+      const pct = st.startPct + (dy / h) * 100
       setDragPct(Math.max(0, Math.min(92, pct)))
       if (e.cancelable) e.preventDefault()
     }

@@ -178,8 +178,7 @@ export function useNavCanvas(
       .data(nodes)
       .enter()
       .append('g')
-      .style('cursor', 'pointer')
-      .on('click', (_e, n) => optionsRef.current.onNodeClick?.(n.ref))
+      .style('cursor', 'grab')
 
     nodeSel.append('circle').attr('class', 'nc-halo').attr('r', 18).attr('fill', ACCENT2).attr('opacity', 0.25)
     nodeSel
@@ -233,6 +232,35 @@ export function useNavCanvas(
 
     simRef.current = sim
     nodeSelRef.current = nodeSel
+
+    // ── 节点拖拽（d3.drag）：长按拖拽单个节点，其他节点受力学约束位移 ──
+    const dragHandler = d3.drag<SVGGElement, SimNode>()
+      .on('start', function (event, d) {
+        // 阻止事件冒泡到 SVG 的 zoom 行为，避免画布平移和节点拖拽同时触发
+        event.sourceEvent.stopPropagation()
+        if (!event.active) sim.alphaTarget(0.3).restart()
+        // 固定该节点的位置（fx/fy），仿真不再自动移动它
+        d.fx = d.x
+        d.fy = d.y
+        // 光标样式切换为抓取中
+        d3.select(this).style('cursor', 'grabbing')
+      })
+      .on('drag', (event, d) => {
+        d.fx = event.x
+        d.fy = event.y
+      })
+      .on('end', function (event, _d) {
+        if (!event.active) sim.alphaTarget(0)
+        // 保持 fx/fy 不释放，节点停留在拖拽终点位置
+        d3.select(this).style('cursor', 'grab')
+      })
+    nodeSel.call(dragHandler)
+
+    // 点击选中节点（d3.drag 自动抑制拖拽过程中的 click 事件）
+    nodeSel.on('click', (_e, n) => {
+      optionsRef.current.onNodeClick?.(n.ref)
+    })
+
     applyNodeStyles()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [containerRef])

@@ -161,3 +161,18 @@ navigation_nodes:
     preset_weight: 0.35
     browse_weight: 0.25
     connection_type: browse_derived
+  - target_id: node-cog-psy-subgraph
+    preset_weight: 0.5
+    browse_weight: 0.3
+    connection_type: browse_derived
+- id: node-cog-psy-subgraph
+  label: 认知心理学导航图
+  description: 钻入认知心理学导航图，探索注意力、记忆与心智模型
+  bound_cards: []
+  next_nodes:
+  - target_id: node-la-foundation
+    preset_weight: 0.5
+    browse_weight: 0.35
+    connection_type: browse_derived
+  sub_graph_id: g3
+  entry_node_id: node-cog-psy-foundation

@@ -213,15 +213,13 @@ const NavView: React.FC = () => {
     const entryId = config?.target_entry_node || currentNode.entry_node_id
     if (!targetId || !entryId) return
 
+    // 快照保存在钻入栈项中，每层独立，钻出时从对应栈项恢复
     const currentSelected = useNavStore.getState().selectedGraphIds
-    if (currentSelected.length > 0) {
-      useDrillStore.getState().setSnapshot(currentSelected)
-    }
 
     // 切换到子图的画布数据
     useNavStore.getState().setSelectedGraphs([targetId])
 
-    drillIn(targetId, entryId, currentNode.id, currentNode.label)
+    drillIn(targetId, entryId, currentNode.id, currentNode.label, currentSelected)
     setCurrentNode(entryId)
     toast(`已钻入「${currentNode.label}」`)
   }
@@ -231,11 +229,14 @@ const NavView: React.FC = () => {
     if (popped) {
       setCurrentNode(popped.parentNodeId)
 
-      const snapshot = useDrillStore.getState().snapshotSelectedGraphIds
-      if (snapshot.length > 0) {
-        useNavStore.getState().setSelectedGraphs(snapshot)
-        useDrillStore.getState().setSnapshot([])
+      // 从弹出的栈项中恢复对应层的快照
+      if (popped.snapshot && popped.snapshot.length > 0) {
+        useNavStore.getState().setSelectedGraphs(popped.snapshot)
       }
+
+      // 恢复面板显示的节点（子图节点的选中状态）
+      const parentNode = getCurrentNode({ currentNodeId: popped.parentNodeId })
+      if (parentNode) setPanelNode(parentNode)
 
       toast(`已钻出，回到「${popped.parentNodeLabel}」`)
     }

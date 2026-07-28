@@ -11,7 +11,7 @@ graphs:
     label: 数学基础
     description: 概率论、线性代数与微积分——机器学习与数据科学的数学基础
     created_at: '2026-07-26T00:00:00Z'
-    node_count: 7
+    node_count: 8
     card_count: 8
   - graph_id: g3
     file: g3-psychology.yaml

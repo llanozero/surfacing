@@ -8,6 +8,7 @@ export interface DrillStackItem {
   entryNodeId: string     // 目标图中的入口节点
   parentNodeLabel: string // 子图节点的 label（面包屑用）
   subGraphLabel: string   // 目标图的 label（面包屑用）
+  snapshot: string[]      // 钻入前的 selectedGraphIds 快照（钻出时恢复）
 }
 
 /** 面包屑路径中的一步 */

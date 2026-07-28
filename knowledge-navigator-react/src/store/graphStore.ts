@@ -29,6 +29,7 @@ interface GraphStore {
     entryNodeId: string,
     parentNodeId: string,
     parentNodeLabel: string,
+    snapshot: string[],
   ) => void
   /** 钻出子图：恢复到父图，定位到父节点 */
   drillOut: () => DrillStackItem | undefined
@@ -92,12 +93,12 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
     }
   },
 
-  drillIn: (subGraphId, entryNodeId, parentNodeId, parentNodeLabel) => {
+  drillIn: (subGraphId, entryNodeId, parentNodeId, parentNodeLabel, snapshot) => {
     const { graphs, activeGraphId } = get()
     const subGraphMeta = graphs.find((g) => g.graph_id === subGraphId)
     if (!subGraphMeta) return
 
-    // 记录钻入栈
+    // 记录钻入栈（含当前 selectedGraphIds 快照，钻出时恢复）
     useDrillStore.getState().push({
       parentGraphId: activeGraphId,
       parentNodeId,
@@ -105,6 +106,7 @@ export const useGraphStore = create<GraphStore>((set, get) => ({
       entryNodeId,
       parentNodeLabel,
       subGraphLabel: subGraphMeta.label,
+      snapshot,
     })
 
     // 切换到目标图

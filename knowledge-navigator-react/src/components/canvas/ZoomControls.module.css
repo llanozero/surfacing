@@ -1,9 +1,9 @@
 .controls {
   position: absolute;
   right: 12px;
-  bottom: 12px;
+  top: 12px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 6px;
   z-index: 5;
 }

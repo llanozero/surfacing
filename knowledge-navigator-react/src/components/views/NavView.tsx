@@ -1,6 +1,7 @@
 import React, { useRef, useState, useMemo } from 'react'
 import styles from './NavView.module.css'
 import Button from '../shared/Button'
+import BreadcrumbNav from '../shared/BreadcrumbNav'
 import NavCanvas from '../canvas/NavCanvas'
 import ZoomControls from '../canvas/ZoomControls'
 import NavModeToggle from '../nav/NavModeToggle'
@@ -35,6 +36,7 @@ const NavView: React.FC = () => {
   const allNavNodes = useNavStore((s) => s.allNavNodes)
   const allEdges = useNavStore((s) => s.allEdges)
   const waypoints = useNavStore((s) => s.waypoints)
+  const selectedGraphIds = useNavStore((s) => s.selectedGraphIds)
   const setMode = useNavStore((s) => s.setMode)
   const setCurrentNode = useNavStore((s) => s.setCurrentNode)
   const getNextNodes = useNavStore((s) => s.getNextNodes)
@@ -49,9 +51,29 @@ const NavView: React.FC = () => {
   const enterFreeBrowse = useBrowseStore((s) => s.enterFreeBrowse)
 
   const drillIn = useGraphStore((s) => s.drillIn)
-  const isInDrill = useDrillStore((s) => s.isInDrill)
+  const graphs = useGraphStore((s) => s.graphs)
+  const activeGraphId = useGraphStore((s) => s.activeGraphId)
+  const drillStack = useDrillStore((s) => s.stack)
+  const buildBreadcrumb = useDrillStore((s) => s.buildBreadcrumb)
 
   const currentNode = getCurrentNode({ currentNodeId })
+
+  const inDrill = drillStack.length > 0
+  const hasCanvasData = inDrill || selectedGraphIds.length > 0
+
+  /** 构建面包屑 */
+  const breadcrumbItems = useMemo(() => {
+    if (inDrill) {
+      const activeMeta = graphs.find((g) => g.graph_id === activeGraphId)
+      const currentLabel = activeMeta?.label ?? activeGraphId
+      const steps = buildBreadcrumb(activeGraphId, currentLabel, currentNodeId, currentNode?.label ?? '')
+      return steps.map((s) => ({
+        path: s.graphId,
+        label: s.nodeLabel || s.graphLabel || s.graphId,
+      }))
+    }
+    return [{ path: 'top', label: 'top' }]
+  }, [inDrill, graphs, activeGraphId, currentNodeId, currentNode, buildBreadcrumb])
 
   /** 从 allNavNodes 中提取所有子图节点 id */
   const subGraphNodeIds = useMemo(() => {
@@ -62,22 +84,18 @@ const NavView: React.FC = () => {
     return ids
   }, [allNavNodes])
 
-  /** 正在编辑的连接（✅ 指示器点击后弹出浮层） */
   const [editingConn, setEditingConn] = useState<{ fromId: string; toId: string } | null>(null)
 
-  /** QC-02：一键新建连接（预设优先级 #1，类型 user_added） */
   const handleQuickConnect = (fromId: string, toId: string) => {
     const created = ensureQuickConnection(fromId, toId)
     toast(created ? '已建立跳转连接' : '连接已存在')
   }
 
-  /** QC-07：批量补齐所有缺失连接 */
   const handleFillAll = () => {
     const count = fillAllMissingConnections(waypoints)
     toast(count > 0 ? `已建立 ${count} 条跳转连接` : '所有相邻途经点均已连接')
   }
 
-  // 点击节点：全览/逐站统一更新同一个 currentNodeId
   const handleNodeClick = (node: NavNode) => {
     setPanelNode(node)
     setCurrentNode(node.id)
@@ -87,13 +105,13 @@ const NavView: React.FC = () => {
     canvasRef,
     mode,
     {
-      allNodes: allNavNodes,
-      allEdges,
-      currentNode,
-      prevNodes: currentNode ? getPrevNodes(currentNode.id) : [],
-      nextNodes: currentNode ? getNextNodes(currentNode.id) : [],
+      allNodes: hasCanvasData ? allNavNodes : [],
+      allEdges: hasCanvasData ? allEdges : [],
+      currentNode: hasCanvasData ? currentNode : null,
+      prevNodes: currentNode && hasCanvasData ? getPrevNodes(currentNode.id) : [],
+      nextNodes: currentNode && hasCanvasData ? getNextNodes(currentNode.id) : [],
       waypointIds: new Set(waypoints.map((w) => w.id)),
-      selectedNodeId: currentNodeId,
+      selectedNodeId: hasCanvasData ? currentNodeId : '',
       subGraphNodeIds,
     },
     { onNodeClick: handleNodeClick },
@@ -104,7 +122,6 @@ const NavView: React.FC = () => {
     toast('已清空途径点')
   }
 
-  // 自由分支浏览：以第一个途经点为起始节点
   const handleFreeBrowse = () => {
     if (waypoints.length === 0) return
     const startNode = waypoints[0]
@@ -113,7 +130,6 @@ const NavView: React.FC = () => {
     switchView('free-browse')
   }
 
-  // 钻入子图：当前选中节点是子图节点时可用
   const handleDrillIn = () => {
     if (!currentNode) return
     const config = currentNode.subgraph_config
@@ -121,7 +137,6 @@ const NavView: React.FC = () => {
     const entryId = config?.target_entry_node || currentNode.entry_node_id
     if (!targetId || !entryId) return
 
-    // 快照当前选中的图列表
     const currentSelected = useNavStore.getState().selectedGraphIds
     if (currentSelected.length > 0) {
       useDrillStore.getState().setSnapshot(currentSelected)
@@ -132,13 +147,11 @@ const NavView: React.FC = () => {
     toast(`已钻入「${currentNode.label}」`)
   }
 
-  // 钻出子图
   const handleDrillOut = () => {
     const popped = useGraphStore.getState().drillOut()
     if (popped) {
       setCurrentNode(popped.parentNodeId)
 
-      // 恢复钻入前的选中图列表
       const snapshot = useDrillStore.getState().snapshotSelectedGraphIds
       if (snapshot.length > 0) {
         useNavStore.getState().setSelectedGraphs(snapshot)
@@ -149,13 +162,11 @@ const NavView: React.FC = () => {
     }
   }
 
-  // NavView → PlanView（spec §4.4）：途经点 ≥ 2 时进入路线规划
   const handleGoPlan = () => {
     if (waypoints.length < 2) {
       toast('至少需要 2 个途经点才能规划路线')
       return
     }
-    // 权重模式取第一个途经点的 priority_config.mode，缺省 mixed
     const weightMode = waypoints[0]?.priority_config?.mode ?? 'mixed'
     generatePlans(waypoints, weightMode)
     switchView('plan')
@@ -165,16 +176,26 @@ const NavView: React.FC = () => {
     <div className={styles.view}>
       <div className={styles.header}>
         <h2 className={styles.title}>认知导航</h2>
-        <p className={styles.subtitle}>
-          当前节点: {currentNode?.label ?? '—'}
-        </p>
+        {currentNode && hasCanvasData && (
+          <p className={styles.subtitle}>
+            当前节点: {currentNode.label}
+          </p>
+        )}
       </div>
+
+      {/* 面包屑导航 */}
+      <BreadcrumbNav items={breadcrumbItems} onSelect={() => {}} />
 
       <NavModeToggle mode={mode} onChange={setMode} />
 
-      <GraphMultiSelect />
+      {!inDrill && <GraphMultiSelect />}
 
       <div className={styles.canvasWrap}>
+        {!hasCanvasData && (
+          <div className={styles.emptyCanvas}>
+            <span>请在上方选择要加载的导航图</span>
+          </div>
+        )}
         <NavCanvas ref={canvasRef} />
         <ZoomControls onIn={zoomIn} onOut={zoomOut} onReset={zoomReset} />
         <DropDownPanel />
@@ -204,7 +225,7 @@ const NavView: React.FC = () => {
             钻入「{currentNode.label}」
           </Button>
         )}
-        {isInDrill() && (
+        {inDrill && (
           <Button variant="outline" size="sm" onClick={handleDrillOut}>
             钻出
           </Button>
@@ -224,7 +245,6 @@ const NavView: React.FC = () => {
         </Button>
       </div>
 
-      {/* 连接编辑浮层（QC-03 / QC-04） */}
       {editingConn &&
         (() => {
           const { status, ref } = getConnectionStatus(editingConn.fromId, editingConn.toId)

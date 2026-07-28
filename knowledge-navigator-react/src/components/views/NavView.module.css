@@ -34,6 +34,18 @@
   background: var(--bg-primary);
 }
 
+.emptyCanvas {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--label-quaternary);
+  font-size: 14px;
+  z-index: 1;
+  pointer-events: none;
+}
+
 .actions {
   flex-shrink: 0;
   display: flex;

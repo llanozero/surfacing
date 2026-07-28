@@ -75,6 +75,15 @@
   line-height: 1.6;
   color: var(--label-secondary);
 }
+.sourceInfo {
+  font-size: 11px;
+  color: #a78bfa;
+  padding: 2px 0;
+}
+.refIcon,
+.subIcon {
+  font-style: normal;
+}
 .stats {
   display: flex;
   gap: 8px;

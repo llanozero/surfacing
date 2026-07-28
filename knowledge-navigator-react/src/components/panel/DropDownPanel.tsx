@@ -5,6 +5,7 @@ import TtsButton from '../shared/TtsButton'
 import { usePanelStore } from '../../store/panelStore'
 import { useNavStore } from '../../store/navStore'
 import { useNavNodeStore } from '../../store/navNodeStore'
+import { useGraphStore } from '../../store/graphStore'
 import { useViewStore } from '../../store/viewStore'
 import { useToastStore } from '../shared/Toast'
 import { useDragPanel } from '../../hooks/useDragPanel'
@@ -28,6 +29,14 @@ const DropDownPanel: React.FC = () => {
 
   if (!node || hidden) return null
 
+  // 检查是否为引用节点（聚合画布数据中的 _nodeType 标记）
+  const nodeAny = node as any
+  const isRef = nodeAny._nodeType === 'ref' || node.type === 'ref'
+  const isSubgraph = nodeAny._nodeType === 'subgraph' || node.type === 'subgraph'
+  const sourceGraphLabel = nodeAny._sourceGraphLabel || ''
+  const sourceGraphId = nodeAny._sourceGraphId || ''
+  const sourceNodeId = nodeAny._sourceNodeId || ''
+
   const handleAddWaypoint = () => {
     addWaypoint(node)
     toast(`已添加途径点: ${node.label}`)
@@ -39,6 +48,14 @@ const DropDownPanel: React.FC = () => {
     useNavNodeStore.getState().selectNode(node.id)
     useNavNodeStore.getState().setActiveSubTab('nodes')
     useViewStore.getState().switchView('tree')
+  }
+
+  /** 跳转到引用节点的源图 */
+  const handleJumpToSource = () => {
+    if (sourceGraphId) {
+      useGraphStore.getState().setActiveGraph(sourceGraphId)
+      toast(`已切换到「${sourceGraphLabel || sourceGraphId}」`)
+    }
   }
 
   const boundCards = (node.bound_cards ?? [])
@@ -64,7 +81,11 @@ const DropDownPanel: React.FC = () => {
 
       {position === 'collapsed' ? (
         <div className={styles.collapsed}>
-          <span className={styles.collapsedLabel}>{node.label}</span>
+          <span className={styles.collapsedLabel}>
+            {isRef && '↻ '}
+            {isSubgraph && '📂 '}
+            {node.label}
+          </span>
           <Button variant="primary" size="sm" onClick={handleAddWaypoint}>
             添加为途径点
           </Button>
@@ -73,9 +94,19 @@ const DropDownPanel: React.FC = () => {
         <div className={styles.content}>
           <div className={styles.head}>
             <div className={styles.headRow}>
-              <h3 className={styles.nodeLabel}>{node.label}</h3>
+              <h3 className={styles.nodeLabel}>
+                {isRef && <span className={styles.refIcon} title="引用节点">↻ </span>}
+                {isSubgraph && <span className={styles.subIcon} title="子图节点">📂 </span>}
+                {node.label}
+              </h3>
               {node.description && <TtsButton text={node.description} size="sm" />}
             </div>
+            {isRef && sourceGraphLabel && (
+              <p className={styles.sourceInfo}>
+                来自 <strong>{sourceGraphLabel}</strong>
+                {sourceNodeId && <> · {sourceNodeId}</>}
+              </p>
+            )}
             <p className={styles.nodeDesc}>{node.description}</p>
             <div className={styles.stats}>
               <span className={styles.stat}>绑定卡片 {boundCards.length}</span>
@@ -113,6 +144,11 @@ const DropDownPanel: React.FC = () => {
           )}
 
           <div className={styles.actions}>
+            {isRef && sourceGraphId && (
+              <Button variant="outline" onClick={handleJumpToSource}>
+                跳转到源图「{sourceGraphLabel || sourceGraphId}」
+              </Button>
+            )}
             <Button variant="primary" onClick={handleAddWaypoint}>
               添加为途径点
             </Button>

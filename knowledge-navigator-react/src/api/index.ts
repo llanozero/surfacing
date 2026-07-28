@@ -1015,4 +1015,18 @@ export class KnowledgeNavigatorAPI {
       return refs.map((ref) => ({ ref, error: '批量解析失败' }))
     }
   }
+
+  // ============================================================
+  // 画布多图聚合数据
+  // ============================================================
+
+  /** 根据勾选的图列表，获取后端聚合的画布数据 */
+  async fetchCanvasData(selectedGraphIds: string[]): Promise<ApiResult<import('../data/types').CanvasDataResponse>> {
+    if (!isProMode()) return err('多图选择需要 pro 模式')
+    return remoteResult(() =>
+      this.adapter.post<import('../data/types').CanvasDataResponse>('/api/graphs/canvas-data', {
+        selected_graph_ids: selectedGraphIds,
+      }),
+    )
+  }
 }

@@ -51,6 +51,9 @@ export interface CrossGraphResource<T> {
 /** 全量聚合模式特殊 ID */
 export const CANVAS_ALL_GRAPH_ID = '__all__'
 
+/** 顶层虚拟图 ID（面包屑根路径） */
+export const TOP_GRAPH_ID = 'top'
+
 /** 构建命名空间化 ID："{graph_id}::{node_id}" */
 export function nsId(graphId: string, nodeId: string): string {
   return `${graphId}::${nodeId}`

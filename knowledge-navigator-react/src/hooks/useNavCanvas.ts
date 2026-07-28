@@ -14,6 +14,8 @@ export interface NavCanvasData {
   selectedNodeId?: string | null
   /** 子图节点 id 集合（在全览中显示特殊样式） */
   subGraphNodeIds?: Set<string>
+  /** 引用节点 id 集合（在全览中显示虚线样式） */
+  refNodeIds?: Set<string>
 }
 
 export interface NavCanvasOptions {
@@ -332,6 +334,7 @@ export function useNavCanvas(
     const ids = dataRef.current.waypointIds ?? new Set<string>()
     const selectedId = dataRef.current.selectedNodeId ?? null
     const subIds = dataRef.current.subGraphNodeIds ?? new Set<string>()
+    const refIds = dataRef.current.refNodeIds ?? new Set<string>()
 
     // body 圆圈：选中 > 途经点 > 普通
     nodeSel.select<SVGCircleElement>('circle.nc-body')
@@ -339,13 +342,18 @@ export function useNavCanvas(
       .attr('stroke', (n) => {
         if (n.id === selectedId) return ACCENT
         if (ids.has(n.id)) return WAYPOINT
+        if (refIds.has(n.id)) return '#a78bfa' // 紫色表示引用节点
         return ACCENT2
       })
       .attr('stroke-width', (n) => {
         if (n.id === selectedId || ids.has(n.id)) return 4
         return 2.5
       })
-      .attr('stroke-dasharray', (n) => subIds.has(n.id) ? '4 3' : null)
+      .attr('stroke-dasharray', (n) => {
+        if (refIds.has(n.id)) return '6 3' // 引用节点虚线
+        if (subIds.has(n.id)) return '4 3'  // 子图节点虚线
+        return null
+      })
 
     // halo 光晕
     nodeSel.select<SVGCircleElement>('circle.nc-halo')
@@ -353,6 +361,7 @@ export function useNavCanvas(
       .attr('fill', (n) => {
         if (n.id === selectedId) return ACCENT
         if (ids.has(n.id)) return WAYPOINT
+        if (refIds.has(n.id)) return '#a78bfa'
         return ACCENT2
       })
       .attr('opacity', (n) => {
@@ -361,7 +370,7 @@ export function useNavCanvas(
         return 0.25
       })
 
-    // 子图节点标识：小文件夹图标（文本）
+    // 子图节点标识：文件夹图标
     nodeSel.select<SVGTextElement>('text.nc-subgraph-icon').remove()
     nodeSel.each(function (n) {
       if (!subIds.has(n.id)) return
@@ -373,6 +382,22 @@ export function useNavCanvas(
         .attr('fill', '#ffd230')
         .attr('font-size', '10px')
         .text('📂')
+    })
+
+    // 引用节点标识：来源图标签
+    nodeSel.select<SVGTextElement>('text.nc-ref-label').remove()
+    nodeSel.each(function (n) {
+      if (!refIds.has(n.id)) return
+      const g = d3.select(this)
+      const refNode = n.ref as any
+      const srcLabel = refNode?._sourceGraphLabel || refNode?._sourceGraphId || ''
+      g.append('text')
+        .attr('class', 'nc-ref-label')
+        .attr('text-anchor', 'middle')
+        .attr('dy', 54)
+        .attr('fill', '#a78bfa')
+        .attr('font-size', '8px')
+        .text(`↻ ${srcLabel}`)
     })
 
     // 脉冲环：选中节点添加（CSS 动画驱动），非选中移除
@@ -408,7 +433,7 @@ export function useNavCanvas(
 
   useEffect(() => {
     applyNodeStyles()
-  }, [data.selectedNodeId, data.waypointIds, data.subGraphNodeIds, applyNodeStyles])
+  }, [data.selectedNodeId, data.waypointIds, data.subGraphNodeIds, data.refNodeIds, applyNodeStyles])
 
   /* ---------- 缩放控制 ---------- */
   const zoomBy = useCallback((factor: number) => {

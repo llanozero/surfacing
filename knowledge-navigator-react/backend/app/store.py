@@ -88,6 +88,18 @@ class Graph:
                 return n
         return None
 
+    def get_node_ref(self, node_id: str) -> dict[str, Any] | None:
+        """获取节点的引用视图：提取描述性字段，丢弃 next_nodes。"""
+        n = self.get_node(node_id)
+        if not n:
+            return None
+        return {
+            "id": n.get("id", ""),
+            "label": n.get("label", ""),
+            "description": n.get("description", ""),
+            "bound_cards": n.get("bound_cards", []),
+        }
+
     def upsert_node(self, node: dict[str, Any]) -> None:
         for i, n in enumerate(self.nodes):
             if n.get("id") == node.get("id"):
@@ -245,6 +257,107 @@ class DataStore:
         for g in self.graphs.values():
             result.extend(g.cards)
         return result
+
+    def get_aggregated_canvas_data(self, selected_graph_ids: list[str]) -> dict[str, Any]:
+        """根据勾选的图列表，聚合返回画布所需的节点和边数据。
+        
+        处理三种节点类型：
+        - 普通节点：直接返回
+        - 引用节点（ref_graph_id + ref_node_id）：从目标图提取描述字段
+        - 子图节点（sub_graph_id + entry_node_id）：保持原样
+        """
+        nodes: list[dict[str, Any]] = []
+        edges: list[dict[str, Any]] = []
+        graph_labels: dict[str, str] = {}
+
+        for gid in selected_graph_ids:
+            g = self.graphs.get(gid)
+            if not g:
+                continue
+            graph_labels[gid] = g.label
+
+            for node in g.nodes:
+                node_id = node.get("id", "")
+                
+                # 判断节点类型
+                ref_graph_id = node.get("ref_graph_id")
+                ref_node_id = node.get("ref_node_id")
+                
+                if ref_graph_id and ref_node_id:
+                    # 引用节点：从目标图提取描述字段
+                    target_g = self.graphs.get(ref_graph_id)
+                    if target_g:
+                        ref_data = target_g.get_node_ref(ref_node_id)
+                        if ref_data:
+                            # 合并：本图 ID + 目标图描述 + 本图连线
+                            resolved = {
+                                **node,
+                                "id": node_id,
+                                "label": ref_data["label"],
+                                "description": ref_data["description"],
+                                "bound_cards": ref_data["bound_cards"],
+                                "next_nodes": node.get("next_nodes", []),
+                                "_nodeType": "ref",
+                                "_sourceGraphId": ref_graph_id,
+                                "_sourceGraphLabel": target_g.label,
+                                "_sourceNodeId": ref_node_id,
+                            }
+                            nodes.append(resolved)
+                        else:
+                            # 降级：保留本节点但标记缺失
+                            resolved = {
+                                **node,
+                                "_nodeType": "ref",
+                                "_sourceGraphId": ref_graph_id,
+                                "_sourceNodeId": ref_node_id,
+                                "_missing": True,
+                            }
+                            nodes.append(resolved)
+                    else:
+                        resolved = {
+                            **node,
+                            "_nodeType": "ref",
+                            "_sourceGraphId": ref_graph_id,
+                            "_sourceNodeId": ref_node_id,
+                            "_missing": True,
+                        }
+                        nodes.append(resolved)
+                else:
+                    # 普通节点或子图节点
+                    sub_gid = node.get("sub_graph_id")
+                    entry_nid = node.get("entry_node_id")
+                    if sub_gid and entry_nid:
+                        resolved = {
+                            **node,
+                            "_nodeType": "subgraph",
+                            "_sourceGraphId": gid,
+                            "_sourceGraphLabel": g.label,
+                        }
+                    else:
+                        resolved = {
+                            **node,
+                            "_nodeType": "normal",
+                            "_sourceGraphId": gid,
+                            "_sourceGraphLabel": g.label,
+                        }
+                    nodes.append(resolved)
+
+                # 收集边（所有节点类型的连线都从本图的 next_nodes 派生）
+                for ref in node.get("next_nodes", []):
+                    target_id = ref.get("target_id", "")
+                    edges.append({
+                        "source": node_id,
+                        "target": target_id,
+                        "weight": ref.get("preset_weight", 1.0),
+                    })
+
+        return {
+            "nodes": nodes,
+            "edges": edges,
+            "graph_labels": graph_labels,
+            "node_count": len(nodes),
+            "edge_count": len(edges),
+        }
 
     def graph_list(self) -> list[dict[str, Any]]:
         return list(self.manifest.get("graphs", []))

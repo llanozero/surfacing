@@ -27,6 +27,10 @@ class DrillPathBody(BaseModel):
     graph_ids: list[str]
 
 
+class CanvasDataBody(BaseModel):
+    selected_graph_ids: list[str]
+
+
 # ── 清单 ──
 
 @router.get("")
@@ -99,6 +103,22 @@ def resolve_drill_path(body: DrillPathBody) -> dict[str, Any]:
         else:
             steps.append({"graph_id": gid, "graph_label": gid, "description": ""})
     return {"steps": steps}
+
+
+# ── 画布多图聚合数据 ──
+
+@router.post("/canvas-data")
+def get_canvas_data(body: CanvasDataBody) -> dict[str, Any]:
+    """根据勾选的图列表，聚合返回画布节点和边数据。
+    
+    处理三种节点类型：
+    - 普通节点（无特殊字段）：直接返回
+    - 引用节点（ref_graph_id + ref_node_id）：从目标图取描述，连连本图
+    - 子图节点（sub_graph_id + entry_node_id）：保留钻入能力
+    """
+    if not body.selected_graph_ids:
+        raise HTTPException(status_code=400, detail="至少需要选择一个图")
+    return store.get_aggregated_canvas_data(body.selected_graph_ids)
 
 
 # ── 单图操作 ──

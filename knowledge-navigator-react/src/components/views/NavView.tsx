@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react'
+import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react'
 import styles from './NavView.module.css'
 import Button from '../shared/Button'
 import BreadcrumbNav from '../shared/BreadcrumbNav'
@@ -9,7 +9,7 @@ import WaypointsBar from '../nav/WaypointsBar'
 import ConnectionEditPopover from '../nav/ConnectionEditPopover'
 import GraphMultiSelect from '../nav/GraphMultiSelect'
 import DropDownPanel from '../panel/DropDownPanel'
-import { useNavStore, getCurrentNode } from '../../store/navStore'
+import { useNavStore, getCurrentNode, type NextNodeItem } from '../../store/navStore'
 import { useBrowseStore } from '../../store/browseStore'
 import { usePanelStore } from '../../store/panelStore'
 import { usePlanStore } from '../../store/planStore'
@@ -18,6 +18,7 @@ import { useToastStore } from '../shared/Toast'
 import { useGraphStore } from '../../store/graphStore'
 import { useDrillStore } from '../../store/drillStore'
 import { useNavCanvas } from '../../hooks/useNavCanvas'
+import { KnowledgeNavigatorAPI } from '../../api'
 import {
   ensureQuickConnection,
   updateQuickConnection,
@@ -26,15 +27,17 @@ import {
   getConnectionStatus,
 } from '../../utils/quickConnectUtils'
 import { getNavNode } from '../../data/allNavNodes'
-import type { NavNode } from '../../data/types'
+import type { NavNode, CanvasDataResponse, GraphEdge } from '../../data/types'
+
+type CanvasNode = CanvasDataResponse['nodes'][number]
+
+const api = new KnowledgeNavigatorAPI()
 
 const NavView: React.FC = () => {
   const canvasRef = useRef<HTMLDivElement>(null)
 
   const mode = useNavStore((s) => s.mode)
   const currentNodeId = useNavStore((s) => s.currentNodeId)
-  const allNavNodes = useNavStore((s) => s.allNavNodes)
-  const allEdges = useNavStore((s) => s.allEdges)
   const waypoints = useNavStore((s) => s.waypoints)
   const selectedGraphIds = useNavStore((s) => s.selectedGraphIds)
   const setMode = useNavStore((s) => s.setMode)
@@ -59,7 +62,36 @@ const NavView: React.FC = () => {
   const currentNode = getCurrentNode({ currentNodeId })
 
   const inDrill = drillStack.length > 0
-  const hasCanvasData = inDrill || selectedGraphIds.length > 0
+
+  /** 画布聚合数据（从后端获取） */
+  const [canvasNodes, setCanvasNodes] = useState<CanvasNode[]>([])
+  const [canvasEdges, setCanvasEdges] = useState<GraphEdge[]>([])
+
+  /** 当 selectedGraphIds 变化时，从后端获取聚合画布数据 */
+  useEffect(() => {
+    if (inDrill) return // 钻入模式下使用单一图数据
+    if (selectedGraphIds.length === 0) {
+      setCanvasNodes([])
+      setCanvasEdges([])
+      return
+    }
+    let cancelled = false
+    api.fetchCanvasData(selectedGraphIds).then((res) => {
+      if (cancelled) return
+      if (res.ok) {
+        setCanvasNodes(res.data.nodes)
+        setCanvasEdges(res.data.edges)
+      } else {
+        // 降级到本地数据
+        setCanvasNodes([])
+        setCanvasEdges([])
+        toast('获取画布数据失败: ' + res.error)
+      }
+    })
+    return () => { cancelled = true }
+  }, [selectedGraphIds.join(','), inDrill]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const hasCanvasData = inDrill || canvasNodes.length > 0
 
   /** 构建面包屑 */
   const breadcrumbItems = useMemo(() => {
@@ -75,14 +107,58 @@ const NavView: React.FC = () => {
     return [{ path: 'top', label: 'top' }]
   }, [inDrill, graphs, activeGraphId, currentNodeId, currentNode, buildBreadcrumb])
 
-  /** 从 allNavNodes 中提取所有子图节点 id */
+  /** 从画布数据中提取子图节点和引用节点 id */
   const subGraphNodeIds = useMemo(() => {
     const ids = new Set<string>()
-    for (const n of allNavNodes) {
-      if (n.subgraph_config?.target_graph_id || n.sub_graph_id) ids.add(n.id)
+    for (const n of canvasNodes) {
+      if (n._nodeType === 'subgraph' || n.sub_graph_id) ids.add(n.id)
     }
     return ids
-  }, [allNavNodes])
+  }, [canvasNodes])
+
+  const refNodeIds = useMemo(() => {
+    const ids = new Set<string>()
+    for (const n of canvasNodes) {
+      if (n._nodeType === 'ref') ids.add(n.id)
+    }
+    return ids
+  }, [canvasNodes])
+
+  /** 构建 canvasNodes → NavNode 的映射，供查找前驱后继 */
+  const canvasNodeMap = useMemo(() => {
+    const map = new Map<string, CanvasNode>()
+    for (const n of canvasNodes) map.set(n.id, n)
+    return map
+  }, [canvasNodes])
+
+  /** 在画布数据中查找节点的前驱 */
+  const getCanvasPrevNodes = useCallback((nodeId: string) => {
+    const result: { node: NavNode; ref: { weight: number; source: string; seq: number; target_id: string; preset_weight: number; browse_weight: number; connection_type: 'preset' | 'browse_derived' | 'user_added' } }[] = []
+    for (const n of canvasNodes) {
+      for (const ref of n.next_nodes ?? []) {
+        if (ref.target_id === nodeId) {
+          result.push({ node: n as NavNode, ref: { ...ref, weight: ref.preset_weight, source: 'preset' as const, seq: 0 } })
+        }
+      }
+    }
+    return result as NextNodeItem[]
+  }, [canvasNodes])
+
+  /** 在画布数据中查找节点的后继 */
+  const getCanvasNextNodes = useCallback((nodeId: string) => {
+    const node = canvasNodeMap.get(nodeId)
+    if (!node) return [] as NextNodeItem[]
+    return (node.next_nodes ?? [])
+      .map((ref) => {
+        const target = canvasNodeMap.get(ref.target_id)
+        if (!target) return null
+        return {
+          node: target as NavNode,
+          ref: { ...ref, weight: ref.preset_weight, source: 'preset' as const, seq: 0 },
+        }
+      })
+      .filter((x): x is NonNullable<typeof x> => x !== null) as NextNodeItem[]
+  }, [canvasNodeMap])
 
   const [editingConn, setEditingConn] = useState<{ fromId: string; toId: string } | null>(null)
 
@@ -97,6 +173,7 @@ const NavView: React.FC = () => {
   }
 
   const handleNodeClick = (node: NavNode) => {
+    // 保留 _nodeType 等聚合字段
     setPanelNode(node)
     setCurrentNode(node.id)
   }
@@ -105,14 +182,15 @@ const NavView: React.FC = () => {
     canvasRef,
     mode,
     {
-      allNodes: hasCanvasData ? allNavNodes : [],
-      allEdges: hasCanvasData ? allEdges : [],
+      allNodes: hasCanvasData ? canvasNodes as NavNode[] : [],
+      allEdges: hasCanvasData ? canvasEdges : [],
       currentNode: hasCanvasData ? currentNode : null,
-      prevNodes: currentNode && hasCanvasData ? getPrevNodes(currentNode.id) : [],
-      nextNodes: currentNode && hasCanvasData ? getNextNodes(currentNode.id) : [],
+      prevNodes: currentNode && hasCanvasData ? (inDrill ? getPrevNodes(currentNode.id) : getCanvasPrevNodes(currentNode.id)) : [],
+      nextNodes: currentNode && hasCanvasData ? (inDrill ? getNextNodes(currentNode.id) : getCanvasNextNodes(currentNode.id)) : [],
       waypointIds: new Set(waypoints.map((w) => w.id)),
       selectedNodeId: hasCanvasData ? currentNodeId : '',
       subGraphNodeIds,
+      refNodeIds,
     },
     { onNodeClick: handleNodeClick },
   )

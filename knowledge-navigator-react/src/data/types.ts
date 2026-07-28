@@ -29,8 +29,8 @@ export interface NavNode {
   id: string
   label: string
   description: string
-  /** 节点类型：normal | subgraph */
-  type?: 'normal' | 'subgraph'
+  /** 节点类型：normal | subgraph | ref */
+  type?: 'normal' | 'subgraph' | 'ref'
   bound_cards?: string[]
   browse_history?: { from: string; count: number; last_at: string }[]
   next_nodes: NextNodeRef[]
@@ -46,18 +46,42 @@ export interface NavNode {
   sub_graph_id?: string
   /** @deprecated 使用 subgraph_config.target_entry_node */
   entry_node_id?: string
+  /** 引用节点：指向另一个导航图 */
+  ref_graph_id?: string
+  /** 引用节点：另一个导航图中的节点 */
+  ref_node_id?: string
 }
 
 export interface NamespacedNode extends NavNode {
   _nsId: string
   _sourceGraphId: string
   _sourceGraphLabel: string
+  _nodeType?: 'normal' | 'ref' | 'subgraph'
+  _sourceNodeId?: string
+  _missing?: boolean
 }
 
 export interface GraphEdge {
   source: string
   target: string
   weight: number
+}
+
+/** POST /api/graphs/canvas-data 响应类型 */
+export interface CanvasDataResponse {
+  nodes: Array<NavNode & {
+    _nodeType: 'normal' | 'ref' | 'subgraph'
+    _sourceGraphId: string
+    _sourceGraphLabel: string
+    _sourceNodeId?: string
+    _missing?: boolean
+    sub_graph_id?: string
+    entry_node_id?: string
+  }>
+  edges: GraphEdge[]
+  graph_labels: Record<string, string>
+  node_count: number
+  edge_count: number
 }
 
 export interface BrowseCard {

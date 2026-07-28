@@ -145,7 +145,9 @@ export function useNavCanvas(
     const container = containerRef.current
     const overviewG = overviewGRef.current
     const d = dataRef.current
-    if (!container || !overviewG || !d.allNodes || !d.allEdges || overviewBuiltRef.current) return
+    if (!container || !overviewG || !d.allNodes || !d.allEdges) return
+    if (d.allNodes.length === 0) return
+    if (overviewBuiltRef.current) return
     overviewBuiltRef.current = true
 
     const w = container.clientWidth
@@ -391,9 +393,13 @@ export function useNavCanvas(
   useEffect(() => {
     overviewGRef.current?.style('display', mode === 'overview' ? 'inline' : 'none')
     stationGRef.current?.style('display', mode === 'station' ? 'inline' : 'none')
-    if (mode === 'overview') buildOverview()
-    else renderStation()
-  }, [mode, buildOverview, renderStation])
+    if (mode === 'overview') {
+      // data 从空→非空时会触发重入（allNodes.length 变化），因 overviewBuiltRef 仍为 false
+      if (!overviewBuiltRef.current) buildOverview()
+    } else {
+      renderStation()
+    }
+  }, [mode, data.allNodes?.length, data.allEdges?.length, buildOverview, renderStation])
 
   /* ---------- 数据变化：逐站重绘 / 途径点高亮 ---------- */
   useEffect(() => {

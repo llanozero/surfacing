@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { CognitiveCard } from '../../data/types'
 import { allNavNodes } from '../../data/allNavNodes'
 import { useCardStore } from '../../store/cardStore'
@@ -19,7 +19,7 @@ const TAG_OPTIONS = [
   { value: '层级分类', label: '层级分类' },
 ]
 
-/** 认知卡片编辑面板：基本字段 + 语料库 + 绑定导航节点（自动保存） */
+/** 认知卡片编辑面板：基本字段 + 语料库 + 绑定导航节点（草稿暂存，保存时写入） */
 const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
   const { updateField, addCorpus, updateCorpus, removeCorpus, addBoundNode, removeBoundNode, deleteCard } =
     useCardStore()
@@ -29,6 +29,20 @@ const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
   const [selectorOpen, setSelectorOpen] = useState(false)
   const [newCorpus, setNewCorpus] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+
+  // 草稿状态：本地编辑暂存，保存时才写入数据源
+  const [draftTitle, setDraftTitle] = useState(card.title)
+  const [draftDesc, setDraftDesc] = useState(card.description ?? '')
+  const [draftTag, setDraftTag] = useState(card.tag ?? '')
+  const [dirty, setDirty] = useState(false)
+
+  // 切换卡片时重置草稿
+  useEffect(() => {
+    setDraftTitle(card.title)
+    setDraftDesc(card.description ?? '')
+    setDraftTag(card.tag ?? '')
+    setDirty(false)
+  }, [card.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   /** 子卡片（文件夹的生成依据之一） */
   const children = allCards.filter((c) => {
@@ -55,7 +69,8 @@ const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
       text = text.slice(0, 9) + '…'
       truncated = true
     }
-    updateField(card.id, 'title', text)
+    setDraftTitle(text)
+    setDirty(true)
     toast(`已生成标题${result.source === 'local' ? '（本地模式）' : ''}${truncated ? '（已截断）' : ''}`)
   }
 
@@ -65,8 +80,27 @@ const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
       toast('生成失败，请重试')
       return
     }
-    updateField(card.id, 'description', result.text)
+    setDraftDesc(result.text)
+    setDirty(true)
     toast(`已生成描述${result.source === 'local' ? '（本地模式）' : ''}`)
+  }
+
+  // 保存草稿（仅本地缓存，不写后端）
+  const handleSave = () => {
+    updateField(card.id, 'title', draftTitle)
+    updateField(card.id, 'description', draftDesc)
+    updateField(card.id, 'tag', draftTag || undefined)
+    setDirty(false)
+    toast('卡片已保存（本地缓存）')
+  }
+
+  // 取消草稿（放弃修改）
+  const handleCancel = () => {
+    setDraftTitle(card.title)
+    setDraftDesc(card.description ?? '')
+    setDraftTag(card.tag ?? '')
+    setDirty(false)
+    toast('已放弃修改')
   }
 
   const boundNodes = (card.bound_nodes ?? [])
@@ -108,8 +142,11 @@ const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
           <div className={styles.aiRow}>
             <input
               className={mgrStyles.input}
-              value={card.title}
-              onChange={(e) => updateField(card.id, 'title', e.target.value)}
+              value={draftTitle}
+              onChange={(e) => {
+                setDraftTitle(e.target.value)
+                setDirty(true)
+              }}
             />
             <button
               className={styles.aiButton}
@@ -130,8 +167,11 @@ const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
             </span>
             <select
               className={mgrStyles.typeSelect}
-              value={card.tag ?? ''}
-              onChange={(e) => updateField(card.id, 'tag', e.target.value || undefined)}
+              value={draftTag}
+              onChange={(e) => {
+                setDraftTag(e.target.value)
+                setDirty(true)
+              }}
             >
               {TAG_OPTIONS.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -148,8 +188,11 @@ const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
               className={mgrStyles.textarea}
               rows={2}
               placeholder="简短概述卡片内容（1-2 句话）"
-              value={card.description ?? ''}
-              onChange={(e) => updateField(card.id, 'description', e.target.value)}
+              value={draftDesc}
+              onChange={(e) => {
+                setDraftDesc(e.target.value)
+                setDirty(true)
+              }}
             />
             <button
               className={styles.aiButton}
@@ -163,6 +206,27 @@ const CardEditPanel: React.FC<CardEditPanelProps> = ({ card }) => {
           </div>
         </div>
       </section>
+
+      {/* ── 保存/取消按钮 ── */}
+      <div className={mgrStyles.saveBar}>
+        <button
+          className={mgrStyles.saveBtn}
+          onClick={handleSave}
+          disabled={!dirty}
+        >
+          💾 保存
+        </button>
+        <button
+          className={mgrStyles.cancelBtn}
+          onClick={handleCancel}
+          disabled={!dirty}
+        >
+          ↩ 取消
+        </button>
+        <span className={mgrStyles.saveHint}>
+          {dirty ? '有未保存的更改' : '已是最新'}
+        </span>
+      </div>
 
       {/* 语料库 */}
       <section className={mgrStyles.section}>

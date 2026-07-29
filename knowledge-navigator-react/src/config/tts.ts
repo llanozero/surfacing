@@ -13,7 +13,7 @@ const DEFAULT: TtsConfig = {
   voice: 'zh-CN-XiaoxiaoNeural',
   rate: '+0%',
   pitch: '+0Hz',
-  prewarm: true,
+  prewarm: false,
 }
 
 export function getDefaultTtsConfig(): TtsConfig {

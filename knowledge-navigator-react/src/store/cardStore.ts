@@ -5,7 +5,7 @@ import { allNavNodes } from '../data/allNavNodes'
 import { deriveParent } from '../utils/treeUtils'
 import { useTreeStore } from './treeStore'
 import { useNavNodeStore } from './navNodeStore'
-import { wtCreateCard, wtDeleteCard, wtUpdateCard } from '../api/writeThrough'
+import { wtCreateCard, wtDeleteCard } from '../api/writeThrough'
 
 interface CardStore {
   /** 全部认知卡片（与 data/cards 共享数据源，编辑即时同步） */
@@ -29,18 +29,15 @@ interface CardStore {
   removeBoundNode: (id: string, nodeId: string) => void
 }
 
-/**
+/** 
  * 将更新后的卡片写回共享数据源：
  * 1. cognitiveCards 数组（搜索匹配、浏览卡片派生等直接读取）
  * 2. treeStore.flatData（树形视图展示 title/tag/type）
- * 当前阶段仅内存生效，YAML 持久化由后续 data-saver 实现。
+ * 仅内存生效，YAML 持久化由导航视图同步按钮统一完成。
  */
 function commitToSource(updated: CognitiveCard, allCards: CognitiveCard[]) {
   const idx = cognitiveCards.findIndex((c) => c.id === updated.id)
   if (idx >= 0) cognitiveCards[idx] = updated
-
-  // 远程模式：同步到后端（火忘，失败仅告警）
-  wtUpdateCard(updated)
 
   const treeStore = useTreeStore.getState()
   useTreeStore.setState({

@@ -258,6 +258,74 @@ class DataStore:
 
     # ---------- 聚合查询 ----------
 
+    def get_node(self, node_id: str) -> dict[str, Any] | None:
+        """跨所有图搜索单个节点。"""
+        for g in self.graphs.values():
+            node = g.get_node(node_id)
+            if node:
+                return node
+        return None
+
+    def get_card(self, card_id: str) -> dict[str, Any] | None:
+        """跨所有图搜索单个卡片。"""
+        for g in self.graphs.values():
+            card = g.get_card(card_id)
+            if card:
+                return card
+        return None
+
+    # ---------- 全局持久化（兼容旧路由） ----------
+
+    def save(self) -> None:
+        """将所有内存中的图数据写回 YAML 文件（兼容旧版调用）。"""
+        self.save_all()
+
+    def upsert_card(self, card: dict[str, Any]) -> None:
+        """跨所有图插入或更新卡片（兼容旧版调用）。"""
+        card_id = card.get("id", "")
+        for g in self.graphs.values():
+            existing = g.get_card(card_id)
+            if existing is not None:
+                g.upsert_card(card)
+                self.save_graph(g.graph_id)
+                return
+        # 不在任何图中 → 添加到第一个图
+        first = next(iter(self.graphs.values()), None)
+        if first:
+            first.upsert_card(card)
+            self.save_graph(first.graph_id)
+
+    def upsert_node(self, node: dict[str, Any]) -> None:
+        """跨所有图插入或更新节点（兼容旧版调用）。"""
+        node_id = node.get("id", "")
+        for g in self.graphs.values():
+            existing = g.get_node(node_id)
+            if existing is not None:
+                g.upsert_node(node)
+                self.save_graph(g.graph_id)
+                return
+        # 不在任何图中 → 添加到第一个图
+        first = next(iter(self.graphs.values()), None)
+        if first:
+            first.upsert_node(node)
+            self.save_graph(first.graph_id)
+
+    def delete_card(self, card_id: str) -> bool:
+        """跨所有图删除卡片（兼容旧版调用）。"""
+        for g in self.graphs.values():
+            if g.delete_card(card_id):
+                self.save_graph(g.graph_id)
+                return True
+        return False
+
+    def delete_node(self, node_id: str) -> bool:
+        """跨所有图删除节点（兼容旧版调用）。"""
+        for g in self.graphs.values():
+            if g.delete_node(node_id):
+                self.save_graph(g.graph_id)
+                return True
+        return False
+
     def all_nodes(self, graph_id: str | None = None) -> list[dict[str, Any]]:
         if graph_id:
             g = self.graphs.get(graph_id)

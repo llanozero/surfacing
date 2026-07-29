@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import styles from './StatusBar.module.css'
-import TtsSettingsDialog from '../settings/TtsSettingsDialog'
+import SettingsDialog from '../settings/SettingsDialog'
 import { useGraphStore } from '../../store/graphStore'
 
 const StatusBar: React.FC = () => {
   const [time, setTime] = React.useState('')
-  const [ttsOpen, setTtsOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const { fetchGraphList } = useGraphStore()
 
   React.useEffect(() => {
@@ -29,12 +29,12 @@ const StatusBar: React.FC = () => {
       <span className={styles.spacer} />
       <button
         className={styles.ttsBtn}
-        onClick={() => setTtsOpen(true)}
-        title="TTS 语音设置"
+        onClick={() => setSettingsOpen(true)}
+        title="设置"
       >
         ⚙
       </button>
-      {ttsOpen && <TtsSettingsDialog onClose={() => setTtsOpen(false)} />}
+      {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
     </header>
   )
 }

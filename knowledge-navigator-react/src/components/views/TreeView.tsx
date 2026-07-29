@@ -8,7 +8,7 @@ import CardEditPanel from '../tree/CardEditPanel'
 import NodeManagementView from '../node-mgr/NodeManagementView'
 import ImportConfirmDialog from '../dialog/ImportConfirmDialog'
 import ImportErrorDialog from '../dialog/ImportErrorDialog'
-import BackendSettingsDialog from '../settings/BackendSettingsDialog'
+import SettingsDialog from '../settings/SettingsDialog'
 import { useTreeStore } from '../../store/treeStore'
 import { useCardStore, getEditingCard } from '../../store/cardStore'
 import { useNavNodeStore } from '../../store/navNodeStore'
@@ -136,8 +136,8 @@ const TreeView: React.FC = () => {
           <button
             className={styles.ioBtn}
             onClick={() => setShowBackendSettings(true)}
-            title="后端设置（本地 / 远程模式）"
-            aria-label="后端设置"
+            title="设置"
+            aria-label="设置"
           >
             ⚙
           </button>
@@ -201,7 +201,7 @@ const TreeView: React.FC = () => {
         <ImportErrorDialog errors={importErrors} onClose={() => setImportErrors(null)} />
       )}
       {showBackendSettings && (
-        <BackendSettingsDialog onClose={() => setShowBackendSettings(false)} />
+        <SettingsDialog initialTab="backend" onClose={() => setShowBackendSettings(false)} />
       )}
     </div>
   )

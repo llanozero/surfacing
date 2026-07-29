@@ -1,15 +1,19 @@
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 import styles from './SearchView.module.css'
 import SearchBar from '../shared/SearchBar'
 import Button from '../shared/Button'
 import ModeToggle from '../search/ModeToggle'
 import CardMatchItem from '../search/CardMatchItem'
 import BoundNodeItem from '../search/BoundNodeItem'
+import SettingsDialog from '../settings/SettingsDialog'
 import { useSearchStore, getSelectedCard, getSelectedNode } from '../../store/searchStore'
 import { useNavStore } from '../../store/navStore'
 import { useViewStore } from '../../store/viewStore'
+import { getBackendConfig } from '../../config/backend'
+import { getTtsConfig } from '../../config/tts'
 
 const SearchView: React.FC = () => {
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const {
     query, matchedCards, selectedCardId, boundNodes, selectedNodeId,
     matchMode, isVectorLoading, vectorError,
@@ -21,6 +25,18 @@ const SearchView: React.FC = () => {
   const state = useSearchStore.getState()
   const selectedCard = getSelectedCard(state)
   const selectedNode = getSelectedNode(state)
+
+  /** 后端 & TTS 设置摘要 */
+  const settingsSummary = useMemo(() => {
+    const be = getBackendConfig()
+    const tts = getTtsConfig()
+    return {
+      backendMode: be.mode === 'pro' ? '完整模式' : '轻量模式',
+      backendUrl: be.mode === 'pro' ? be.baseUrl : null,
+      ttsVoice: tts.voice,
+      ttsPrewarm: tts.prewarm,
+    }
+  }, [settingsOpen])
 
   const handleEnterNav = () => {
     const node = enterNav()
@@ -112,14 +128,40 @@ const SearchView: React.FC = () => {
         </section>
       )}
 
-      {/* 初始空态 */}
+      {/* 初始空态：搜索提示 + 设置摘要 */}
       {!hasQuery && (
-        <div className={styles.placeholder}>
-          <p>输入关键词开始搜索</p>
-          <p className={styles.hint}>
-            {matchMode === 'vector' ? '支持自然语言描述，按语义相似度匹配' : '支持标题、描述、语料库模糊匹配'}
-          </p>
-        </div>
+        <>
+          <div className={styles.placeholder}>
+            <p>输入关键词开始搜索</p>
+            <p className={styles.hint}>
+              {matchMode === 'vector' ? '支持自然语言描述，按语义相似度匹配' : '支持标题、描述、语料库模糊匹配'}
+            </p>
+          </div>
+
+          {/* 设置摘要 */}
+          <div className={styles.summarySection}>
+            <div className={styles.summaryCard} onClick={() => setSettingsOpen(true)}>
+              <h4 className={styles.summaryTitle}>后端设置</h4>
+              <p className={styles.summaryLine}>
+                模式：<span className={styles.summaryValue}>{settingsSummary.backendMode}</span>
+              </p>
+              {settingsSummary.backendUrl && (
+                <p className={styles.summaryLine}>
+                  地址：<span className={styles.summaryValue}>{settingsSummary.backendUrl}</span>
+                </p>
+              )}
+            </div>
+            <div className={styles.summaryCard} onClick={() => setSettingsOpen(true)}>
+              <h4 className={styles.summaryTitle}>TTS 语音</h4>
+              <p className={styles.summaryLine}>
+                音色：<span className={styles.summaryValue}>{settingsSummary.ttsVoice}</span>
+              </p>
+              <p className={styles.summaryLine}>
+                预热：<span className={styles.summaryValue}>{settingsSummary.ttsPrewarm ? '已开启' : '已关闭'}</span>
+              </p>
+            </div>
+          </div>
+        </>
       )}
 
       {/* 底部操作区 */}
@@ -133,6 +175,8 @@ const SearchView: React.FC = () => {
           </Button>
         </div>
       )}
+
+      {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
     </div>
   )
 }

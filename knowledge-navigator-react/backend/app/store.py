@@ -238,6 +238,24 @@ class DataStore:
         self._save_manifest()
         return True
 
+    def save_all(self) -> int:
+        """将所有内存中的图数据写回 YAML 文件，返回保存的图数量。"""
+        with self._lock:
+            count = 0
+            for gid, g in self.graphs.items():
+                filepath = GRAPHS_DIR / f"{gid}.yaml"
+                g.save(filepath)
+                count += 1
+            # 同步更新 manifest 计数
+            for entry in self.manifest.get("graphs", []):
+                gid = entry.get("graph_id", "")
+                g = self.graphs.get(gid)
+                if g:
+                    entry["node_count"] = len(g.nodes)
+                    entry["card_count"] = len(g.cards)
+            self._save_manifest()
+            return count
+
     # ---------- 聚合查询 ----------
 
     def all_nodes(self, graph_id: str | None = None) -> list[dict[str, Any]]:

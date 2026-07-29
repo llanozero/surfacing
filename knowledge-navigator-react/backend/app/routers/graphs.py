@@ -205,3 +205,12 @@ def delete_graph(graph_id: str) -> dict[str, Any]:
     if not ok:
         raise HTTPException(status_code=404, detail=f"图 {graph_id} 不存在")
     return {"ok": True}
+
+
+# ── 全量同步 ──
+
+@router.post("/sync-all")
+def sync_all_graphs() -> dict[str, Any]:
+    """将所有内存中的图数据写回 YAML 文件。"""
+    saved = store.save_all()
+    return {"ok": True, "saved_graphs": saved}

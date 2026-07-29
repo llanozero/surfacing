@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavNodeStore, getEditingNode } from '../../store/navNodeStore'
 import { useCardStore } from '../../store/cardStore'
 import { useNavStore } from '../../store/navStore'
@@ -18,6 +18,18 @@ const NodeEditPanel: React.FC = () => {
   const { generating, generateNodeLabel, generateNodeDescription } = useAiGenerate()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const node = getEditingNode({ allNodes, selectedNodeId })
+
+  // 草稿状态：本地编辑暂存，保存时才写入数据源
+  const [draftLabel, setDraftLabel] = useState(node?.label ?? '')
+  const [draftDesc, setDraftDesc] = useState(node?.description ?? '')
+  const [dirty, setDirty] = useState(false)
+
+  // 切换节点时重置草稿
+  useEffect(() => {
+    setDraftLabel(node?.label ?? '')
+    setDraftDesc(node?.description ?? '')
+    setDirty(false)
+  }, [node?.id])
 
   const handleDelete = () => {
     if (!confirmingDelete) {
@@ -57,6 +69,24 @@ const NodeEditPanel: React.FC = () => {
   const labelDisabledHint = '缺少生成依据，请先绑定认知卡片'
   const descDisabledHint = '缺少生成依据，请先绑定卡片或连接前驱/后继节点'
 
+  // 保存草稿（仅本地缓存，不写后端）
+  const handleSave = () => {
+    if (!node) return
+    updateField('label', draftLabel)
+    updateField('description', draftDesc)
+    setDirty(false)
+    toast('节点已保存（本地缓存）')
+  }
+
+  // 取消草稿（放弃修改）
+  const handleCancel = () => {
+    if (!node) return
+    setDraftLabel(node.label)
+    setDraftDesc(node.description ?? '')
+    setDirty(false)
+    toast('已放弃修改')
+  }
+
   const handleGenLabel = async () => {
     const result = await generateNodeLabel(node, boundCards)
     if (!result) {
@@ -90,8 +120,11 @@ const NodeEditPanel: React.FC = () => {
           <div className={styles.aiRow}>
             <input
               className={styles.input}
-              value={node.label}
-              onChange={(e) => updateField('label', e.target.value)}
+              value={draftLabel}
+              onChange={(e) => {
+                setDraftLabel(e.target.value)
+                setDirty(true)
+              }}
             />
             <button
               className={styles.aiButton}
@@ -110,8 +143,11 @@ const NodeEditPanel: React.FC = () => {
             <textarea
               className={styles.textarea}
               rows={3}
-              value={node.description}
-              onChange={(e) => updateField('description', e.target.value)}
+              value={draftDesc}
+              onChange={(e) => {
+                setDraftDesc(e.target.value)
+                setDirty(true)
+              }}
             />
             <button
               className={styles.aiButton}
@@ -128,6 +164,28 @@ const NodeEditPanel: React.FC = () => {
 
       <BoundCardEditor node={node} />
       <NextNodeEditor node={node} />
+
+      {/* ── 保存/取消按钮 ── */}
+      <div className={styles.saveBar}>
+        <button
+          className={styles.saveBtn}
+          onClick={handleSave}
+          disabled={!dirty}
+        >
+          💾 保存
+        </button>
+        <button
+          className={styles.cancelBtn}
+          onClick={handleCancel}
+          disabled={!dirty}
+        >
+          ↩ 取消
+        </button>
+        <span className={styles.saveHint}>
+          {dirty ? '有未保存的更改' : '已是最新'}
+        </span>
+      </div>
+
       <BrowseHistoryViewer node={node} />
 
       {/* 删除节点（两步确认；级联清理其他节点与卡片的引用） */}

@@ -324,6 +324,48 @@
   cursor: not-allowed;
 }
 
+/* ── 保存/取消操作栏 ── */
+.saveBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid var(--separator);
+  border-bottom: 1px solid var(--separator);
+}
+.saveBtn {
+  padding: 8px 20px;
+  background: var(--accent, #06b6d4);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.saveBtn:hover:not(:disabled) { opacity: 0.85; }
+.saveBtn:disabled { opacity: 0.4; cursor: default; }
+.cancelBtn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--label-secondary);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cancelBtn:hover:not(:disabled) { background: var(--fill-f1); }
+.cancelBtn:disabled { opacity: 0.4; cursor: default; }
+.saveHint {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--label-quaternary);
+}
+
 /* ---------- 选择器弹窗 ---------- */
 .selectorMask {
   position: fixed;

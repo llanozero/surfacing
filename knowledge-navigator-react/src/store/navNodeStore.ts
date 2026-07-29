@@ -38,14 +38,12 @@ interface NavNodeStore {
 /**
  * 将更新后的节点写回共享数据源（allNavNodes 数组 + navNodeMap），
  * 使 NavView 画布、搜索绑定查询等其他视图读取到最新值。
- * 当前阶段仅内存生效，YAML 持久化由后续 data-saver 实现。
+ * 仅内存生效，YAML 持久化由 saveAllDraftsToBackend() 统一完成。
  */
 function commitToSource(updated: NavNode) {
   const idx = allNavNodes.findIndex((n) => n.id === updated.id)
   if (idx >= 0) allNavNodes[idx] = updated
   navNodeMap.set(updated.id, updated)
-  // pro 模式（完整模式）：同步到后端（火忘，失败仅告警）
-  wtUpdateNode(updated)
 }
 
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n))
@@ -221,4 +219,17 @@ export function filterNodes(nodes: NavNode[], query: string): NavNode[] {
 /** 当前编辑的节点（派生） */
 export function getEditingNode(state: Pick<NavNodeStore, 'allNodes' | 'selectedNodeId'>): NavNode | null {
   return state.allNodes.find((n) => n.id === state.selectedNodeId) ?? null
+}
+
+/**
+ * 将所有已保存到内存的节点变更一次性写回后端 YAML。
+ * 由导航视图右上角的 🔄 同步 按钮触发。
+ */
+export async function saveAllDraftsToBackend(): Promise<number> {
+  let count = 0
+  for (const node of allNavNodes) {
+    await wtUpdateNode(node)
+    count++
+  }
+  return count
 }

@@ -1,0 +1,788 @@
+graph_id: g1
+graph_label: 机器学习
+graph_description: 机器学习核心概念与算法导航图
+cognitive_cards:
+- id: root/1
+  title: 机器学习
+  type: folder
+  tag: 层级分类
+  description: 人工智能的子领域，使计算机能够从数据中学习和改进。
+  corpus:
+  - 机器学习是人工智能的一个子领域，使计算机能够从数据中学习和改进。
+  - 主要范式包括监督学习、无监督学习和强化学习。
+  bound_nodes:
+  - node-ml-foundation
+  - node-ai-intro
+- id: root/1/1
+  title: 监督学习
+  type: leaf
+  tag: 决策分支
+  description: 使用标注数据训练模型，学习输入到输出的映射函数。
+  corpus:
+  - 使用标注数据训练模型，学习从输入到输出的映射函数。
+  - 常见算法包括线性回归、逻辑回归、SVM、决策树和神经网络。
+  bound_nodes:
+  - node-supervised
+  - node-ml-foundation
+- id: root/1/2
+  title: 无监督学习
+  type: leaf
+  tag: 层级分类
+  description: 从未标注数据中发现隐藏的模式和结构。
+  corpus:
+  - 从未标注数据中发现隐藏的模式和结构。
+  - 常见算法包括聚类（K-means）、降维（PCA）和关联规则学习。
+  bound_nodes:
+  - node-unsupervised
+- id: root/1/3
+  title: 强化学习
+  type: leaf
+  tag: 决策分支
+  description: 智能体通过与环境交互、基于奖励信号学习最优策略。
+  corpus:
+  - 强化学习关注智能体如何在环境中采取行动以最大化累积奖励。
+  - 核心概念包括状态、动作、奖励、策略与价值函数，代表算法有 Q-Learning 与策略梯度。
+  bound_nodes:
+  - node-reinforcement
+- id: root/2
+  title: 神经网络
+  type: folder
+  tag: 层级分类
+  description: 受生物神经网络启发设计的计算模型。
+  corpus:
+  - 受生物神经网络启发设计的计算模型，由大量相互连接的神经元层构成。
+  - 通过反向传播算法调整权重，拟合复杂的非线性映射。
+  bound_nodes:
+  - node-nn-foundation
+- id: root/2/1
+  title: CNN 卷积神经网络
+  type: leaf
+  tag: 决策分支
+  description: 利用卷积核提取局部特征，是计算机视觉的基石。
+  corpus:
+  - 卷积神经网络通过卷积层、池化层堆叠提取图像的层次化特征。
+  - 代表结构：LeNet、AlexNet、ResNet。
+  bound_nodes:
+  - node-cnn
+  - node-cv
+- id: root/2/2
+  title: RNN 循环神经网络
+  type: leaf
+  tag: 层级分类
+  description: 具有时序记忆能力，适用于序列建模。
+  corpus:
+  - 循环神经网络通过隐状态传递历史信息，适用于文本、语音等序列数据。
+  - LSTM 与 GRU 通过门控机制缓解长序列梯度消失问题。
+  bound_nodes:
+  - node-rnn
+  - node-nlp
+- id: root/2/3
+  title: 注意力机制
+  type: leaf
+  tag: 决策分支
+  description: 让模型动态聚焦输入中最相关的部分。
+  corpus:
+  - 注意力机制通过查询、键、值计算相关性权重，实现对输入的软选择。
+  - 自注意力是 Transformer 的核心构件。
+  bound_nodes:
+  - node-attention
+  - node-nlp
+- id: root/3
+  title: 深度学习
+  type: folder
+  tag: 层级分类
+  description: 基于多层神经网络的机器学习方法。
+  corpus:
+  - 深度学习使用多层神经网络逐层抽象数据特征。
+  - 训练依赖大规模数据、GPU 算力与反向传播算法。
+  bound_nodes:
+  - node-deep-learning
+- id: root/3/1
+  title: 反向传播
+  type: leaf
+  tag: 层级分类
+  description: 通过链式法则高效计算梯度并更新网络权重。
+  corpus:
+  - 反向传播利用链式法则从输出层向输入层逐层传递误差梯度。
+  - 配合梯度下降及其变体（SGD、Adam）完成参数优化。
+  bound_nodes:
+  - node-deep-learning
+- id: root/4
+  title: 自然语言处理
+  type: folder
+  tag: 层级分类
+  description: 让计算机理解、生成和处理人类语言。
+  corpus:
+  - 自然语言处理涵盖分词、词性标注、命名实体识别、机器翻译等任务。
+  - 现代 NLP 以预训练语言模型为主导范式。
+  bound_nodes:
+  - node-nlp
+- id: root/4/1
+  title: 词嵌入
+  type: leaf
+  tag: 决策分支
+  description: 将词语映射为稠密向量，捕捉语义关系。
+  corpus:
+  - 词嵌入将离散词语映射到低维稠密向量空间。
+  - Word2Vec、GloVe 是经典的静态词嵌入方法。
+  bound_nodes:
+  - node-word-embedding
+  - node-nlp
+- id: root/4/2
+  title: Transformer
+  type: leaf
+  tag: 决策分支
+  description: 完全基于注意力机制的序列建模架构。
+  corpus:
+  - Transformer 摒弃循环结构，完全依赖自注意力机制并行处理序列。
+  - BERT、GPT 等大模型均构建于 Transformer 之上。
+  bound_nodes:
+  - node-transformer
+  - node-attention
+- id: root/5
+  title: 计算机视觉
+  type: folder
+  tag: 层级分类
+  description: 让计算机从图像和视频中获取理解。
+  corpus:
+  - 计算机视觉涵盖图像分类、目标检测、语义分割与图像生成。
+  - 卷积神经网络与视觉 Transformer 是两大主流架构。
+  bound_nodes:
+  - node-cv
+- id: root/5/1
+  title: 目标检测
+  type: leaf
+  tag: 决策分支
+  description: 在图像中定位并识别多个目标。
+  corpus:
+  - 目标检测同时输出目标的类别与边界框位置。
+  - 代表算法：YOLO、Faster R-CNN、DETR。
+  bound_nodes:
+  - node-cv
+  - node-cnn
+- id: root/6
+  title: 数学基础
+  type: folder
+  tag: 层级分类
+  description: 机器学习所需的数学工具集合。
+  corpus:
+  - 概率论、线性代数与微积分是理解机器学习算法的三大数学支柱。
+  bound_nodes:
+  - node-math-foundation
+- id: root/6/1
+  title: 概率论
+  type: leaf
+  tag: 层级分类
+  description: 研究随机现象规律，是统计学习的语言。
+  corpus:
+  - 概率论为不确定性建模提供形式化工具。
+  - 贝叶斯定理、期望、方差与常见分布是机器学习的必备基础。
+  bound_nodes:
+  - node-probability
+  - node-math-foundation
+- id: root/6/2
+  title: 线性代数
+  type: leaf
+  tag: 层级分类
+  description: 向量、矩阵与张量运算是深度学习的计算骨架。
+  corpus:
+  - 线性代数研究向量空间与线性映射。
+  - 矩阵分解、特征值与奇异值分解广泛应用于降维与推荐系统。
+  bound_nodes:
+  - node-linear-algebra
+  - node-math-foundation
+- id: root/7
+  title: 心智工具箱 · 设计者循环
+  type: folder
+  tag: 心智工具
+  description: 来自 cognitive-cards 项目的 10 张概念卡片与 8 个锦囊（设计者 ↔ 执行者循环）。
+  corpus: []
+  bound_nodes:
+  - node-kit-a
+  - node-kit-b
+  - node-kit-c
+  - node-kit-d
+  - node-kit-e
+  - node-kit-f
+  - node-kit-g
+  - node-kit-h
+- id: root/7/1
+  title: 01 二阶观察者困境
+  type: leaf
+  tag: 元认知
+  description: 当你同时是系统的设计者与使用者，元认知的审视目光会破坏执行的纯粹性。你无法真正「忘记」设计意图——每一次执行时，设计者的意识都在场，而这种在场本身就瓦解了执行者应有的沉浸状态。
+  corpus:
+  - 当你同时是系统的设计者与使用者，元认知的审视目光会破坏执行的纯粹性。你无法真正「忘记」设计意图——每一次执行时，设计者的意识都在场，而这种在场本身就瓦解了执行者应有的沉浸状态。
+  - 将设计态与执行态物理分离。工具必须拥有两种不可混淆的模式，模式切换需要真实的物理成本，而非仅靠意志力或自我提醒。
+  - 双模式架构：设计模式下可编辑、可优化、可调整流程；执行模式下只读、不可修改。切换方式为物理仪式——关闭应用、切换空间、等待冷却期。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/2
+  title: 02 悖论绕过
+  type: leaf
+  tag: 悖论
+  description: 某些悖论无法被「解决」——它们只能被绕过。二阶观察者困境不是一个需要回答的问题，而是一个需要用非语义通道绕过的障碍。用语言去对抗语言制造的困境，只会加深困境。
+  corpus:
+  - 某些悖论无法被「解决」——它们只能被绕过。二阶观察者困境不是一个需要回答的问题，而是一个需要用非语义通道绕过的障碍。用语言去对抗语言制造的困境，只会加深困境。
+  - 工具的核心策略不是「说服」或「解释」，而是用感官锚点、环境线索、身体仪式来直接激活状态，绕过语言意识层。
+  - 所有指令均通过感官通道传递（声音、光线、触觉），不使用语言说服或认知重构。用户不需要「理解」任何东西来进入状态——理解发生在状态之后。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/3
+  title: 03 环境级工具
+  type: leaf
+  tag: 环境级工具
+  description: 工具不应告诉你「做什么」，而应改变「你在什么条件下做」。指令级工具要求你理解并执行，这本身就激活了设计者心态；环境级工具只创造条件和触发，执行者自然响应。
+  corpus:
+  - 工具不应告诉你「做什么」，而应改变「你在什么条件下做」。指令级工具要求你理解并执行，这本身就激活了设计者心态；环境级工具只创造条件和触发，执行者自然响应。
+  - 工具架构为五层环境系统：触发器（环境线索）、容器（时间边界+最少约束）、过渡（无关沉浸预热）、沉淀（无评判记录）、关闭（仪式性结束）。每一层只改变条件，不规定反应。
+  - 一个完整的五层环境系统。用户只感知到环境的变化，不感知到「指令」。每个环节的触发都由感官锚点驱动，语义层完全留白。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/4
+  title: 04 容器非模具
+  type: leaf
+  tag: 容器
+  description: 滋养来自开放，但执行需要封闭。这个矛盾不需要「平衡」——而是需要一种特殊的设计：将规范设计为「容器」而非「模具」。容器提供边界，但不规定内部发生什么。
+  corpus:
+  - 滋养来自开放，但执行需要封闭。这个矛盾不需要「平衡」——而是需要一种特殊的设计：将规范设计为「容器」而非「模具」。容器提供边界，但不规定内部发生什么。
+  - 只定义时间、空间、节奏的边界，不定义体验的内容。如禅宗坐禅：形式严格封闭（时间、姿势、呼吸），但内部体验完全开放。
+  - 时间盒（固定时长，内容自由）、空间锚（特定物理/数字空间）、节奏标记（开始/结束信号），无内容指令。用户知道「何时」和「何地」，但不知道「应如何」。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/5
+  title: 05 合拍飞轮
+  type: leaf
+  tag: 合拍飞轮
+  description: 存在一种节律，一旦进入就会自我维持——手感火热、纯粹、不需要意志力。工具的任务是创建进入飞轮的入口，而非维持飞轮本身。飞轮一旦启动，工具应退出。
+  corpus:
+  - 存在一种节律，一旦进入就会自我维持——手感火热、纯粹、不需要意志力。工具的任务是创建进入飞轮的入口，而非维持飞轮本身。飞轮一旦启动，工具应退出。
+  - 设计「预热过渡」环节——一段无关的、沉浸的、低门槛的活动，作为从日常意识到专注状态的桥梁。设计为「点燃即撤」，不越界。
+  - 过渡仪式（固定时长的低认知负荷活动，如呼吸引导、简单重复动作）、节奏锚点（声音节拍、光线渐变），不附带任何目标或预期。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/6
+  title: 06 直觉即压缩理性
+  type: leaf
+  tag: 直觉
+  description: 直觉不是理性的对立面，而是理性内化到不需要显式计算的阶段。「刻意」之所以唤醒旧负面回路，是因为它调用显式、步骤化、被命名的框架——而这些框架在历史上与失败经验绑定。
+  corpus:
+  - 直觉不是理性的对立面，而是理性内化到不需要显式计算的阶段。「刻意」之所以唤醒旧负面回路，是因为它调用显式、步骤化、被命名的框架——而这些框架在历史上与失败经验绑定。
+  - 不在工具中使用任何「你应该」的语言。不在工具中定义任何「正确方法」。所有引导通过感官通道而非语义通道。
+  - 无语言指令、无评价体系、无正确/错误二分。所有引导为感官线索（颜色渐变、声音变化、触觉反馈），语义层完全留白，不触发旧框架。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/7
+  title: 07 具身认知
+  type: leaf
+  tag: 具身认知
+  description: 知识不在脑中，而在你与处境的互动中涌现。「到了处境自会知道其情况」——工具的目的不是告诉你答案，而是把你放到一个处境里，让答案自己从互动中长出来。
+  corpus:
+  - 知识不在脑中，而在你与处境的互动中涌现。「到了处境自会知道其情况」——工具的目的不是告诉你答案，而是把你放到一个处境里，让答案自己从互动中长出来。
+  - 工具的核心交付物不是信息，而是处境。设计目标从「传递正确认知」转变为「创造让正确认知自发涌现的条件」。
+  - 情境触发器——特定的环境组合自动激活特定状态，不附带任何解释或说明。用户进入处境后，认知自发涌现，而非被灌输。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/8
+  title: 08 自发命名
+  type: leaf
+  tag: 自发命名
+  description: 旧框架的问题不在于「错」，而在于「早」——过早的命名污染了体验，用旧分类框住了新意蕴。正确的命名时机：当体验本身产生「寻求表达」的内在冲动，而非「应该总结一下」。
+  corpus:
+  - 旧框架的问题不在于「错」，而在于「早」——过早的命名污染了体验，用旧分类框住了新意蕴。正确的命名时机：当体验本身产生「寻求表达」的内在冲动，而非「应该总结一下」。
+  - 在体验与命名之间设置强制延迟。为自发命名的浮现留出空间。命名不是任务，而是体验的自然溢出。
+  - 无评判记录窗口（体验后自由书写，无格式、无要求、无评价）、冷却期（体验结束后强制等待，期间不允许分析或总结）。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/9
+  title: 09 信念覆盖机制
+  type: leaf
+  tag: 信念覆盖
+  description: 信念不是通过「替换」来覆盖的，而是通过「让旧信念失去相关性」来自然消退的。旧的神经回路不会消失，但新回路的高频激活会抑制旧回路——不是对抗，而是让旧路径因长期不被激活而自然褪色。
+  corpus:
+  - 信念不是通过「替换」来覆盖的，而是通过「让旧信念失去相关性」来自然消退的。旧的神经回路不会消失，但新回路的高频激活会抑制旧回路——不是对抗，而是让旧路径因长期不被激活而自然褪色。
+  - 不设计「对抗旧信念」的环节。不提及、不暗示、不否定旧信念。只创造高密度、高强度的新体验，让新回路的激活频率超过旧回路。
+  - 完全的路径隔离——新工具中没有任何元素会触发旧信念的记忆线索。体验设计为「全新的、无关的、沉浸的」，旧信念因缺乏关联刺激而自然沉寂。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/10
+  title: 10 重新定向能量
+  type: leaf
+  tag: 重新定向
+  description: 你不需要从零开始。上次失败信念的「残留」不是需要消灭的敌人——它恰恰是已经存在的能量，只是方向不对。工具不需要产生新能量，只需要重新定向已有的能量流。
+  corpus:
+  - 你不需要从零开始。上次失败信念的「残留」不是需要消灭的敌人——它恰恰是已经存在的能量，只是方向不对。工具不需要产生新能量，只需要重新定向已有的能量流。
+  - 工具的起点不是「创造新状态」，而是「接住已有状态」。识别用户当前的能量流向，设计一个温和的转弯，而非一个彻底的断裂。
+  - 入口设计为「从你所在的地方开始」——不要求任何前置条件、不预设任何理想状态。过渡环节的设计原则是渐变而非突变，是转弯而非掉头。
+  bound_nodes: []
+  metadata:
+    created_at: '2026-07-22T00:00:00Z'
+- id: root/7/11
+  title: 锦囊 A · 锚点确立
+  type: leaf
+  tag: 锦囊
+  description: 你正处于设计者心态的自然体验——这是一个稳定的支点、锚点
+  corpus:
+  - 你此刻正处于设计者心态——这不是需要被'克服'的东西，而是整个循环的稳定支点。
+  - 感受它，承认它。你不需要现在就复盘，不需要现在就优化。你设计的流程会把你带向执行者体验——信任它，而非审视它。
+  - 你此刻的唯一任务，就是让自己进入下一环。不是思考下一环，而是走进下一环。设计者已经完成了他的工作，现在，把身体交给执行者。
+  - 机制：设计者心态不是敌人。它是循环的起点而非终点。承认它的存在，然后信任流程本身——这是绕过二阶观察者困境的第一步。
+  bound_nodes:
+  - node-kit-a
+- id: root/7/12
+  title: 锦囊 B · 迷失预警
+  type: leaf
+  tag: 锦囊
+  description: 状态正在流转——注意力涣散、方向感弱化、开始感到'不对'
+  corpus:
+  - 状态正在流转——这是正常的，不是失败。迷失不是你的错，而是所有自我指涉系统都会经历的结构性必然。
+  - 此刻不要对抗迷失，不要试图'纠正'自己。对抗只会让设计者心态提前介入，而产生更多的审视和焦虑。
+  - 回到感官锚点：呼吸，身体感觉，环境中的声音。用身体而非思维来定位自己。你不需要'想清楚'，你只需要感觉到自己还在这个空间里。
+  - 机制：迷失是节律的暂时断裂。语义层面的对抗只会加深断裂。感官锚点绕过语言层，直接重建身体与环境的连接。
+  bound_nodes:
+  - node-kit-b
+- id: root/7/13
+  title: 锦囊 C · 负向沉沦
+  type: leaf
+  tag: 锦囊
+  description: 能量耗损——陷入负向信念、越搞越乱、身体开始抽离
+  corpus:
+  - 你正在经历负向信念的沉沦。此刻的关键不是'想通'——想通是陷阱，因为负向信念本身就是一个自我指涉的闭环：你越是试图用理性理解它，它就越把你拉回它的逻辑里。
+  - 身体已经启动了自防御机制，抽离、失去意识——这不是故障，这是保护。不会在错误的节律上一错到底，这是身体比你更智慧的地方。
+  - 此刻不需要答案，只需要暂停。允许自己失忆，允许自己不知道为什么会这样。不要试图抢救，不要试图复盘。让沉沦自然抵达它的终点。
+  - 机制：负向信念是一个自指涉的语义闭环。用语义对抗语义只会陷入无限递归。身体的抽离是系统级的熔断保护——接受它，而不是对抗它。
+  bound_nodes:
+  - node-kit-c
+- id: root/7/14
+  title: 锦囊 D · 自防御后
+  type: leaf
+  tag: 锦囊
+  description: 身体抽离结束——失忆淡化负面影响、重新浮现但方向和经验都丢失了
+  corpus:
+  - 你刚刚经历了一次自防御的抽离。失忆让负面影响淡化了——这很好，这是身体的智慧。但你也失去了'为什么会踩坑'的经验。
+  - 此刻不要试图追溯和复盘。你还没有回到设计者心态，你还在执行者通道的入口。如果现在复盘，你是在用未恢复的、脆弱的、被抽离打乱的状态来审视刚才的崩溃——这只会诱发二次崩溃。
+  - 用内生能量重新凝聚，等待自然的回归。回到锦囊A，重新进入循环——这次，带着更深的体感，而非更强的分析。
+  - 机制：自防御后的失忆是双刃剑——它保护了你，但也切断了经验。此刻强行复盘是无水之源。回归锚点，重新开始。
+  bound_nodes:
+  - node-kit-d
+- id: root/7/15
+  title: 锦囊 E · 回归执行者
+  type: leaf
+  tag: 锦囊
+  description: 内生能量重新凝聚——准备进入执行者心态、经历稳妥的神经回路
+  corpus:
+  - 你能感觉到内生能量正在回来——不需要解释它为什么回来，它本就是你的本质。它是生命自有、无须解释、不依靠外物的自生能量。
+  - 此刻进入执行者心态，不要试图同时做设计者的事。设计者心态是复盘和优化，但执行者心态是经历和沉浸。两者不能共存。
+  - 信任你之前设下的神经回路——那些你在设计者心态中铺设的稳妥路径。它们就在那里，不需要你去检查或确认。不要思考'对不对'，只需经历。
+  - 机制：内生能量是循环的燃料。它不是被'创造'出来的，而是被'释放'出来的。执行者心态的唯一任务就是让这股能量通过预设的神经回路流动。
+  bound_nodes:
+  - node-kit-e
+- id: root/7/16
+  title: 锦囊 F · 具身认知临战
+  type: leaf
+  tag: 锦囊
+  description: 执行者状态中——需要打开具身认知、捅破窗户纸的那一瞬间
+  corpus:
+  - 你正在执行者状态中——这是具身认知发生的时刻，是临门一脚捅破窗户纸的瞬间。
+  - 不要命名，不要总结，不要提炼。此刻唯一的任务就是沉浸。用全新的、脑内无关的沉浸体验的能量，让它自然沉淀后自发显现。
+  - 到了处境，你自会知道其情况——这不是知识诅咒，这是具身认知的承诺。你就在处境中，让答案自己从互动中长出来。不要用旧有的被污染的框架去分类抽离，沉进去，体验新的意蕴。
+  - 机制：具身认知的核心是'知识在互动中涌现'。这一刻你不需要提取任何事先准备好的认知——你只需要沉浸在处境中，让认知自发地从互动中长出来。
+  bound_nodes:
+  - node-kit-f
+- id: root/7/17
+  title: 锦囊 G · 复盘提取
+  type: leaf
+  tag: 锦囊
+  description: 回到设计者心态——此时可以提取之前的崩溃报错进行复盘
+  corpus:
+  - 你已经回到了设计者心态。现在可以提取之前的崩溃报错进行复盘了。
+  - 但注意你的复盘角度：'从环境上减少再度出发的可能性'，而不是'我为什么又失败了'。前者是设计者视角——客观、系统、可操作；后者是负向信念的残渣——主观、自我攻击、闭环。
+  - 从心态上，你刚刚又强化了一次神经回路：从负面迷失，到内生力量，再到稳妥的执行者具身认知，最终回到设计者。这就是核心的圈。不断推广其外沿，积累广度体感，内核会随之变得更加强大。
+  - 机制：设计者复盘的真正价值在于'环境级优化'——减少未来再度出发的阻力。它不是自我批判，而是系统调试。
+  bound_nodes:
+  - node-kit-g
+- id: root/7/18
+  title: 锦囊 H · 提前复盘警告
+  type: leaf
+  tag: 锦囊
+  description: 感到想要提前复盘——但执行者体验还不够，这是刻意体验而非自然体验
+  corpus:
+  - 停止。
+  - 你正在试图提前进入设计者复盘——但你没有经历足够的执行者具身认知。这不是自然体验的循环完成，这是刻意体验——设计者心态在未成熟的时机强行介入。
+  - 如果继续，你会把复盘和报错带到执行者状态中，导致再度崩溃。崩溃后你会再度试图提前复盘，再度崩溃——这是一个循环Bug，是第二十二条军规的自我指涉死锁。
+  - 此刻唯一正确的动作：回到锦囊E，回到执行者轨道，继续经历，不要复盘。具身认知的积累还不够。等它够了，你自然会知道——不需要任何人提醒你。
+  - 机制：提前复盘是'刻意体验'的核心症状——设计者心态在具身认知未完成时介入，导致体验被污染、复盘无素材、崩溃被强化。这是整个系统中最危险的Bug。
+  bound_nodes:
+  - node-kit-h
+navigation_nodes:
+- id: node-ai-intro
+  label: AI 简介
+  description: 人工智能概览，建立对机器学习、神经网络与应用版图的整体认知。
+  bound_cards:
+  - root/1
+  next_nodes:
+  - target_id: node-math-subgraph
+    preset_weight: 0.65
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-math-foundation
+    preset_weight: 0.7
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-ml-foundation
+    preset_weight: 0.85
+    browse_weight: 0.62
+    connection_type: preset
+- id: node-math-subgraph
+  label: 数学基础全景
+  description: 钻入数学基础导航图，学习概率论、线性代数与微积分的完整知识体系
+  bound_cards:
+  - root/6
+  next_nodes:
+  - target_id: node-deep-learning
+    preset_weight: 0.6
+    browse_weight: 0.45
+    connection_type: preset
+  sub_graph_id: g2
+  entry_node_id: node-probability-theory
+- id: node-math-foundation
+  label: 数学基础
+  description: 概率论、线性代数与微积分——机器学习算法的数学语言。
+  bound_cards:
+  - root/6
+  next_nodes:
+  - target_id: node-probability
+    preset_weight: 0.78
+    browse_weight: 0.55
+    connection_type: preset
+  - target_id: node-linear-algebra
+    preset_weight: 0.82
+    browse_weight: 0.48
+    connection_type: preset
+  - target_id: node-ml-foundation
+    preset_weight: 0.5
+    browse_weight: 0.6
+    connection_type: browse_derived
+- id: node-probability
+  label: 概率论
+  description: 随机变量、概率分布与贝叶斯推断。
+  bound_cards:
+  - root/6/1
+  next_nodes:
+  - target_id: node-ml-foundation
+    preset_weight: 0.75
+    browse_weight: 0.42
+    connection_type: preset
+- id: node-linear-algebra
+  label: 线性代数
+  description: 向量空间、矩阵运算与特征分解。
+  bound_cards:
+  - root/6/2
+  next_nodes:
+  - target_id: node-ml-foundation
+    preset_weight: 0.8
+    browse_weight: 0.5
+    connection_type: preset
+- id: node-ml-foundation
+  label: 机器学习基础
+  description: 涵盖监督学习、无监督学习与强化学习的核心概念与算法基础。
+  bound_cards:
+  - root/1
+  - root/1/1
+  browse_history:
+  - from: node-probability
+    count: 3
+    last_at: '2026-07-24T09:30:00Z'
+  - from: node-linear-algebra
+    count: 5
+    last_at: '2026-07-24T08:15:00Z'
+  next_nodes:
+  - target_id: node-supervised
+    preset_weight: 0.75
+    browse_weight: 0.42
+    connection_type: preset
+  - target_id: node-unsupervised
+    preset_weight: 0.6
+    browse_weight: 0.3
+    connection_type: preset
+  - target_id: node-reinforcement
+    preset_weight: 0.4
+    browse_weight: 0.25
+    connection_type: preset
+  - target_id: node-nn-foundation
+    preset_weight: 0.55
+    browse_weight: 0.58
+    connection_type: browse_derived
+  priority_config:
+    mode: mixed
+    preset_priority: 0
+    browse_priority: 4
+    user_overrides: []
+- id: node-supervised
+  label: 监督学习
+  description: 回归与分类：从标注数据学习映射函数。
+  bound_cards:
+  - root/1/1
+  next_nodes:
+  - target_id: node-nn-foundation
+    preset_weight: 0.7
+    browse_weight: 0.52
+    connection_type: preset
+  - target_id: node-deep-learning
+    preset_weight: 0.45
+    browse_weight: 0.4
+    connection_type: browse_derived
+- id: node-unsupervised
+  label: 无监督学习
+  description: 聚类、降维与关联规则——发现数据的内在结构。
+  bound_cards:
+  - root/1/2
+  next_nodes:
+  - target_id: node-deep-learning
+    preset_weight: 0.5
+    browse_weight: 0.35
+    connection_type: preset
+- id: node-reinforcement
+  label: 强化学习
+  description: 基于奖励信号的策略优化，从 Q-Learning 到 PPO。
+  bound_cards:
+  - root/1/3
+  next_nodes:
+  - target_id: node-deep-learning
+    preset_weight: 0.55
+    browse_weight: 0.3
+    connection_type: preset
+- id: node-nn-foundation
+  label: 神经网络基础
+  description: 神经元、激活函数与前馈网络结构。
+  bound_cards:
+  - root/2
+  next_nodes:
+  - target_id: node-deep-learning
+    preset_weight: 0.8
+    browse_weight: 0.6
+    connection_type: preset
+  - target_id: node-cnn
+    preset_weight: 0.6
+    browse_weight: 0.45
+    connection_type: preset
+  - target_id: node-rnn
+    preset_weight: 0.55
+    browse_weight: 0.4
+    connection_type: preset
+- id: node-deep-learning
+  label: 深度学习
+  description: 多层网络训练：反向传播、优化器与正则化。
+  bound_cards:
+  - root/3
+  - root/3/1
+  next_nodes:
+  - target_id: node-cnn
+    preset_weight: 0.65
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-attention
+    preset_weight: 0.7
+    browse_weight: 0.62
+    connection_type: preset
+  - target_id: node-nlp
+    preset_weight: 0.5
+    browse_weight: 0.55
+    connection_type: browse_derived
+  - target_id: node-cv
+    preset_weight: 0.5
+    browse_weight: 0.44
+    connection_type: preset
+- id: node-cnn
+  label: 卷积神经网络
+  description: 卷积、池化与残差连接，视觉任务的核心架构。
+  bound_cards:
+  - root/2/1
+  next_nodes:
+  - target_id: node-cv
+    preset_weight: 0.75
+    browse_weight: 0.55
+    connection_type: preset
+- id: node-rnn
+  label: 循环神经网络
+  description: 序列建模与门控机制（LSTM / GRU）。
+  bound_cards:
+  - root/2/2
+  next_nodes:
+  - target_id: node-attention
+    preset_weight: 0.6
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-nlp
+    preset_weight: 0.55
+    browse_weight: 0.4
+    connection_type: preset
+- id: node-attention
+  label: 注意力机制
+  description: Query-Key-Value 与自注意力计算。
+  bound_cards:
+  - root/2/3
+  - root/4/2
+  next_nodes:
+  - target_id: node-transformer
+    preset_weight: 0.85
+    browse_weight: 0.7
+    connection_type: preset
+- id: node-transformer
+  label: Transformer
+  description: 多头注意力与前馈层堆叠的现代架构。
+  bound_cards:
+  - root/4/2
+  next_nodes:
+  - target_id: node-nlp
+    preset_weight: 0.8
+    browse_weight: 0.66
+    connection_type: preset
+  - target_id: node-cv
+    preset_weight: 0.4
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-nlp
+  label: NLP 专项
+  description: 从词嵌入到预训练语言模型的完整路径。
+  bound_cards:
+  - root/4
+  next_nodes:
+  - target_id: node-word-embedding
+    preset_weight: 0.65
+    browse_weight: 0.4
+    connection_type: preset
+  - target_id: node-transformer
+    preset_weight: 0.6
+    browse_weight: 0.5
+    connection_type: user_added
+- id: node-word-embedding
+  label: 词嵌入
+  description: Word2Vec / GloVe：词语的向量化表示。
+  bound_cards:
+  - root/4/1
+  next_nodes:
+  - target_id: node-rnn
+    preset_weight: 0.55
+    browse_weight: 0.42
+    connection_type: preset
+  - target_id: node-attention
+    preset_weight: 0.5
+    browse_weight: 0.55
+    connection_type: browse_derived
+- id: node-cv
+  label: CV 专项
+  description: 图像分类、目标检测与视觉生成。
+  bound_cards:
+  - root/5
+  - root/5/1
+  next_nodes:
+  - target_id: node-cnn
+    preset_weight: 0.6
+    browse_weight: 0.45
+    connection_type: preset
+- id: node-kit-a
+  label: A · 锚点确立
+  description: 设计者心态不是敌人。它是循环的起点而非终点。承认它的存在，然后信任流程本身——这是绕过二阶观察者困境的第一步。
+  bound_cards:
+  - root/7/11
+  next_nodes:
+  - target_id: node-kit-b
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-e
+    preset_weight: 0.9
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-b
+  label: B · 迷失预警
+  description: 迷失是节律的暂时断裂。语义层面的对抗只会加深断裂。感官锚点绕过语言层，直接重建身体与环境的连接。
+  bound_cards:
+  - root/7/12
+  next_nodes:
+  - target_id: node-kit-c
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-e
+    preset_weight: 0.9
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-c
+  label: C · 负向沉沦
+  description: 负向信念是一个自指涉的语义闭环。用语义对抗语义只会陷入无限递归。身体的抽离是系统级的熔断保护——接受它，而不是对抗它。
+  bound_cards:
+  - root/7/13
+  next_nodes:
+  - target_id: node-kit-d
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-d
+  label: D · 自防御后
+  description: 自防御后的失忆是双刃剑——它保护了你，但也切断了经验。此刻强行复盘是无水之源。回归锚点，重新开始。
+  bound_cards:
+  - root/7/14
+  next_nodes:
+  - target_id: node-kit-a
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-e
+    preset_weight: 0.9
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-e
+  label: E · 回归执行者
+  description: 内生能量是循环的燃料。它不是被'创造'出来的，而是被'释放'出来的。执行者心态的唯一任务就是让这股能量通过预设的神经回路流动。
+  bound_cards:
+  - root/7/15
+  next_nodes:
+  - target_id: node-kit-f
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-g
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: user_added
+- id: node-kit-f
+  label: F · 具身认知临战
+  description: 具身认知的核心是'知识在互动中涌现'。这一刻你不需要提取任何事先准备好的认知——你只需要沉浸在处境中，让认知自发地从互动中长出来。
+  bound_cards:
+  - root/7/16
+  next_nodes:
+  - target_id: node-kit-g
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-g
+  label: G · 复盘提取
+  description: 设计者复盘的真正价值在于'环境级优化'——减少未来再度出发的阻力。它不是自我批判，而是系统调试。
+  bound_cards:
+  - root/7/17
+  next_nodes:
+  - target_id: node-kit-a
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-h
+  label: H · 提前复盘警告
+  description: 提前复盘是'刻意体验'的核心症状——设计者心态在具身认知未完成时介入，导致体验被污染、复盘无素材、崩溃被强化。这是整个系统中最危险的Bug。
+  bound_cards:
+  - root/7/18
+  next_nodes:
+  - target_id: node-kit-e
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset

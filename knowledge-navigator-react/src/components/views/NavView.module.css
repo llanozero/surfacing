@@ -19,23 +19,6 @@
   min-width: 0;
 }
 
-.syncBtn {
-  flex-shrink: 0;
-  margin-top: 2px;
-  background: var(--fill-f1);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  color: var(--label-secondary);
-  font-size: 12px;
-  padding: 4px 10px;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  transition: background 0.15s, color 0.15s;
-  white-space: nowrap;
-}
-.syncBtn:hover { background: var(--fill-f2); color: var(--label-primary); }
-.syncBtn:disabled { opacity: 0.5; cursor: default; }
-
 .title {
   font-size: 20px;
   line-height: 28px;

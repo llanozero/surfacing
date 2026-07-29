@@ -28,8 +28,6 @@ import {
 } from '../../utils/quickConnectUtils'
 import { getNavNode } from '../../data/allNavNodes'
 import { triggerWarmup } from '../../utils/ttsWarmup'
-import { saveAllDraftsToBackend } from '../../store/navNodeStore'
-import { isProMode, getBackendConfig } from '../../config/backend'
 import type { NavNode, CanvasDataResponse, GraphEdge } from '../../data/types'
 
 type CanvasNode = CanvasDataResponse['nodes'][number]
@@ -169,29 +167,6 @@ const NavView: React.FC = () => {
   }, [canvasNodeMap])
 
   const [editingConn, setEditingConn] = useState<{ fromId: string; toId: string } | null>(null)
-  const [syncing, setSyncing] = useState(false)
-
-  const handleSync = async () => {
-    if (!isProMode()) {
-      toast('无后端模式无需同步')
-      return
-    }
-    setSyncing(true)
-    try {
-      // 1. 将所有节点缓存写回后端
-      const nodeCount = await saveAllDraftsToBackend()
-      // 2. 触发后端全量 YAML 写盘（含卡片、边等）
-      const baseUrl = getBackendConfig().baseUrl
-      const resp = await fetch(`${baseUrl}/api/graphs/sync-all`, { method: 'POST' })
-      if (!resp.ok) throw new Error(`同步失败: ${resp.status}`)
-      const data = await resp.json()
-      toast(`同步完成: ${nodeCount} 个节点 + ${data.saved_graphs} 个图已保存`)
-    } catch (e) {
-      toast('同步失败: ' + (e instanceof Error ? e.message : '网络错误'))
-    } finally {
-      setSyncing(false)
-    }
-  }
 
   const handleQuickConnect = (fromId: string, toId: string) => {
     const created = ensureQuickConnection(fromId, toId)
@@ -296,16 +271,6 @@ const NavView: React.FC = () => {
             </p>
           )}
         </div>
-        {isProMode() && (
-          <button
-            className={styles.syncBtn}
-            onClick={handleSync}
-            disabled={syncing}
-            title="同步所有数据到后端 YAML 文件"
-          >
-            {syncing ? '⏳' : '🔄'} 同步
-          </button>
-        )}
       </div>
 
       {/* 面包屑导航 */}
@@ -313,7 +278,7 @@ const NavView: React.FC = () => {
 
       <NavModeToggle mode={mode} onChange={setMode} />
 
-      {!inDrill && <GraphMultiSelect />}
+      <GraphMultiSelect />
 
       <div className={styles.canvasWrap}>
         {!hasCanvasData && (

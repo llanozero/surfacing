@@ -1,0 +1,335 @@
+graph_id: g5
+graph_label: 他人与我 · 信号简化
+graph_description: 让他人安全地认识无法随大流的"我自己"—变异临界点、体面替代策略、黑盒操作与支持圈分层
+cognitive_cards:
+- id: root/social/1
+  title: 变异临界点
+  type: folder
+  tag: 问题识别
+  description: 他人对某人的判断从"良性"转向"恶性"的临界节点——越过此点后，真实困境的暴露会招致排斥而非帮助
+  corpus:
+  - 变异临界点是他人判断从"良性"转向"恶性"的临界节点。越过此节点后，真实困境的暴露会招致排斥而非帮助。
+  - 核心矛盾：暴露真实则被排斥，隐藏真实则无人援助。这是一个无法靠"更真诚"或"更坚强"解决的结构性困境。
+  - 破局方向不是"让环境更包容"，而是用体面替代策略绕过临界点的判断机制。
+  bound_nodes:
+  - node-variation-start
+- id: root/social/1/1
+  title: 破窗效应
+  type: leaf
+  tag: 恶性循环
+  description: 一旦表现出"破损状态"，他人用统一标准衡量，产生新负面评价，形成"初始伤害→状态变差→被否定→状态更差"的恶性螺旋
+  corpus:
+  - 破窗效应描述的是变异临界点被触发后的恶性循环：初始伤害 → 状态变差（破窗）→ 他人用统一标准衡量 → 不达标 → 新的负面评价 → 状态更差。
+  - 它与变异临界点的区别：临界点是单次阈值，破窗效应是触发后的自加速循环。
+  - 体面替代策略的作用：在临界点到达之前，提供一个不会被判断为"破窗"的解释框架。
+  bound_nodes:
+  - node-variation-start
+- id: root/social/2
+  title: 体面替代策略
+  type: folder
+  tag: 核心策略
+  description: 将真实但不可接受的困境翻译为社会可接受的"体面理由"，绕过变异临界点的判断机制
+  corpus:
+  - 体面替代策略是将真实但不可接受的困境，翻译为社会可接受的"体面理由"，绕过变异临界点的判断机制。
+  - 它不是谎言——是对真实困境的翻译，将需要专业背景才能理解的痛苦，翻译成社会通用的语言。
+  - 体面理由的三个特征：可理解（不需特殊背景知识）、不引发防御（不被视为指责或求助）、有限透明度（信息量刚好够用）。
+  bound_nodes:
+  - node-dignified-strategy
+- id: root/social/2/1
+  title: 翻译四步法
+  type: leaf
+  tag: 操作协议
+  description: 体面替代策略的具体操作流程：识别核心诉求 → 寻找社会等价物 → 构建可讲述叙事 → 预留退出/升级通道
+  corpus:
+  - 第一步：识别核心诉求——剥离情感包装，找到功能性的本质（需要时间？空间？资源？）。
+  - 第二步：寻找社会等价物——哪些正常行为可以产生与需求相似的结果？（需要独处→"专注学习"；需要暂停→"重新规划"）。
+  - 第三步：构建可讲述叙事——保持连续性：过去（正常）→ 现在（特殊安排）→ 未来（回归正常）。
+  - 第四步：预留退出/升级通道——好转时自然回归，恶化时可升级叙事而不引起怀疑。
+  bound_nodes:
+  - node-translate-four
+- id: root/social/2/2
+  title: 体面理由的特征
+  type: leaf
+  tag: 质量门禁
+  description: 一个好的体面理由必须同时满足：可理解、不引发防御、不暴露脆弱性、有主动感、有限透明度
+  corpus:
+  - 可理解：对方不需要特殊背景知识就能明白。
+  - 不引发防御：不让他人觉得是在指责或求助。
+  - 不暴露脆弱性：不让他人掌握可伤害你的软肋。
+  - 有主动感：展示你在采取行动，而非被动承受。
+  - 有限透明度：信息量刚好够用，不多不少。
+  - 对照表：真实困境"重度抑郁无法工作" → 体面理由"目前在调整职业方向，需要一些时间沉淀"。
+  bound_nodes:
+  - node-dignified-strategy
+- id: root/social/3
+  title: 黑盒操作
+  type: folder
+  tag: 策略工具
+  description: 不解释底层原理的行为或表达，旨在激发对方的"反推意图"，引发好奇和深入探究
+  corpus:
+  - 黑盒操作的核心是"不解释原理"。行为看似随意，实则精心设计，但底层逻辑不可观测。
+  - 这种不可观测性迫使对方反推你的意图，从而激发参与感和投入——是一种无形但高效的能量流动。
+  - 成功标志：对方产生了主动探究欲望。不是"你解释清楚了吗"，而是"他想知道更多"。
+  - 分寸感的关键：在对方表现出探究欲望时，确立稳定的"锚点对接"——提供你某个角色的稳定接口。
+  bound_nodes:
+  - node-blackbox
+- id: root/social/3/1
+  title: 剧情化
+  type: leaf
+  tag: 策略扩展
+  description: 黑盒操作在时间维度上的扩展——将困境叙事包装为有吸引力的人生故事，让他人从"解救者"变为"参与者/见证者"
+  corpus:
+  - 剧情化是黑盒操作在时间维度上的扩展。黑盒定义"做什么"（不解释原理引出好奇），剧情化定义"如何维持"（经营叙事节奏）。
+  - 核心转变：他人角色从"解救者/施舍者"变为"参与者/见证者/同路人"。
+  - 操作要点：叙事调性从悲惨压抑变为有张力有悬念有成长线；互动模式从单向倾诉变为双向探索。
+  - 关键区分：剧情化≠单纯卖惨。卖惨是"一次性倾诉"，用完示弱额度就没有了。剧情化是可持续的——他人期待"下一集"。
+  bound_nodes:
+  - node-dramatize
+- id: root/social/4
+  title: 代际翻译
+  type: leaf
+  tag: 信号通道
+  description: 将非同龄人无法直接体验的事物，通过对方可理解的框架进行转译——核心信号通道之一
+  corpus:
+  - 代际翻译解决的是"非同龄人无法直接体会到另一代人经历的事物"这个结构化鸿沟。
+  - 翻译不是简化，而是框架转换——从你的经验框架转换到对方能共鸣的框架。
+  - 代际翻译与体面替代策略的关系：翻译四步法是对代际翻译的规范化和可操作化。
+  bound_nodes:
+  - node-translation
+- id: root/social/5
+  title: 同龄验证
+  type: leaf
+  tag: 信号通道
+  description: 同龄人之间互动证明有效性 → 展示结果 → 上一代人产生信任 → 获得资源支持
+  corpus:
+  - 同龄验证的核心逻辑链：同龄人验证有效性 → 展示结果 → 上一代人产生信任 → 获得资源支持。
+  - 同龄人之间的优势：天然共鸣、可直接碰撞、共同体验产生信任。非同龄人则需要通过翻译才能理解。
+  - 策略意义：先用同类验证降低不确定性，再将验证结果作为信任凭证展示给上一代。这是从"被怀疑"到"被信任"的转化路径。
+  bound_nodes:
+  - node-peer-validation
+- id: root/social/6
+  title: 支持圈分层
+  type: folder
+  tag: 环境映射
+  description: 个体社交关系的三层结构——外部圈（美好形象）、内部圈（真实琐碎）、共鸣圈（相互激活）
+  corpus:
+  - 外部圈：展示美好的、值得期待和探索的形象。策略：展现想象空间，激发投资和期待。不暴露真实困境和挣扎。
+  - 内部圈：容纳真实的、琐碎的、正在挣扎的过程。策略：习惯真实，容纳脆弱和不确定性。不需要维持形象。
+  - 共鸣圈：基于新形象的相互激活，不知道你的过去。策略：用新的面向激发彼此的共鸣和想象。
+  - 圈层之间的切换不是分裂——每个圈层看到的是你的一个侧面，如果把它们全放进一个圈层，会导致认同载体过度集中和路径依赖。
+  bound_nodes:
+  - node-circle-stratify
+- id: root/social/6/1
+  title: 生态位
+  type: leaf
+  tag: 关系动态
+  description: 每个人周围有限且相对固定的社交角色空间。进入机会在于对方生态位中是否缺少你这种类型
+  corpus:
+  - 生态位概念描述了一个人在他人社交空间中占据的独特位置。每个生态位空间有限，包含不同类型角色。
+  - 进入机会：如果对方生态位中缺少你这种类型，则容易直接进入。
+  - 替代可能：如果已有相似类型，替代需要提供更优价值。资源关系会"轻轻转移"到你这边。
+  - 形象弹性：在不同生态位中保留不同面向，不把所有面向暴露给同一个人。
+  bound_nodes:
+  - node-niche
+- id: root/social/6/2
+  title: 路径依赖
+  type: leaf
+  tag: 陷阱预警
+  description: 长期依赖某个单一支持节点或社交角色后，一旦该节点消失，自身会失去对应功能的风险
+  corpus:
+  - 路径依赖是支持圈层管理中最常见的风险——某个圈层太安全、太舒适，导致你过度依赖。
+  - 林远案例：阿凯（发小）的圈层是最安全的"真空释放阀"，但如果只在阿凯面前释放真实，阿凯某天不在，释放阀就断了。
+  - 解法：多培养1-2个同等深度的内部支持节点，分散路径依赖风险。
+  bound_nodes:
+  - node-path-dependency
+- id: root/social/7
+  title: 信号简化
+  type: folder
+  tag: 元机制
+  description: 他人与我轴的核心机制——压缩信号中的"创伤噪音"，只传递环境能消化的信息。目标不是被完全理解，而是不被误判为威胁
+  corpus:
+  - 信号简化是他人与我轴贯穿所有策略的元机制。体面理由、代际翻译、黑盒操作、剧情化，都是信号简化的具体形态。
+  - 核心理念：不让环境判断你"有没有病"，只让环境收到你"在做什么"。
+  - 信号简化≠让环境理解"真实的我"。目标是"不被误判为威胁"，而非"被完全理解"。
+  - 在变异临界点到来之前，主动为环境提供一个可接受的认知框架——这是信号简化的本质定位。
+  bound_nodes:
+  - node-signal-simplify
+- id: root/social/8
+  title: 支持圈层的身份切换
+  type: folder
+  tag: 操作实例
+  description: 基于剧情模拟案例的圈层切换实战指南——外部圈（投资饭局）、内部圈（旧友客厅）、共鸣圈（社群活动）
+  corpus:
+  - 林远的三个锚点：每个圈层看到的是我的一个侧面；外部圈需要想象空间，内部圈需要真实存在；切换身份不是虚伪，是保护核心自我的弹性。
+  - 外部圈（投资人饭局）：翻译复杂性为商业语言、提及同龄人已验证、展现可靠清爽形象、不暴露真实困境。
+  - 内部圈（旧友客厅）：直接从表演状态切换到真空状态、坦诚脆弱、需要陪伴但不要求互动。
+  - 共鸣圈（即兴戏剧）：用模糊的未经解释的表达激发好奇（黑盒操作）、不纠正只肯定对方解读（锚点对接）。
+  bound_nodes:
+  - node-switch-practice
+navigation_nodes:
+- id: node-variation-start
+  label: 变异临界点入口
+  description: 暴露真实则被排斥，隐藏真实则无人援助。这不是"更真诚"或"更坚强"能解决的——需要绕过而非对抗。
+  bound_cards:
+  - root/social/1
+  - root/social/1/1
+  next_nodes:
+  - target_id: node-dignified-strategy
+    preset_weight: 0.9
+    browse_weight: 0.6
+    connection_type: preset
+  - target_id: node-translation
+    preset_weight: 0.5
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-dignified-strategy
+  label: 体面替代策略
+  description: 将真实困境翻译为社会可接受的"体面理由"。不是谎言，而是将痛苦翻译成社会通用的语言。
+  bound_cards:
+  - root/social/2
+  - root/social/2/2
+  next_nodes:
+  - target_id: node-translate-four
+    preset_weight: 0.85
+    browse_weight: 0.55
+    connection_type: preset
+  - target_id: node-blackbox
+    preset_weight: 0.5
+    browse_weight: 0.4
+    connection_type: browse_derived
+  - target_id: node-signal-simplify
+    preset_weight: 0.6
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-translate-four
+  label: 📋 翻译四步法
+  description: 识别核心诉求 → 寻找社会等价物 → 构建可讲述叙事 → 预留退出/升级通道。
+  bound_cards:
+  - root/social/2/1
+  next_nodes:
+  - target_id: node-peer-validation
+    preset_weight: 0.6
+    browse_weight: 0.4
+    connection_type: preset
+  - target_id: node-signal-simplify
+    preset_weight: 0.55
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-blackbox
+  label: ⬛ 黑盒操作
+  description: 不解释底层原理，激发对方"反推意图"。成功标志：对方产生了主动探究欲望。
+  bound_cards:
+  - root/social/3
+  next_nodes:
+  - target_id: node-dramatize
+    preset_weight: 0.8
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-translation
+    preset_weight: 0.4
+    browse_weight: 0.3
+    connection_type: browse_derived
+- id: node-dramatize
+  label: 🎭 剧情化
+  description: 黑盒操作的时间扩展——让他人从"解救者"变为"参与者/见证者"。可持续，他人期待"下一集"。
+  bound_cards:
+  - root/social/3/1
+  next_nodes:
+  - target_id: node-signal-simplify
+    preset_weight: 0.65
+    browse_weight: 0.45
+    connection_type: preset
+  - target_id: node-circle-stratify
+    preset_weight: 0.5
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-translation
+  label: 🔄 代际翻译
+  description: 将非同龄人无法直接体验的事物，通过对方可理解的框架进行转译——从你的框架转换到对方能共鸣的框架。
+  bound_cards:
+  - root/social/4
+  next_nodes:
+  - target_id: node-dignified-strategy
+    preset_weight: 0.75
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-peer-validation
+    preset_weight: 0.7
+    browse_weight: 0.45
+    connection_type: preset
+- id: node-peer-validation
+  label: 👥 同龄验证
+  description: 同龄人验证有效性 → 展示结果 → 上一代人产生信任 → 获得资源支持。从"被怀疑"到"被信任"的转化路径。
+  bound_cards:
+  - root/social/5
+  next_nodes:
+  - target_id: node-signal-simplify
+    preset_weight: 0.7
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-dignified-strategy
+    preset_weight: 0.6
+    browse_weight: 0.4
+    connection_type: browse_derived
+- id: node-circle-stratify
+  label: 🎯 支持圈分层
+  description: 外部圈（美好形象/激发投资）→ 内部圈（真实琐碎/容纳脆弱）→ 共鸣圈（新形象/相互激活）。
+  bound_cards:
+  - root/social/6
+  next_nodes:
+  - target_id: node-niche
+    preset_weight: 0.6
+    browse_weight: 0.4
+    connection_type: preset
+  - target_id: node-path-dependency
+    preset_weight: 0.7
+    browse_weight: 0.45
+    connection_type: preset
+  - target_id: node-switch-practice
+    preset_weight: 0.75
+    browse_weight: 0.5
+    connection_type: preset
+- id: node-niche
+  label: 🔗 生态位
+  description: 有限且相对固定的社交角色空间。缺少你这类型则容易进入；替代已有需提供更优价值。
+  bound_cards:
+  - root/social/6/1
+  next_nodes:
+  - target_id: node-circle-stratify
+    preset_weight: 0.6
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-path-dependency
+  label: ⚠ 路径依赖陷阱
+  description: 过度依赖单一支持节点或角色，节点消失则功能丧失。解法：多培养1-2个同等深度的替代节点。
+  bound_cards:
+  - root/social/6/2
+  next_nodes:
+  - target_id: node-circle-stratify
+    preset_weight: 0.8
+    browse_weight: 0.4
+    connection_type: preset
+- id: node-signal-simplify
+  label: 📡 信号简化·元机制
+  description: 压缩信号中的"创伤噪音"，只传递环境能消化的信息。目标不是"被完全理解"，而是"不被误判为威胁"。
+  bound_cards:
+  - root/social/7
+  next_nodes:
+  - target_id: node-variation-start
+    preset_weight: 0.3
+    browse_weight: 0.2
+    connection_type: browse_derived
+- id: node-switch-practice
+  label: 🎬 圈层切换实战
+  description: 林远案例——外部圈（投资饭局/商业语言）→ 内部圈（旧友客厅/真空状态）→ 共鸣圈（即兴戏剧/黑盒操作）。
+  bound_cards:
+  - root/social/8
+  next_nodes:
+  - target_id: node-circle-stratify
+    preset_weight: 0.7
+    browse_weight: 0.45
+    connection_type: browse_derived
+  - target_id: node-blackbox
+    preset_weight: 0.6
+    browse_weight: 0.4
+    connection_type: browse_derived

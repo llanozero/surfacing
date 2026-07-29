@@ -1,0 +1,208 @@
+graph_id: g6
+graph_label: 他人与他人 · 协作工具
+graph_description: 让他人与他人之间形成有效协作网络的工具项目——共享语言、协作协议、网络基础设施（待定义）
+cognitive_cards:
+- id: root/net/1
+  title: 他人与他人轴·概述
+  type: folder
+  tag: 定位
+  description: 与前两轴的本质区别——此轴不为自身认知或表达服务，而是让他人与他人之间形成有效的协作网络
+  corpus:
+  - 他人与他人轴是整个三轴结构中最上层的轴，建立在"内在稳定→环境容纳→他人协作"的递进关系之上。
+  - 与前两轴的本质区别：我与我轴是内向的（设计者也是执行者），他人与我轴是外向的（信号发送者），他人与他人轴是网络化的（连接者/平台提供者）。
+  - 当前状态：待定义。此文档记录已知的约束、候选方向、以及与已有概念的关联。具体形态需要后续构建。
+  bound_nodes:
+  - node-net-orient
+- id: root/net/1/1
+  title: 三轴递进关系
+  type: leaf
+  tag: 约束
+  description: 每个轴建立在前一轴的成果之上——内在稳定 → 环境容纳 → 他人之间协作
+  corpus:
+  - 他人与他人轴不能跳过前两轴直接构建。如果自我认知仍然是断裂的（我与我未稳），或者环境仍然在排斥你（他人与我未稳），你没有余力去构建他人之间的协作。
+  - 这条递进关系既是时间顺序，也是逻辑依赖：你只能把你已经拥有的东西分享给别人。认知锚点稳定了，才能成为他人之间的连接点；信号简化成功了，才能用自己的语言框架去容纳他人之间的沟通。
+  bound_nodes:
+  - node-net-orient
+  - node-net-prerequisite
+- id: root/net/2
+  title: 已知工具形态
+  type: folder
+  tag: 基础
+  description: 虽然协作工具本身待定义，已有概念中已经蕴含了他人与他人协作的种子
+  corpus:
+  - 认知卡片系统（Card Collaboration）是三轴交汇的共享工具形态。在我与我是认知锚点的物化，在他人与我是信号的输出，在他人与他人是可共享的协作语言和协议。
+  - 现有的"同龄验证"机制已经隐含了他人与他人协作的雏形——同龄人之间的互动本身就是一种协作验证网络。
+  - "剧情化"中的角色分配（解救者→参与者/见证者）指向了一种关系设计语言，可以扩展为定义他人之间如何协作的协议。
+  bound_nodes:
+  - node-net-seeds
+- id: root/net/2/1
+  title: 卡牌作为共享语言
+  type: leaf
+  tag: 候选形态
+  description: 认知卡片作为他人之间共享的协作语言——每张卡牌定义了一种角色、协议或协作模式
+  corpus:
+  - 每一张认知卡片在他人与他人轴中可以被重新定义为一种"协作原语"——定义一种关系角色、一种互动协议、一种协作模式。
+  - 例如：定义"黑盒操作"的卡片可以成为两个人之间"允许不解释"的协作协议；定义"内部圈"的卡片可以成为"这个空间里不需要表演"的圈层约定。
+  - 卡牌的层级继承（父子嵌套）天然适合构建从宏观协作框架到微观协作协议的层次化语言。
+  bound_nodes:
+  - node-net-language
+- id: root/net/2/2
+  title: 协作协议方向
+  type: leaf
+  tag: 候选形态
+  description: 定义他人之间如何协作的显式规则——从隐性默契到可共享、可协商的协议
+  corpus:
+  - 人与人之间的协作通常依赖隐性默契和个体经验。协作协议的目标是将这些隐性知识显式化为可共享的规则。
+  - 可能的协议类型：角色定义（谁做什么）、能量交换规则（给予和接受的边界）、冲突处理协议（意见不一致时怎么做）、圈层切换规则（外界进入协作网络的通道）。
+  - 这不是"规则手册"，而是"可协商的协议"——每次协作前双方确认或调整协议的条款。
+  bound_nodes:
+  - node-net-protocol
+- id: root/net/2/3
+  title: 网络基础设施方向
+  type: leaf
+  tag: 候选形态
+  description: 降低他人之间协作摩擦的系统——匹配、调度、同步机制
+  corpus:
+  - 网络基础设施是降低他人之间协作摩擦的技术系统。类比：道路降低交通摩擦，协议降低通信摩擦，市场降低交易摩擦。
+  - 在认知导航工具的语境下，网络基础设施可以包括：协作方匹配机制（谁需要谁）、能量状态同步（谁现在有空）、协作痕迹记录（谁和谁合作过、结果如何）。
+  - 注意：此方向容易过度工程化。前两轴的教训是"工具应环境级而非指令级"——网络基础设施应创造协作条件，而非规定协作方式。
+  bound_nodes:
+  - node-net-infra
+- id: root/net/3
+  title: 设计约束
+  type: folder
+  tag: 边界条件
+  description: 从已有领域模型继承的设计约束——任何他人与他人轴的实现必须满足以下条件
+  corpus:
+  - 来源于认知导航工具的核心约束：工具必须是环境级而非指令级——只改变协作条件，不规定协作方式。
+  - 来源于信号简化的核心约束：不要求参与者暴露"真实的自己"——协作可以基于角色而非全人。
+  - 来源于表达推进的约束：协作语言必须支持表达即推进——协作过程中的表达本身应推进各方的认知。
+  - 来源于能量运营的约束：协作需匹配参与者各自的能量状态——六环原则同样适用于他人的能量节律。
+  bound_nodes:
+  - node-net-constraints
+- id: root/net/3/1
+  title: 环境而非指令
+  type: leaf
+  tag: 设计原则
+  description: 工具不告诉他人"该做什么协作"，只创造一个让协作自然发生的条件
+  corpus:
+  - 这是我与我轴中"环境级工具"原则的扩展。工具改变条件而非规定行为。
+  - 在他人与他人轴的体现：创造一个让他人之间协作更容易发生的环境（共享语言、匹配机制、痕迹记录），但不规定他们应该以什么方式协作、协作多久、产出什么。
+  bound_nodes:
+  - node-net-constraints
+- id: root/net/3/2
+  title: 角色而非全人
+  type: leaf
+  tag: 设计原则
+  description: 协作可以基于角色而非全人——不要求参与者暴露真实自我
+  corpus:
+  - 这是我与我轴中"设计者/执行者身份隔断"和他人与我轴中"信号简化"的共同延伸。
+  - 在他人与他人轴的体现：一个参与者在协作网络中可以有多个角色（而非一个"真实身份"），不同角色之间可以不一致，且不需要向其他参与者解释这种不一致。
+  - 这是"形象弹性"在协作网络中的映射——不是分裂，而是保护核心自我的弹性。
+  bound_nodes:
+  - node-net-constraints
+- id: root/net/3/3
+  title: 协作即表达
+  type: leaf
+  tag: 设计原则
+  description: 协作过程中的表达本身就是各方认知推进的通道——不是"先想清楚再协作"，而是在协作中想清楚
+  corpus:
+  - 这是表达即推进元属性在"他人与他人"维度的体现。协作不仅仅是"交换已知的信息"，而是各方在协作中共同推进认知。
+  - 设计含义：协作工具不应预设"参与者已经准备好了要说什么"，而应设计为"在协作中说清楚"——表达本身就是思考过程的一部分。
+  bound_nodes:
+  - node-net-constraints
+navigation_nodes:
+- id: node-net-orient
+  label: 🧭 他人与他人·定位
+  description: 三轴中最上层的轴——让你成为他人之间协作的连接者/平台提供者，而非仅仅是信息发送者。当前待定义。
+  bound_cards:
+  - root/net/1
+  - root/net/1/1
+  next_nodes:
+  - target_id: node-net-prerequisite
+    preset_weight: 0.9
+    browse_weight: 0.6
+    connection_type: preset
+  - target_id: node-net-seeds
+    preset_weight: 0.7
+    browse_weight: 0.5
+    connection_type: preset
+- id: node-net-prerequisite
+  label: ⛰ 前轴依赖
+  description: 不能跳过前两轴直接构建。内在稳定→环境容纳→他人协作。先完成我与我，再完成他人与我，再进入此轴。
+  bound_cards:
+  - root/net/1/1
+  next_nodes:
+  - target_id: node-net-orient
+    preset_weight: 0.5
+    browse_weight: 0.3
+    connection_type: browse_derived
+- id: node-net-seeds
+  label: 🌱 已有的种子
+  description: 认知卡片系统、同龄验证、剧情化中的角色分配——这些已有概念已经蕴含了协作工具的雏形。
+  bound_cards:
+  - root/net/2
+  next_nodes:
+  - target_id: node-net-language
+    preset_weight: 0.82
+    browse_weight: 0.55
+    connection_type: preset
+  - target_id: node-net-protocol
+    preset_weight: 0.7
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-net-infra
+    preset_weight: 0.5
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-net-language
+  label: 🃏 卡牌作为共享语言
+  description: 认知卡片在他人与他人轴中重新定义为"协作原语"——每种卡片定义一种角色、协议或协作模式。
+  bound_cards:
+  - root/net/2/1
+  next_nodes:
+  - target_id: node-net-protocol
+    preset_weight: 0.7
+    browse_weight: 0.45
+    connection_type: preset
+  - target_id: node-net-constraints
+    preset_weight: 0.5
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-net-protocol
+  label: 📜 协作协议
+  description: 将隐性协作默契转化为可共享、可协商的显式协议——角色定义、能量交换规则、冲突处理。
+  bound_cards:
+  - root/net/2/2
+  next_nodes:
+  - target_id: node-net-language
+    preset_weight: 0.6
+    browse_weight: 0.4
+    connection_type: browse_derived
+  - target_id: node-net-infra
+    preset_weight: 0.55
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-net-infra
+  label: 🏗 网络基础设施
+  description: 降低协作摩擦的技术系统——匹配、调度、同步。注意：避免过度工程化，应环境级而非指令级。
+  bound_cards:
+  - root/net/2/3
+  next_nodes:
+  - target_id: node-net-constraints
+    preset_weight: 0.8
+    browse_weight: 0.5
+    connection_type: preset
+- id: node-net-constraints
+  label: ⚖ 设计约束
+  description: 从已有领域模型继承的设计约束——环境而非指令、角色而非全人、协作即表达。
+  bound_cards:
+  - root/net/3
+  - root/net/3/1
+  - root/net/3/2
+  - root/net/3/3
+  next_nodes:
+  - target_id: node-net-orient
+    preset_weight: 0.4
+    browse_weight: 0.25
+    connection_type: browse_derived

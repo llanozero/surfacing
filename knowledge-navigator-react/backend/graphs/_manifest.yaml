@@ -1,23 +1,44 @@
 graphs:
-  - graph_id: g1
-    file: g1-ml.yaml
-    label: 机器学习
-    description: 机器学习核心概念与算法导航图
-    created_at: '2026-07-20T00:00:00Z'
-    node_count: 18
-    card_count: 35
-  - graph_id: g2
-    file: g2-math.yaml
-    label: 数学基础
-    description: 概率论、线性代数与微积分——机器学习与数据科学的数学基础
-    created_at: '2026-07-26T00:00:00Z'
-    node_count: 8
-    card_count: 8
-  - graph_id: g3
-    file: g3-psychology.yaml
-    label: 认知心理学
-    description: 人类认知过程：注意力、记忆、思维与心智模型
-    created_at: '2026-07-26T00:00:00Z'
-    node_count: 7
-    card_count: 12
-next_graph_number: 4
+- graph_id: g1
+  file: g1-ml.yaml
+  label: 机器学习
+  description: 机器学习核心概念与算法导航图
+  created_at: '2026-07-20T00:00:00Z'
+  node_count: 26
+  card_count: 37
+- graph_id: g2
+  file: g2-math.yaml
+  label: 数学基础
+  description: 概率论、线性代数与微积分——机器学习与数据科学的数学基础
+  created_at: '2026-07-26T00:00:00Z'
+  node_count: 8
+  card_count: 8
+- graph_id: g3
+  file: g3-psychology.yaml
+  label: 认知心理学
+  description: 人类认知过程：注意力、记忆、思维与心智模型
+  created_at: '2026-07-26T00:00:00Z'
+  node_count: 7
+  card_count: 12
+- graph_id: g4
+  file: g4-self.yaml
+  label: 我与我 · 认知导航
+  description: 认知断裂后的功能代偿路径——设计者↔执行者循环、认知锚点重建与重温人性
+  created_at: '2026-07-29T00:00:00Z'
+  node_count: 14
+  card_count: 16
+- graph_id: g5
+  file: g5-social.yaml
+  label: 他人与我 · 信号简化
+  description: 让他人安全地认识无法随大流的"我自己"—变异临界点、体面替代策略、黑盒操作与支持圈分层
+  created_at: '2026-07-29T00:00:00Z'
+  node_count: 12
+  card_count: 15
+- graph_id: g6
+  file: g6-network.yaml
+  label: 他人与他人 · 协作工具
+  description: 让他人与他人之间形成有效协作网络的工具项目——共享语言、协作协议、网络基础设施（待定义）
+  created_at: '2026-07-29T00:00:00Z'
+  node_count: 7
+  card_count: 10
+next_graph_number: 7

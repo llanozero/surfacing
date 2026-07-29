@@ -1,0 +1,422 @@
+graph_id: g4
+graph_label: 我与我 · 认知导航
+graph_description: 认知断裂后的功能代偿路径——设计者↔执行者循环、认知锚点重建与重温人性
+cognitive_cards:
+- id: root/self/1
+  title: 创伤解离与认知断裂
+  type: folder
+  tag: 问题识别
+  description: 因早期创伤导致的人格碎片化与认知功能受损——解离失忆、锚点紊乱、意识断裂、人性缺失
+  corpus:
+  - 创伤解离是因早期创伤导致的人格碎片化和认知功能受损状态。核心断裂链：解离失忆 → 认知锚点紊乱 → 意识断裂 → 人性缺失。
+  - 这不是"性格问题"或"不够努力"，而是认知功能的结构性损伤，需要结构化工具代偿而非意志力克服。
+  bound_nodes:
+  - node-self-start
+- id: root/self/1/1
+  title: 解离失忆
+  type: leaf
+  tag: 断裂环节
+  description: 在需要表达或面对压力时难以维持连续的自我叙事，出现记忆空白和身份暂时性断裂
+  corpus:
+  - 解离失忆表现为在压力场景中思维突然空白、无法调用已知信息、难以组织语言。
+  - 核心矛盾：不是"没记住"，而是"在需要调用的时刻，访问通道被阻断"。认知导航工具提供外部记忆锚点绕过此通道。
+  bound_nodes:
+  - node-self-start
+- id: root/self/1/2
+  title: 认知锚点紊乱
+  type: leaf
+  tag: 断裂环节
+  description: 在不同状态间迷失方向，缺乏稳定的内部参照系
+  corpus:
+  - 认知锚点紊乱表现为在不同身份、状态、场景间切换时失去方向感，无法确认"我现在是谁""我该用什么方式应对"。
+  - 锚点紊乱的根源：内部参照系因创伤被破坏，需要外部物化的认知锚点重建稳定感。
+  bound_nodes:
+  - node-self-start
+- id: root/self/1/3
+  title: 意识断裂
+  type: leaf
+  tag: 断裂环节
+  description: 无法连续体验"我是谁"，自我体验呈碎片化
+  corpus:
+  - 意识断裂不只是"注意力不集中"，而是自我意识在时间轴上的连续体验被打断，产生"过去的我和现在的我不是同一个人"的感觉。
+  - 重建路径：通过设计者↔执行者循环，用仪式建立合法的"断裂通道"，让断裂本身成为可预期的流程而非意外创伤。
+  bound_nodes:
+  - node-self-start
+- id: root/self/1/4
+  title: 人性缺失
+  type: leaf
+  tag: 断裂环节
+  description: 长期孤独探索导致失去与常人共鸣的基础感知
+  corpus:
+  - 人性缺失不是道德缺陷，而是长期脱离人类社会互动后，对常人的情感语言和社交常识失去直觉感知能力。
+  - 代偿方向：通过"重温人性"阶段系统重建——从向下兼容阶梯的顶层（热线）开始，逐级向更接近日常的受众迁移。
+  bound_nodes:
+  - node-self-start
+  - node-warm-humanity
+- id: root/self/2
+  title: 功能代偿机制
+  type: folder
+  tag: 核心机制
+  description: 用结构化工具替代缺失的自然认知功能——认知导航工具作为"认知的拐杖"
+  corpus:
+  - 功能代偿借用医学隐喻：骨折后用拐杖代偿行走功能，肾衰后用透析代偿肾功能。认知断裂后用结构化工具代偿认知功能。
+  - 在我与我轴，功能代偿的形态是"认知导航工具"——将混乱的内在体验转化为可操作的、可视化的、可外部化的流程。
+  - 关键原则：代偿工具不是"治愈"，而是"让功能缺失者能够正常参与"。代偿不修复断裂，但它让断裂不再阻断行动。
+  bound_nodes:
+  - node-self-compensation
+- id: root/self/2/1
+  title: 认知导航工具
+  type: leaf
+  tag: 代偿形态
+  description: 将三层领域模型从静态概念结构转化为可操作状态导航的工具，是功能代偿在我与我轴的具体形态
+  corpus:
+  - 认知导航工具将三层领域模型（心理康复、社会导航、能量运营）从"静态概念结构"转化为"可操作状态导航"。
+  - 它不定义"有什么"，而定义"谁在什么状态下操作什么"。核心输出是设计者↔执行者循环、认知卡片系统、模式切换仪式。
+  bound_nodes:
+  - node-self-compensation
+  - node-designer-executor
+- id: root/self/2/2
+  title: 认知锚点重建
+  type: leaf
+  tag: 代偿形态
+  description: 在人格整合或社交切换期间提供稳定参照的核心信念或行为准则——锚点不变，面向可以变
+  corpus:
+  - 认知锚点在人格整合期间提供稳定参照。林远的三个锚点：每个圈层看到的是我的一个侧面；外部圈需要想象空间，内部圈需要真实存在；切换身份不是虚伪，是保护核心自我的弹性。
+  - 锚点的关键性质：对设计者它是设计出来的准则，对执行者它是不需要思考的本能。
+  - 物化形态：认知卡片作为锚点的外部存储——不看时可以遗忘，需要时回到卡片即可。
+  bound_nodes:
+  - node-self-anchor
+- id: root/self/3
+  title: 设计者↔执行者循环
+  type: folder
+  tag: 操作循环
+  description: 系统的核心运行循环——设计者锚点 → 模式切换 → 执行者具身 → 设计者复盘 → 外沿扩大
+  corpus:
+  - 设计者↔执行者循环是认知导航工具的操作核心。每一次循环完成一次"认知提取"和"范围扩展"。
+  - 循环的两大防线：模式切换仪式（防止设计者心态污染执行者沉浸）和提前复盘死锁预警（防止未完成的执行被提前中止）。
+  bound_nodes:
+  - node-designer-executor
+- id: root/self/3/1
+  title: 设计者身份
+  type: leaf
+  tag: 操作角色
+  description: 负责设计策略、复盘优化、构建工具和锚点的状态。设计者必须在进入执行场景前完成所有设计，不得现场修改
+  corpus:
+  - 设计者视角是元认知的、分析性的，它的工作是设计和优化。设计者必须在进入执行场景前完成所有设计工作，不得在执行中现场修改脚本。
+  - 与"表演协议"的关系：手册中的"表演协议"本质是设计者心态的工作——在外部圈层中预先设计角色脚本，但进入场景后由执行者"表演"。
+  bound_nodes:
+  - node-designer-state
+- id: root/self/3/2
+  title: 执行者身份
+  type: leaf
+  tag: 操作角色
+  description: 负责按设计执行、沉浸体验、不分析不评判的状态。执行者越"无知"，执行越纯粹
+  corpus:
+  - 执行者视角是具身的、直觉性的。执行者的核心原则"遗忘即信任"——不知道设计者的全部意图，执行越纯粹。
+  - 认知导航工具对执行者应该是不可见的"空气"。执行者只需要"做"，不需要知道"为什么这么设计"。
+  bound_nodes:
+  - node-executor-state
+- id: root/self/3/3
+  title: 模式切换仪式
+  type: leaf
+  tag: 操作边界
+  description: 从设计态到执行态的物理/仪式性隔断。需要真实成本——换装、换环境、特定动作序列，不可想切就切
+  corpus:
+  - 模式切换仪式防止设计者的审视目光持续污染执行者的沉浸。成本的存在阻止随意切换。
+  - 形式可以是：换一件特定的衣服、移动到特定位置、完成一组固定动作序列、打开特定的环境声音。
+  - 与"表演协议"的关系：切换仪式执行完毕后，才进入场景。进入场景后，执行者不再参考设计笔记。
+  bound_nodes:
+  - node-switch-ritual
+- id: root/self/3/4
+  title: 提前复盘死锁
+  type: leaf
+  tag: 陷阱预警
+  description: 系统最常见的崩溃路径——执行者体验不充分 → 设计者提前复盘 → 负面反馈 → 再度崩溃 → 螺旋恶化
+  corpus:
+  - 提前复盘死锁是设计者心态在不当时间介入导致的循环Bug：设计者心态 → 未经历足够执行者具身 → 提前复盘 → 崩溃报错波及执行者状态 → 再度崩溃 → 再度提前复盘 → 再度崩溃。
+  - 唯一解法：在感到"想要复盘"时，先检查是否已完整经历执行者具身。如果没有——回到执行者轨道，继续沉浸，不要复盘。
+  - 这是整个认知导航系统中最危险的Bug，也是"模式A（脚本预演型）"蹩脚感的根源：设计者在执行场景中仍在优化脚本。
+  bound_nodes:
+  - node-premature-review
+- id: root/self/3/5
+  title: 锦囊路径映射
+  type: folder
+  tag: 工具集
+  description: 设计者↔执行者循环的八个关键分支节点——A 锚点确立 → B 迷失预警 → C 负向沉沦 → D 自防御后 → E 回归执行者 → F 具身认知临战 → G 复盘提取 → H 提前复盘警告
+  corpus:
+  - 八个锦囊对应循环中的八个关键分支节点。每个锦囊解决一个特定的状态异常。
+  - 关键防线：锦囊H（提前复盘警告）是提前复盘死锁的第一道防线——在感到想要复盘时立即警告，阻止设计者心态的过早介入。
+  bound_nodes:
+  - node-kit-a
+  - node-kit-b
+  - node-kit-c
+  - node-kit-d
+  - node-kit-e
+  - node-kit-f
+  - node-kit-g
+  - node-kit-h
+- id: root/self/4
+  title: 重温人性
+  type: folder
+  tag: 重建路径
+  description: 人格整合完成后，重新学习人际互动常识的阶段——系统化重建与常人共鸣的基础感知
+  corpus:
+  - 重温人性是人格解离→认知锚点保护→人格整合完成后的下一步：重新学习和人打交道的常识。
+  - 这不是"自然恢复"，而是需要系统化训练的路径：从最安全的环境开始，逐级挑战。
+  - 核心工具：向下兼容阶梯——按受众的专业兼容度从高到低分层训练。
+  bound_nodes:
+  - node-warm-humanity
+- id: root/self/4/1
+  title: 向下兼容阶梯
+  type: leaf
+  tag: 训练协议
+  description: 按受众专业兼容度从高到低分层训练：热线 → 半专业人士 → 亲戚 → 父母 → 职场。每级检验标准是"对方能否理解"
+  corpus:
+  - 向下兼容阶梯是重温人性阶段的具体训练协议。它利用社会系统中不同受众的"向下兼容梯度"进行分层训练。
+  - 五个层次：热线（专业兼容度最高，但容易产生虚假自信）→ 半专业人士 → 亲戚（血缘缓冲）→ 父母（最难）→ 职场（终极考场）。
+  - 关键变量：受众的专业兼容度、受众的血缘缓冲度、话题的自我暴露深度、成功归因的准确性。
+  - 虚假自信陷阱：区分"环境兼容了我的表达"和"我具备了表达能力"。前者是热线的专业向下兼容带来的错觉。
+  bound_nodes:
+  - node-downward-ladder
+navigation_nodes:
+- id: node-self-start
+  label: 认知断裂入口
+  description: 解离失忆 → 锚点紊乱 → 意识断裂 → 人性缺失。不是性格缺陷，而是认知功能的结构性损伤，需要结构化工具代偿。
+  bound_cards:
+  - root/self/1
+  - root/self/1/1
+  - root/self/1/2
+  - root/self/1/3
+  - root/self/1/4
+  next_nodes:
+  - target_id: node-self-compensation
+    preset_weight: 0.9
+    browse_weight: 0.6
+    connection_type: preset
+  - target_id: node-self-anchor
+    preset_weight: 0.6
+    browse_weight: 0.4
+    connection_type: browse_derived
+- id: node-self-compensation
+  label: 功能代偿·认知导航
+  description: 用结构化工具替代缺失的自然认知功能——认知导航工具作为"认知的拐杖"，不修复断裂但让断裂不再阻断行动。
+  bound_cards:
+  - root/self/2
+  - root/self/2/1
+  next_nodes:
+  - target_id: node-self-anchor
+    preset_weight: 0.75
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-designer-executor
+    preset_weight: 0.85
+    browse_weight: 0.55
+    connection_type: preset
+  - target_id: node-downward-ladder
+    preset_weight: 0.4
+    browse_weight: 0.3
+    connection_type: browse_derived
+- id: node-self-anchor
+  label: 认知锚点建立
+  description: 在混乱中提供"不变的点"。锚点不变，面向可以变。对设计者是设计准则，对执行者是不需思考的本能。
+  bound_cards:
+  - root/self/2/2
+  next_nodes:
+  - target_id: node-designer-executor
+    preset_weight: 0.8
+    browse_weight: 0.52
+    connection_type: preset
+  - target_id: node-warm-humanity
+    preset_weight: 0.5
+    browse_weight: 0.35
+    connection_type: browse_derived
+- id: node-designer-executor
+  label: 设计者↔执行者循环
+  description: 核心运行循环：设计者锚点 → 模式切换 → 执行者具身 → 设计者复盘 → 外沿扩大。每一次循环完成一次认知提取和范围扩展。
+  bound_cards:
+  - root/self/3
+  next_nodes:
+  - target_id: node-designer-state
+    preset_weight: 0.85
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-executor-state
+    preset_weight: 0.85
+    browse_weight: 0.5
+    connection_type: preset
+  - target_id: node-switch-ritual
+    preset_weight: 0.7
+    browse_weight: 0.45
+    connection_type: preset
+  - target_id: node-premature-review
+    preset_weight: 0.6
+    browse_weight: 0.4
+    connection_type: browse_derived
+- id: node-designer-state
+  label: 设计态·锚点确立
+  description: 设计策略、复盘优化、构建工具和锚点。设计者必须在进入执行场景前完成所有设计，不得在现场修改。
+  bound_cards:
+  - root/self/3/1
+  next_nodes:
+  - target_id: node-switch-ritual
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-a
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-switch-ritual
+  label: 模式切换仪式
+  description: 设计态到执行态的物理/仪式性隔断。需要真实成本，不可想切就切。成本阻止设计者的审视目光污染执行者的沉浸。
+  bound_cards:
+  - root/self/3/3
+  next_nodes:
+  - target_id: node-executor-state
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-executor-state
+  label: 执行态·沉浸体验
+  description: 按设计执行、具身沉浸、不分析不评判。执行者越"无知"（不知道设计者的全部意图），执行越纯粹。
+  bound_cards:
+  - root/self/3/2
+  next_nodes:
+  - target_id: node-kit-e
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-f
+    preset_weight: 0.9
+    browse_weight: 0
+    connection_type: preset
+- id: node-premature-review
+  label: ⚠ 提前复盘死锁
+  description: 系统最危险的Bug——执行者体验不充分 → 设计者提前复盘 → 负面反馈 → 再度崩溃 → 螺旋恶化。解法：检查是否已完整经历执行者具身。
+  bound_cards:
+  - root/self/3/4
+  next_nodes:
+  - target_id: node-executor-state
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-h
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-warm-humanity
+  label: 重温人性路径
+  description: 人格整合完成后的系统化重建阶段——从最安全的环境开始，逐级挑战，重建与常人共鸣的基础感知。
+  bound_cards:
+  - root/self/4
+  next_nodes:
+  - target_id: node-downward-ladder
+    preset_weight: 0.9
+    browse_weight: 0.6
+    connection_type: preset
+- id: node-downward-ladder
+  label: 📉 向下兼容阶梯
+  description: 热线（最高兼容）→ 半专业人士 → 亲戚（血缘缓冲）→ 父母 → 职场（终极考场）。每级检验标准：对方能否理解。
+  bound_cards:
+  - root/self/4/1
+  next_nodes:
+  - target_id: node-self-start
+    preset_weight: 0.3
+    browse_weight: 0.2
+    connection_type: browse_derived
+- id: node-kit-a
+  label: A · 锚点确立
+  description: 你正处于设计者心态——这不是需要被'克服'的东西，而是整个循环的稳定支点。承认它，信任流程，然后走进下一环。
+  bound_cards:
+  - root/self/3/5
+  next_nodes:
+  - target_id: node-kit-b
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-e
+    preset_weight: 0.9
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-b
+  label: B · 迷失预警
+  description: 迷失是节律的暂时断裂。不要对抗迷失，不要试图'纠正'。回到感官锚点——用身体而非思维来定位。
+  bound_cards:
+  - root/self/3/5
+  next_nodes:
+  - target_id: node-kit-c
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-e
+    preset_weight: 0.9
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-c
+  label: C · 负向沉沦
+  description: 负向信念是一个自指涉的语义闭环。此刻不需要答案，只需要暂停。允许自己失忆，让沉沦自然抵达终点。
+  bound_cards:
+  - root/self/3/5
+  next_nodes:
+  - target_id: node-kit-d
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-d
+  label: D · 自防御后
+  description: 身体抽离结束，失忆淡化了负面影响，但方向和经验也丢失了。此刻不要追溯复盘——用内生能量重新凝聚，回归锚点。
+  bound_cards:
+  - root/self/3/5
+  next_nodes:
+  - target_id: node-kit-a
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-e
+    preset_weight: 0.9
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-e
+  label: E · 回归执行者
+  description: 内生能量正在回来——它是生命自有、无须解释的力量。进入执行者心态，信任之前铺好的神经回路，不要思考"对不对"，只需经历。
+  bound_cards:
+  - root/self/3/5
+  next_nodes:
+  - target_id: node-kit-f
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+  - target_id: node-kit-g
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-f
+  label: F · 具身认知临战
+  description: 临门一脚捅破窗户纸的瞬间。不要命名、不要总结、不要提炼。沉浸，让答案自己从处境中长出来。
+  bound_cards:
+  - root/self/3/5
+  next_nodes:
+  - target_id: node-kit-g
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-g
+  label: G · 复盘提取
+  description: 回到设计者心态。复盘角度：'从环境上减少再度出发的可能性'，而非'我为什么又失败了'。前者是系统调试，后者是负向信念。
+  bound_cards:
+  - root/self/3/5
+  next_nodes:
+  - target_id: node-kit-a
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset
+- id: node-kit-h
+  label: H · ⚠ 提前复盘警告
+  description: 停止。你正在试图提前进入复盘——但执行者具身还不够。回到执行者轨道，继续经历。等够了，你自然会知道。
+  bound_cards:
+  - root/self/3/5
+  next_nodes:
+  - target_id: node-kit-e
+    preset_weight: 1.0
+    browse_weight: 0
+    connection_type: preset

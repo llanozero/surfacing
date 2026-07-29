@@ -14,7 +14,7 @@ export function isTtsPlaying(): boolean {
   return currentAudio !== null && !currentAudio.paused
 }
 
-function apiUrl(path: string): string {
+export function apiUrl(path: string): string {
   if (isProMode()) {
     return `${getBackendConfig().baseUrl}${path}`
   }

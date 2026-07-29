@@ -10,6 +10,7 @@ import { useViewStore } from '../../store/viewStore'
 import { useToastStore } from '../shared/Toast'
 import { useGraphStore } from '../../store/graphStore'
 import { useDrillStore } from '../../store/drillStore'
+import { triggerWarmup } from '../../utils/ttsWarmup'
 import { getNavNode } from '../../data/allNavNodes'
 
 const FreeBrowseView: React.FC = () => {
@@ -74,6 +75,10 @@ const FreeBrowseView: React.FC = () => {
     setTimeout(() => {
       jumpToNode(entryId!)
       setCurrentNode(entryId!)
+      // 钻入后触发预热（子图节点）
+      const parentNode = currentNode
+      const warmupNodes = [{ id: entryId, label: parentNode.label, description: parentNode.description }]
+      triggerWarmup(warmupNodes, targetId)
     }, 0)
     toast(`已钻入「${currentNode.label}」`)
   }, [currentNode, drillIn, jumpToNode, setCurrentNode, toast])

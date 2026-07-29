@@ -27,6 +27,7 @@ import {
   getConnectionStatus,
 } from '../../utils/quickConnectUtils'
 import { getNavNode } from '../../data/allNavNodes'
+import { triggerWarmup } from '../../utils/ttsWarmup'
 import type { NavNode, CanvasDataResponse, GraphEdge } from '../../data/types'
 
 type CanvasNode = CanvasDataResponse['nodes'][number]
@@ -88,6 +89,13 @@ const NavView: React.FC = () => {
     })
     return () => { cancelled = true }
   }, [selectedGraphIds.join(',')]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** 画布数据加载完成后触发 TTS 预热 */
+  useEffect(() => {
+    if (canvasNodes.length > 0) {
+      triggerWarmup(canvasNodes)
+    }
+  }, [canvasNodes])
 
   const hasCanvasData = inDrill || canvasNodes.length > 0
 

@@ -26,6 +26,7 @@ const TtsSettingsDialog: React.FC<TtsSettingsDialogProps> = ({ onClose }) => {
   const [voice, setVoice] = useState(getTtsConfig().voice)
   const [rate, setRate] = useState(getTtsConfig().rate)
   const [pitch, setPitch] = useState(getTtsConfig().pitch)
+  const [prewarm, setPrewarm] = useState(getTtsConfig().prewarm)
   const [testing, setTesting] = useState(false)
   const [error, setError] = useState('')
 
@@ -43,15 +44,16 @@ const TtsSettingsDialog: React.FC<TtsSettingsDialogProps> = ({ onClose }) => {
   const selectedVoice = voices.find((v) => v.name === voice)
 
   const handleSave = useCallback(() => {
-    setTtsConfig({ voice, rate, pitch })
+    setTtsConfig({ voice, rate, pitch, prewarm })
     onClose()
-  }, [voice, rate, pitch, onClose])
+  }, [voice, rate, pitch, prewarm, onClose])
 
   const handleReset = useCallback(() => {
     const d = getDefaultTtsConfig()
     setVoice(d.voice)
     setRate(d.rate)
     setPitch(d.pitch)
+    setPrewarm(d.prewarm)
   }, [])
 
   const handleTest = useCallback(async () => {
@@ -135,6 +137,23 @@ const TtsSettingsDialog: React.FC<TtsSettingsDialogProps> = ({ onClose }) => {
                 <span>+20Hz</span>
               </span>
             </label>
+
+            {/* ── 预热开关 ── */}
+            <div className={styles.prewarmSection}>
+              <label className={styles.prewarmToggle}>
+                <span className={styles.prewarmLabel}>启用后台预热</span>
+                <input
+                  type="checkbox"
+                  className={styles.prewarmCheckbox}
+                  checked={prewarm}
+                  onChange={(e) => setPrewarm(e.target.checked)}
+                />
+                <span className={styles.prewarmSwitch} />
+              </label>
+              <p className={styles.prewarmHint}>
+                首次加载导航图时自动预合成音频，减少等待时间
+              </p>
+            </div>
 
             {/* 试听 */}
             <button

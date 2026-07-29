@@ -4,6 +4,7 @@ export interface TtsConfig {
   voice: string
   rate: string   // e.g. '+0%', '-20%', '+50%'
   pitch: string  // e.g. '+0Hz', '-10Hz', '+5Hz'
+  prewarm: boolean
 }
 
 const STORAGE_KEY = 'kn_tts_config'
@@ -12,6 +13,7 @@ const DEFAULT: TtsConfig = {
   voice: 'zh-CN-XiaoxiaoNeural',
   rate: '+0%',
   pitch: '+0Hz',
+  prewarm: true,
 }
 
 export function getDefaultTtsConfig(): TtsConfig {
